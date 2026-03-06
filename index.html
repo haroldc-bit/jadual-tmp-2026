@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v6.3</title>
+    <title>Jadual Waktu Mingguan TMP Digital v6.4</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -38,17 +38,14 @@
         }
         .highlight-new { animation: high-visibility-flash 2.5s ease-out forwards; }
         
-        /* Custom Scrollbar for the week selector */
         .week-scrollbar::-webkit-scrollbar { height: 8px; display: block; }
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Top dummy scrollbar container */
         .top-scrollbar-container { overflow-x: auto; overflow-y: hidden; height: 16px; margin-bottom: 2px; }
         .top-scrollbar-dummy { height: 1px; }
 
-        /* General layout scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f8fafc; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -72,7 +69,6 @@
         };
 
         const App = () => {
-            // FIREBASE CONFIG (KEKAL)
             const firebaseConfig = {
                 apiKey: "AIzaSyBOCPBrZ-xkwEgi4OnkBwDB8YqGgWEuMVE",
                 authDomain: "jadual-tmp-digital.firebaseapp.com",
@@ -103,7 +99,6 @@
             const [lastUpdatedKey, setLastUpdatedKey] = useState(null);
             const [isSaving, setIsSaving] = useState(false);
 
-            // Refs for synchronized scrolling
             const topScrollRef = useRef(null);
             const tableContainerRef = useRef(null);
             const tableElementRef = useRef(null);
@@ -131,7 +126,6 @@
                 { label: 'Ulangkaji', value: 'Ulangkaji', color: 'bg-orange-50 border-orange-400 text-orange-700' }
             ];
 
-            // Mapping initial mengikut jenis sesi
             const sessionInitials = {
                 'Kuliah': '(L)',
                 'Amali': '(P)',
@@ -154,25 +148,18 @@
 
             const [formData, setFormData] = useState({ id: '', day: '', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', semester: '', duration: 1 });
 
-            // Sync top and bottom scrollbars
             useEffect(() => {
                 const top = topScrollRef.current;
                 const bottom = tableContainerRef.current;
                 if (!top || !bottom) return;
-
                 const syncTop = () => { bottom.scrollLeft = top.scrollLeft; };
                 const syncBottom = () => { top.scrollLeft = bottom.scrollLeft; };
-
                 top.addEventListener('scroll', syncTop);
                 bottom.addEventListener('scroll', syncBottom);
-                
                 const resizeObserver = new ResizeObserver(() => {
-                    if (tableElementRef.current) {
-                        setTableWidth(tableElementRef.current.scrollWidth);
-                    }
+                    if (tableElementRef.current) setTableWidth(tableElementRef.current.scrollWidth);
                 });
                 if (tableElementRef.current) resizeObserver.observe(tableElementRef.current);
-
                 return () => {
                     top.removeEventListener('scroll', syncTop);
                     bottom.removeEventListener('scroll', syncBottom);
@@ -180,7 +167,6 @@
                 };
             }, [isAuthorized, selectedWeek, filterSemester, saturdayConfigs]);
 
-            // Firebase Startup
             useEffect(() => {
                 if (!firebase.apps.length) {
                     try {
@@ -193,7 +179,6 @@
                 }
             }, []);
 
-            // Data Syncing
             useEffect(() => {
                 if (!isAuthorized || !isCloudEnabled || !user) {
                     if (isAuthorized) loadLocalData();
@@ -212,7 +197,6 @@
                     .onSnapshot((doc) => { if (doc.exists) setFooterData(doc.data()); });
                 const unsubSat = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('saturday_configs')
                     .onSnapshot((doc) => { if (doc.exists) setSaturdayConfigs(doc.data()); });
-
                 return () => { unsubEvents(); unsubFooter(); unsubSat(); };
             }, [user, isAuthorized, isCloudEnabled]);
 
@@ -227,13 +211,6 @@
                 }
             };
 
-            const saveLocally = () => {
-                if (!isCloudEnabled) {
-                    localStorage.setItem('tmp_v6.3_local', JSON.stringify({ events, footer: footerData, saturdayConfigs, start: sessionStartDate }));
-                }
-            };
-            useEffect(() => saveLocally(), [events, footerData, saturdayConfigs, sessionStartDate]);
-
             const getFullDate = (dayIdx, weekNum) => {
                 const start = new Date(sessionStartDate);
                 const daysToAdd = (weekNum - 1) * 7 + dayIdx;
@@ -246,7 +223,6 @@
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true;
                 if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true;
-                // Jumaat slot 11.30-12.30 dibuka. 12.30 - 2.15ptg (Slot 5 & 6) kekal REHAT.
                 if (day === 'Jumaat') return [5, 6].includes(slotIdx); 
                 return false;
             };
@@ -269,7 +245,6 @@
                 const finalCode = formData.courseCode === 'Lain-lain' ? formData.customCourseCode : formData.courseCode;
                 const key = `${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 const data = { ...formData, courseCode: finalCode };
-
                 try {
                     if (isCloudEnabled && user) {
                         const db = firebase.firestore();
@@ -359,10 +334,7 @@
                             <div className="flex flex-wrap items-center gap-3">
                                 <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
                                     <span className="text-[9px] font-black uppercase text-slate-400 tracking-tighter">Sabtu (M{selectedWeek}):</span>
-                                    <button 
-                                        onClick={toggleSaturday}
-                                        className={`w-10 h-5 rounded-full relative transition-all ${currentWeekHasSaturday ? 'bg-green-500' : 'bg-slate-300'}`}
-                                    >
+                                    <button onClick={toggleSaturday} className={`w-10 h-5 rounded-full relative transition-all ${currentWeekHasSaturday ? 'bg-green-500' : 'bg-slate-300'}`}>
                                         <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${currentWeekHasSaturday ? 'left-6' : 'left-1'}`}></div>
                                     </button>
                                 </div>
@@ -382,7 +354,8 @@
                         
                         {/* HEADER RASMI KKM */}
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 bg-white">
-                            <div className="absolute top-0 right-0 text-[10px] font-bold text-right text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
+                            {/* PENAMBAHBAIKAN SAIZ FON: BPL KKM -> 12px */}
+                            <div className="absolute top-0 right-0 text-[12px] font-bold text-right text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
 
                             <div className="flex justify-center mb-1">
                                 <img 
@@ -396,23 +369,26 @@
                                 />
                             </div>
                             
-                            <h1 className="text-xl font-black tracking-[0.1em] text-black uppercase">KEMENTERIAN KESIHATAN MALAYSIA</h1>
+                            <h1 className="text-xl font-black tracking-[0.1em] text-black uppercase leading-tight">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-lg font-bold tracking-[0.15em] text-black mt-1 uppercase underline underline-offset-8">Jadual Waktu Mingguan</h2>
                             
                             <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-end text-left gap-4">
                                 <div className="space-y-1 flex-1">
+                                    {/* PENAMBAHBAIKAN SAIZ FON: NAMA INSTITUSI -> 12px */}
                                     <div className="flex gap-2">
-                                        <span className="font-black text-[10px] uppercase shrink-0 text-black">NAMA INSTITUSI:</span>
-                                        <span className="font-bold text-[10px] uppercase text-black">INSTITUT LATIHAN KEMENTERIAN KESIHATAN MALAYSIA KUCHING, SARAWAK</span>
+                                        <span className="font-black text-[12px] uppercase shrink-0 text-black">NAMA INSTITUSI:</span>
+                                        <span className="font-bold text-[12px] uppercase text-black">INSTITUT LATIHAN KEMENTERIAN KESIHATAN MALAYSIA KUCHING, SARAWAK</span>
                                     </div>
                                     <div className="flex items-center gap-10">
+                                        {/* PENAMBAHBAIKAN SAIZ FON: TARIKH -> 12px */}
                                         <div className="flex items-center gap-2">
-                                            <span className="font-black text-[10px] uppercase text-black">TARIKH:</span>
-                                            <input type="date" value={currentDate} onChange={e => setCurrentDate(e.target.value)} className="font-bold text-[10px] outline-none text-black bg-transparent" />
+                                            <span className="font-black text-[12px] uppercase text-black">TARIKH:</span>
+                                            <input type="date" value={currentDate} onChange={e => setCurrentDate(e.target.value)} className="font-bold text-[12px] outline-none text-black bg-transparent" />
                                         </div>
+                                        {/* PENAMBAHBAIKAN SAIZ FON: SEMESTER -> 12px */}
                                         <div className="flex items-center gap-2">
-                                            <span className="font-black text-[10px] uppercase text-black">SEMESTER:</span>
-                                            <span className="font-bold text-[10px] uppercase text-black">
+                                            <span className="font-black text-[12px] uppercase text-black">SEMESTER:</span>
+                                            <span className="font-bold text-[12px] uppercase text-black">
                                                 {filterSemester === 'SEMUA' ? 'Tahun 1 Semester II, Tahun 2 Semester I & Tahun 2 Semester II' : semesterLabels[filterSemester]}
                                             </span>
                                         </div>
@@ -421,17 +397,15 @@
 
                                 <div className="text-right">
                                     <h2 className="text-3xl font-black text-black uppercase tracking-tighter leading-none">MINGGU {selectedWeek}</h2>
-                                    {weekStatus !== "NORMAL" && <div className="text-[10px] font-black text-red-600 mt-1 uppercase tracking-widest">{weekStatus}</div>}
+                                    {weekStatus !== "NORMAL" && <div className="text-[11px] font-black text-red-600 mt-1 uppercase tracking-widest">{weekStatus}</div>}
                                 </div>
                             </div>
                         </div>
 
-                        {/* TOP SCROLLBAR (SYCHRONIZED) */}
                         <div ref={topScrollRef} className="top-scrollbar-container no-print">
                             <div className="top-scrollbar-dummy" style={{ width: `${tableWidth}px` }}></div>
                         </div>
 
-                        {/* JADUAL UTAMA */}
                         <div ref={tableContainerRef} className="bg-white border-2 border-black overflow-x-auto print:overflow-visible relative shadow-sm">
                             <div ref={tableElementRef}>
                                 <table className="w-full border-collapse table-fixed min-w-[1600px] print:min-w-full">
@@ -446,7 +420,6 @@
                                         {visibleDays.map((day, dayIdx) => {
                                             const dateStr = getFullDate(dayIdx, selectedWeek);
                                             const visibleSemesters = filterSemester === 'SEMUA' ? semesters : [filterSemester];
-                                            
                                             return (
                                                 <React.Fragment key={day}>
                                                     {visibleSemesters.map((sem, semIdx) => {
@@ -465,7 +438,6 @@
                                                                     const key = `${selectedWeek}-${day}-${sem}-${slotIdx}`;
                                                                     const event = events[key];
                                                                     const isBreak = isSlotBreak(day, slotIdx);
-                                                                    
                                                                     if (weekStatus !== 'NORMAL' || isBreak) {
                                                                         if (semIdx === 0) return (
                                                                             <td key={slotIdx} rowSpan={visibleSemesters.length} className="bg-slate-50 border-r border-black p-2 text-center align-middle">
@@ -485,7 +457,6 @@
                                                                         <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top transition-all ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
                                                                             {event ? (
                                                                                 <div onClick={() => handleOpenModal(day, sem, slotIdx, event)} className={`h-full w-full rounded border-l-[4px] p-3 text-[10px] cursor-pointer flex flex-col gap-1 overflow-hidden active:scale-95 ${sessionTypes.find(t => t.value === event.type)?.color || 'bg-white'}`}>
-                                                                                    {/* PENAMBAHBAIKAN: Menambah Initial di sebelah Kod Kursus */}
                                                                                     <div className="font-black truncate uppercase text-black border-b border-black/5 pb-1 mb-1 leading-tight text-[11px]">
                                                                                         {event.courseCode} {sessionInitials[event.type] || ''}
                                                                                     </div>
@@ -511,31 +482,38 @@
                             {/* FOOTER PENGESAHAN */}
                             <div className="p-12 border-t-2 border-black grid grid-cols-2 gap-40 bg-white relative">
                                 <div className="space-y-1">
-                                    <h4 className="text-[10px] font-black text-black uppercase tracking-[0.2em]">DISEDIAKAN OLEH:</h4>
+                                    {/* PENAMBAHBAIKAN SAIZ FON: DISEDIAKAN OLEH -> 12px */}
+                                    <h4 className="text-[12px] font-black text-black uppercase tracking-[0.2em]">DISEDIAKAN OLEH:</h4>
                                     <div className="pt-10 pb-2 border-b border-black flex items-center gap-2">
-                                        <span className="text-[9px] font-black text-black uppercase shrink-0">NAMA:</span>
+                                        {/* PENAMBAHBAIKAN SAIZ FON: NAMA -> 11px */}
+                                        <span className="text-[11px] font-black text-black uppercase shrink-0">NAMA:</span>
                                         <input type="text" value={footerData.preparedName || ''} onChange={e => handleFooterChange('preparedName', e.target.value)} className="w-full bg-transparent font-black text-sm outline-none text-black uppercase" />
                                     </div>
-                                    <p className="text-[9px] font-black text-black uppercase mt-1 tracking-tight">PENGAJAR PENYELARAS</p>
+                                    {/* PENAMBAHBAIKAN SAIZ FON: PENGAJAR PENYELARAS -> 11px */}
+                                    <p className="text-[11px] font-black text-black uppercase mt-1 tracking-tight">PENGAJAR PENYELARAS</p>
                                     <div className="flex items-center gap-2 pt-4">
-                                        <span className="text-[9px] font-black text-black uppercase">TARIKH:</span>
+                                        {/* PENAMBAHBAIKAN SAIZ FON: TARIKH -> 11px */}
+                                        <span className="text-[11px] font-black text-black uppercase">TARIKH:</span>
                                         <input type="date" value={footerData.preparedDate || ''} onChange={e => handleFooterChange('preparedDate', e.target.value)} className="bg-transparent font-bold text-[11px] outline-none cursor-pointer text-black" />
                                     </div>
                                 </div>
                                 <div className="space-y-1 text-left">
-                                    <h4 className="text-[10px] font-black text-black uppercase tracking-[0.2em]">DISAHKAN OLEH:</h4>
+                                    {/* PENAMBAHBAIKAN SAIZ FON: DISAHKAN OLEH -> 12px */}
+                                    <h4 className="text-[12px] font-black text-black uppercase tracking-[0.2em]">DISAHKAN OLEH:</h4>
                                     <div className="pt-10 pb-2 border-b border-black flex items-center gap-2">
-                                        <span className="text-[9px] font-black text-black uppercase shrink-0">NAMA:</span>
+                                        {/* PENAMBAHBAIKAN SAIZ FON: NAMA -> 11px */}
+                                        <span className="text-[11px] font-black text-black uppercase shrink-0">NAMA:</span>
                                         <input type="text" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} className="w-full bg-transparent font-black text-sm outline-none text-black uppercase" />
                                     </div>
-                                    <p className="text-[9px] font-black text-black uppercase mt-1 leading-tight tracking-tight uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
+                                    {/* PENAMBAHBAIKAN SAIZ FON: TIMBALAN PENGARAH... -> 11px */}
+                                    <p className="text-[11px] font-black text-black uppercase mt-1 leading-tight tracking-tight uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
                                     <div className="flex items-center gap-2 pt-4">
-                                        <span className="text-[9px] font-black text-black uppercase">TARIKH:</span>
+                                        {/* PENAMBAHBAIKAN SAIZ FON: TARIKH -> 11px */}
+                                        <span className="text-[11px] font-black text-black uppercase">TARIKH:</span>
                                         <input type="date" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} className="bg-transparent font-bold text-[11px] outline-none cursor-pointer text-black" />
                                     </div>
                                 </div>
 
-                                {/* Trademark Signature */}
                                 <div className="absolute bottom-4 right-8 text-[10px] text-black">
                                     <span className="font-black italic">**Harold Criso Anak Ajin**</span>
                                 </div>
@@ -543,7 +521,6 @@
                         </div>
                     </main>
 
-                    {/* MODAL EDITOR */}
                     {isModalOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm no-print animate-in fade-in duration-300">
                             <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
@@ -588,7 +565,7 @@
                                 </div>
                                 <div className="p-10 bg-slate-50 border-t border-slate-100 flex gap-4 shrink-0">
                                     <button onClick={() => { if(editingEvent) setFormData({...editingEvent}); else setFormData(prev => ({...prev, topic: '', instructor: ''})); }} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border border-slate-200 active:scale-90 shadow-sm uppercase"><Icons.Undo /> Undo</button>
-                                    {editingEvent && <button onClick={handleDelete} className="p-5 bg-white text-red-600 border-red-100 border rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.Trash /></button>}
+                                    {editingEvent && <button onClick={handleDelete} className="p-5 bg-white text-red-600 border border-red-100 border rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.Trash /></button>}
                                     <button onClick={handleSave} disabled={isSaving} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 active:scale-95 transition-all shadow-xl">{isSaving ? 'Menyimpan...' : 'SIMPAN REKOD'}</button>
                                 </div>
                             </div>
