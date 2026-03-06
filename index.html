@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v5.9</title>
+    <title>Jadual Waktu Mingguan TMP Digital v6.0</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -39,13 +39,17 @@
         .highlight-new { animation: high-visibility-flash 2.5s ease-out forwards; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Hide scrollbar for week slider but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-white min-h-screen text-black font-sans">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useRef } = React;
 
         const Icons = {
             Plus: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
@@ -53,11 +57,13 @@
             Undo: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-15 9 9 0 0 0-8.31 5.5"></path></svg>,
             Save: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>,
             Lock: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
-            Trash: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Trash: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
+            ChevronRight: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>,
+            ChevronLeft: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
         };
 
         const App = () => {
-            // PEMBOLEHUBAH FIREBASE (KEKAL SEPERTI ASAL)
+            // FIREBASE CONFIG (KEKAL)
             const firebaseConfig = {
                 apiKey: "AIzaSyBOCPBrZ-xkwEgi4OnkBwDB8YqGgWEuMVE",
                 authDomain: "jadual-tmp-digital.firebaseapp.com",
@@ -80,11 +86,13 @@
             const [events, setEvents] = useState({});
             const [footerData, setFooterData] = useState({ preparedName: '', preparedDate: '', verifiedName: '', verifiedDate: '' });
             const [filterSemester, setFilterSemester] = useState('SEMUA');
+            const [showSaturday, setShowSaturday] = useState(true);
 
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [editingEvent, setEditingEvent] = useState(null);
             const [lastUpdatedKey, setLastUpdatedKey] = useState(null);
             const [isSaving, setIsSaving] = useState(false);
+            const weekSliderRef = useRef(null);
 
             const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTBC 2032", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTBT 2193", "MTPC 2203", "MTNF 2162", "MTHE 2182", "MTVS 2142", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "CCRM 2013", "GCSF 2013", "Lain-lain"];
             const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
@@ -108,8 +116,6 @@
                 { label: 'Ulangkaji', value: 'Ulangkaji', color: 'bg-orange-50 border-orange-400 text-orange-700' }
             ];
 
-            const [formData, setFormData] = useState({ id: '', day: '', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', semester: '', duration: 1 });
-
             const weekStatus = useMemo(() => {
                 const w = parseInt(selectedWeek);
                 if (w === 10) return "CUTI PERTENGAHAN SEMESTER";
@@ -117,6 +123,8 @@
                 if ([24, 25, 26].includes(w)) return "CUTI AKHIR SEMESTER";
                 return "NORMAL";
             }, [selectedWeek]);
+
+            const visibleDays = useMemo(() => showSaturday ? days : days.slice(0, 5), [showSaturday]);
 
             useEffect(() => {
                 if (!firebase.apps.length) {
@@ -148,7 +156,7 @@
             }, [user, isAuthorized, isCloudEnabled]);
 
             const loadLocalData = () => {
-                const saved = localStorage.getItem('tmp_v5.9_local');
+                const saved = localStorage.getItem('tmp_v6.0_local');
                 if (saved) {
                     const p = JSON.parse(saved);
                     setEvents(p.events || {});
@@ -156,6 +164,13 @@
                     setSessionStartDate(p.start || '2026-01-05');
                 }
             };
+
+            const saveLocally = () => {
+                if (!isCloudEnabled) {
+                    localStorage.setItem('tmp_v6.0_local', JSON.stringify({ events, footer: footerData, start: sessionStartDate }));
+                }
+            };
+            useEffect(() => saveLocally(), [events, footerData, sessionStartDate]);
 
             const getFullDate = (dayIdx, weekNum) => {
                 const start = new Date(sessionStartDate);
@@ -169,7 +184,9 @@
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true;
                 if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true;
-                if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx); 
+                // Hari Jumaat: Rehat dipendekkan. Slot 4 (11.30-12.30) kini dibuka mengikut permintaan.
+                // Slot 5 (12.30-1.00) dan Slot 6 (1.00-2.00) kekal REHAT.
+                if (day === 'Jumaat') return [5, 6].includes(slotIdx); 
                 return false;
             };
 
@@ -214,15 +231,11 @@
                 }
             };
 
-            const handleDelete = async () => {
-                if (!confirm("Padam slot ini?")) return;
-                const key = `${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
-                if (isCloudEnabled && user) {
-                    await firebase.firestore().collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_master').doc(key).delete();
-                } else {
-                    const next = { ...events }; delete next[key]; setEvents(next);
+            const scrollWeeks = (direction) => {
+                if (weekSliderRef.current) {
+                    const scrollAmount = direction === 'left' ? -200 : 200;
+                    weekSliderRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
                 }
-                setIsModalOpen(false);
             };
 
             if (!isAuthorized) {
@@ -242,38 +255,64 @@
 
             return (
                 <div className="pb-20 bg-white">
-                    <nav className="bg-white border-b-2 border-slate-100 sticky top-0 z-40 px-6 py-4 no-print shadow-sm flex flex-wrap items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                            <button onClick={() => setSelectedWeek(Math.max(1, selectedWeek-1))} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl"><Icons.Undo /></button>
-                            <div className="text-center min-w-[120px]">
-                                <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">Minggu</div>
-                                <div className="text-2xl font-black text-blue-600 leading-none">{selectedWeek}</div>
+                    {/* Navigation Slider & Dashboard */}
+                    <nav className="bg-white border-b-2 border-slate-100 sticky top-0 z-40 px-6 py-4 no-print shadow-sm">
+                        <div className="max-w-[98%] mx-auto flex flex-col gap-4">
+                            <div className="flex flex-wrap items-center justify-between gap-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic shadow-lg">TMP</div>
+                                    <div>
+                                        <h1 className="font-black text-slate-800 text-lg leading-none uppercase">JWM MASTER</h1>
+                                        <p className="text-[9px] font-black text-blue-600 uppercase mt-1">Versi 6.0 Pro</p>
+                                    </div>
+                                </div>
+
+                                {/* Slider Minggu */}
+                                <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner">
+                                    <button onClick={() => scrollWeeks('left')} className="p-1 hover:bg-white rounded-full transition-all"><Icons.ChevronLeft /></button>
+                                    <div ref={weekSliderRef} className="flex gap-2 overflow-x-auto no-scrollbar w-[300px] sm:w-[500px] scroll-smooth py-1">
+                                        {Array.from({length: 26}, (_, i) => i + 1).map(w => (
+                                            <button 
+                                                key={w} 
+                                                onClick={() => setSelectedWeek(w)}
+                                                className={`shrink-0 w-12 py-2 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white shadow-md scale-110' : 'bg-white text-slate-400 hover:bg-slate-200'}`}
+                                            >
+                                                M{w}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button onClick={() => scrollWeeks('right')} className="p-1 hover:bg-white rounded-full transition-all"><Icons.ChevronRight /></button>
+                                </div>
+
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
+                                        <span className="text-[9px] font-black uppercase text-slate-400">Sabtu:</span>
+                                        <button 
+                                            onClick={() => setShowSaturday(!showSaturday)}
+                                            className={`w-10 h-5 rounded-full relative transition-all ${showSaturday ? 'bg-green-500' : 'bg-slate-300'}`}
+                                        >
+                                            <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${showSaturday ? 'left-6' : 'left-1'}`}></div>
+                                        </button>
+                                    </div>
+                                    <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-2.5 rounded-xl outline-none cursor-pointer border border-blue-100">
+                                        <option value="SEMUA">Semua Semester</option>
+                                        {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
+                                    </select>
+                                    <button onClick={() => window.print()} className="bg-slate-800 text-white px-6 py-2.5 rounded-xl text-xs font-black hover:bg-black flex items-center gap-2 shadow-lg transition-all active:scale-95">
+                                        <Icons.Save /> CETAK
+                                    </button>
+                                    <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all shadow-sm"><Icons.Lock /></button>
+                                </div>
                             </div>
-                            <button onClick={() => setSelectedWeek(Math.min(26, selectedWeek+1))} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all rotate-180"><Icons.Undo /></button>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex flex-col gap-1 border-r pr-4 border-slate-200">
-                                <label className="text-[8px] font-black uppercase text-slate-400">Filter Semester</label>
-                                <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg outline-none cursor-pointer">
-                                    <option value="SEMUA">Semua Semester</option>
-                                    {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
-                                </select>
-                            </div>
-                            <button onClick={() => window.print()} className="bg-slate-800 text-white px-6 py-3 rounded-2xl text-xs font-black hover:bg-black transition-all shadow-md flex items-center gap-2">
-                                <Icons.Save /> CETAK
-                            </button>
-                            <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all"><Icons.Lock /></button>
                         </div>
                     </nav>
 
-                    <main className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
+                    <main className="max-w-[99%] mx-auto p-4 md:p-10 print:p-0 bg-white">
                         
                         {/* HEADER RASMI KKM */}
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 bg-white">
-                            {/* Kod Dokumen Sudut Kanan */}
                             <div className="absolute top-0 right-0 text-[10px] font-bold text-right text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
 
-                            {/* LOGO JATA NEGARA BERWARNA */}
                             <div className="flex justify-center mb-1">
                                 <img 
                                     src="JATA_NEGARA_MALAYSIA.jpg" 
@@ -328,7 +367,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {days.map((day, dayIdx) => {
+                                        {visibleDays.map((day, dayIdx) => {
                                             const dateStr = getFullDate(dayIdx, selectedWeek);
                                             const visibleSemesters = filterSemester === 'SEMUA' ? semesters : [filterSemester];
                                             
@@ -349,7 +388,7 @@
                                                                     if (skips.includes(slotIdx)) return null;
                                                                     const key = `${selectedWeek}-${day}-${sem}-${slotIdx}`;
                                                                     const event = events[key];
-                                                                    const isBreak = (slot === '10.00 - 10.30' || (day !== 'Jumaat' && slot === '1.00 - 2.00') || (day === 'Jumaat' && [4, 5, 6].includes(slotIdx)));
+                                                                    const isBreak = isSlotBreak(day, slotIdx);
                                                                     
                                                                     if (weekStatus !== 'NORMAL' || isBreak) {
                                                                         if (semIdx === 0) return (
@@ -410,7 +449,7 @@
                                         <span className="text-[9px] font-black text-black uppercase shrink-0">NAMA:</span>
                                         <input type="text" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} className="w-full bg-transparent font-black text-sm outline-none text-black uppercase" />
                                     </div>
-                                    <p className="text-[9px] font-black text-black uppercase mt-1 leading-tight tracking-tight uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
+                                    <p className="text-[10px] font-black text-black uppercase mt-1 leading-tight tracking-tight uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
                                     <div className="flex items-center gap-2 pt-4">
                                         <span className="text-[9px] font-black text-black uppercase">TARIKH:</span>
                                         <input type="date" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} className="bg-transparent font-bold text-[11px] outline-none cursor-pointer text-black" />
@@ -424,7 +463,7 @@
                     {isModalOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm no-print animate-in fade-in duration-300">
                             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
-                                <div className="bg-white px-10 py-6 border-b-2 border-slate-100 flex justify-between items-center shrink-0">
+                                <div className="bg-slate-50 px-10 py-6 border-b-2 border-slate-100 flex justify-between items-center shrink-0">
                                     <h3 className="font-black text-lg uppercase text-black tracking-tight">KEMAS KINI SLOT</h3>
                                     <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-3 rounded-2xl hover:rotate-90 transition-all shadow-md"><Icons.X /></button>
                                 </div>
