@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v6.2</title>
+    <title>Jadual Waktu Mingguan TMP Digital v6.3</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -44,8 +44,8 @@
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Top dummy scrollbar */
-        .top-scrollbar-container { overflow-x: auto; overflow-y: hidden; height: 20px; }
+        /* Top dummy scrollbar container */
+        .top-scrollbar-container { overflow-x: auto; overflow-y: hidden; height: 16px; margin-bottom: 2px; }
         .top-scrollbar-dummy { height: 1px; }
 
         /* General layout scrollbar */
@@ -131,6 +131,16 @@
                 { label: 'Ulangkaji', value: 'Ulangkaji', color: 'bg-orange-50 border-orange-400 text-orange-700' }
             ];
 
+            // Mapping initial mengikut jenis sesi
+            const sessionInitials = {
+                'Kuliah': '(L)',
+                'Amali': '(P)',
+                'IL': '(IL)',
+                'Tutorial': '(T)',
+                'CA': '(CA)',
+                'Ulangkaji': '(UK)'
+            };
+
             const weekStatus = useMemo(() => {
                 const w = parseInt(selectedWeek);
                 if (w === 10) return "CUTI PERTENGAHAN SEMESTER";
@@ -156,7 +166,6 @@
                 top.addEventListener('scroll', syncTop);
                 bottom.addEventListener('scroll', syncBottom);
                 
-                // Observer to update dummy width when table changes
                 const resizeObserver = new ResizeObserver(() => {
                     if (tableElementRef.current) {
                         setTableWidth(tableElementRef.current.scrollWidth);
@@ -208,7 +217,7 @@
             }, [user, isAuthorized, isCloudEnabled]);
 
             const loadLocalData = () => {
-                const saved = localStorage.getItem('tmp_v6.2_local');
+                const saved = localStorage.getItem('tmp_v6.3_local');
                 if (saved) {
                     const p = JSON.parse(saved);
                     setEvents(p.events || {});
@@ -220,7 +229,7 @@
 
             const saveLocally = () => {
                 if (!isCloudEnabled) {
-                    localStorage.setItem('tmp_v6.2_local', JSON.stringify({ events, footer: footerData, saturdayConfigs, start: sessionStartDate }));
+                    localStorage.setItem('tmp_v6.3_local', JSON.stringify({ events, footer: footerData, saturdayConfigs, start: sessionStartDate }));
                 }
             };
             useEffect(() => saveLocally(), [events, footerData, saturdayConfigs, sessionStartDate]);
@@ -237,6 +246,7 @@
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true;
                 if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true;
+                // Jumaat slot 11.30-12.30 dibuka. 12.30 - 2.15ptg (Slot 5 & 6) kekal REHAT.
                 if (day === 'Jumaat') return [5, 6].includes(slotIdx); 
                 return false;
             };
@@ -326,13 +336,12 @@
                                 <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic shadow-lg">TMP</div>
                                 <div>
                                     <h1 className="font-black text-slate-800 text-lg leading-none uppercase tracking-tight">JWM MASTER</h1>
-                                    <p className="text-[10px] font-black text-blue-600 uppercase mt-1 tracking-widest">
-                                        {isCloudEnabled ? 'Awan Aktif' : 'Mod Luar Talian'}
+                                    <p className="text-[10px] font-black text-blue-600 uppercase mt-1 tracking-widest leading-none">
+                                        {isCloudEnabled ? 'Data Awan Aktif' : 'Mod Offline'}
                                     </p>
                                 </div>
                             </div>
 
-                            {/* Horizontal Scrollbar Week Selector */}
                             <div className="flex-1 max-w-3xl bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner overflow-hidden">
                                 <div className="week-scrollbar flex gap-2 overflow-x-auto pb-2 px-1 scroll-smooth">
                                     {Array.from({length: 26}, (_, i) => i + 1).map(w => (
@@ -361,7 +370,7 @@
                                     <option value="SEMUA">Semua Semester</option>
                                     {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
                                 </select>
-                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-6 py-2.5 rounded-xl text-[10px] font-black hover:bg-black shadow-md flex items-center gap-2 uppercase tracking-widest">
+                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-6 py-2.5 rounded-xl text-[10px] font-black hover:bg-black transition-all shadow-md flex items-center gap-2 uppercase tracking-widest">
                                     <Icons.Save /> Cetak
                                 </button>
                                 <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Keluar"><Icons.External /></button>
@@ -418,7 +427,7 @@
                         </div>
 
                         {/* TOP SCROLLBAR (SYCHRONIZED) */}
-                        <div ref={topScrollRef} className="top-scrollbar-container no-print mb-1">
+                        <div ref={topScrollRef} className="top-scrollbar-container no-print">
                             <div className="top-scrollbar-dummy" style={{ width: `${tableWidth}px` }}></div>
                         </div>
 
@@ -476,7 +485,10 @@
                                                                         <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top transition-all ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
                                                                             {event ? (
                                                                                 <div onClick={() => handleOpenModal(day, sem, slotIdx, event)} className={`h-full w-full rounded border-l-[4px] p-3 text-[10px] cursor-pointer flex flex-col gap-1 overflow-hidden active:scale-95 ${sessionTypes.find(t => t.value === event.type)?.color || 'bg-white'}`}>
-                                                                                    <div className="font-black truncate uppercase text-black border-b border-black/5 pb-1 mb-1 leading-tight text-[11px]">{event.courseCode}</div>
+                                                                                    {/* PENAMBAHBAIKAN: Menambah Initial di sebelah Kod Kursus */}
+                                                                                    <div className="font-black truncate uppercase text-black border-b border-black/5 pb-1 mb-1 leading-tight text-[11px]">
+                                                                                        {event.courseCode} {sessionInitials[event.type] || ''}
+                                                                                    </div>
                                                                                     <div className="font-bold line-clamp-3 leading-snug text-slate-800 flex-1">{event.topic}</div>
                                                                                     <div className="mt-2 font-black opacity-60 text-[8px] truncate bg-white/60 rounded px-1.5 py-0.5 uppercase text-black">{event.instructor}</div>
                                                                                 </div>
@@ -516,7 +528,7 @@
                                         <span className="text-[9px] font-black text-black uppercase shrink-0">NAMA:</span>
                                         <input type="text" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} className="w-full bg-transparent font-black text-sm outline-none text-black uppercase" />
                                     </div>
-                                    <p className="text-[10px] font-black text-black uppercase mt-1 leading-tight tracking-tight uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
+                                    <p className="text-[9px] font-black text-black uppercase mt-1 leading-tight tracking-tight uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
                                     <div className="flex items-center gap-2 pt-4">
                                         <span className="text-[9px] font-black text-black uppercase">TARIKH:</span>
                                         <input type="date" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} className="bg-transparent font-bold text-[11px] outline-none cursor-pointer text-black" />
@@ -576,7 +588,7 @@
                                 </div>
                                 <div className="p-10 bg-slate-50 border-t border-slate-100 flex gap-4 shrink-0">
                                     <button onClick={() => { if(editingEvent) setFormData({...editingEvent}); else setFormData(prev => ({...prev, topic: '', instructor: ''})); }} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border border-slate-200 active:scale-90 shadow-sm uppercase"><Icons.Undo /> Undo</button>
-                                    {editingEvent && <button onClick={handleDelete} className="p-5 bg-white text-red-600 border border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.Trash /></button>}
+                                    {editingEvent && <button onClick={handleDelete} className="p-5 bg-white text-red-600 border-red-100 border rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.Trash /></button>}
                                     <button onClick={handleSave} disabled={isSaving} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 active:scale-95 transition-all shadow-xl">{isSaving ? 'Menyimpan...' : 'SIMPAN REKOD'}</button>
                                 </div>
                             </div>
