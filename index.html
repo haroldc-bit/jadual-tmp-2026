@@ -142,13 +142,16 @@
                     const { initializeApp, getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, getFirestore } = window.FirebaseModular;
                     
                     try {
-                        const config = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-                        if (!config) throw new Error("No config");
-                        
-                        const app = initializeApp(config);
-                        const auth = getAuth(app);
-                        const firestoreDb = getFirestore(app);
-                        setDb(firestoreDb);
+                        firebaseConfig = {
+  			  apiKey: "AIzaSyBOCPBrZ-xkwEgi4OnkBwDB8YqGgWEuMVE",
+  			  authDomain: "jadual-tmp-digital.firebaseapp.com",
+  			  projectId: "jadual-tmp-digital",
+  			  storageBucket: "jadual-tmp-digital.firebasestorage.app",
+ 			  messagingSenderId: "716895729119",
+  			  appId: "1:716895729119:web:ca75d33c6e07a177ef006a",
+  			  measurementId: "G-THMTY1YPX8"
+		         };
+
                         
                         const aId = typeof __app_id !== 'undefined' ? __app_id : 'tmp-jadual-v26-final';
                         setAppId(aId);
