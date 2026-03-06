@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v5.5</title>
+    <title>Jadual Waktu Mingguan TMP Digital v5.6</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -21,14 +21,14 @@
         @media print {
             @page { size: landscape; margin: 0.5cm; }
             .no-print { display: none !important; }
-            body { background: white !important; padding: 0; margin: 0; font-family: 'Times New Roman', serif; }
+            body { background: white !important; padding: 0; margin: 0; font-family: 'Times New Roman', serif; color: black !important; }
             .print-border-0 { border: none !important; box-shadow: none !important; }
             main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
             .overflow-x-auto { overflow: visible !important; }
             table { width: 100% !important; table-layout: fixed !important; font-size: 7pt; border-collapse: collapse; border: 1px solid black !important; }
-            th, td { border: 1px solid black !important; }
+            th, td { border: 1px solid black !important; background: white !important; color: black !important; }
             .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
-            input, select { border: none !important; background: transparent !important; color: black !important; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+            input, select, textarea { border: none !important; background: transparent !important; color: black !important; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
         .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); display: inline-block; }
@@ -39,9 +39,13 @@
         .highlight-new { animation: high-visibility-flash 2.5s ease-out forwards; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Ensure inputs are visible on screen but look like lines on print */
+        .signature-input { border-bottom: 1px solid #cbd5e1; }
+        @media print { .signature-input { border-bottom: 1px solid black; } }
     </style>
 </head>
-<body class="bg-white min-h-screen">
+<body class="bg-white min-h-screen text-slate-900">
     <div id="root"></div>
 
     <script type="text/babel">
@@ -240,10 +244,10 @@
                     <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6">
                         <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full">
                             <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6"><Icons.Lock /></div>
-                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800">Akses Jadual TMP</h2>
+                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 tracking-tight">Kunci Akses TMP</h2>
                             <form onSubmit={(e) => { e.preventDefault(); if(accessCode === "TMP2026"){ setIsAuthorized(true); sessionStorage.setItem('tmp_auth', 'true'); } }}>
                                 <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses Jabatan" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-50 transition-all" autoFocus />
-                                <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all">Buka</button>
+                                <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all">Masuk</button>
                             </form>
                         </div>
                     </div>
@@ -252,32 +256,33 @@
 
             return (
                 <div className="pb-20">
-                    <nav className="bg-white border-b-2 border-slate-200 sticky top-0 z-40 px-6 py-4 no-print shadow-md flex flex-wrap items-center justify-between gap-4">
+                    {/* Navigation (Screen Only) */}
+                    <nav className="bg-white border-b-2 border-slate-100 sticky top-0 z-40 px-6 py-4 no-print shadow-sm flex flex-wrap items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
-                            <button onClick={() => setSelectedWeek(Math.max(1, selectedWeek-1))} className="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"><Icons.Undo /></button>
+                            <button onClick={() => setSelectedWeek(Math.max(1, selectedWeek-1))} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all"><Icons.Undo /></button>
                             <div className="text-center min-w-[120px]">
-                                <div className="text-[10px] font-black uppercase text-slate-400">Minggu</div>
+                                <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Minggu</div>
                                 <div className="text-2xl font-black text-blue-600 leading-none">{selectedWeek}</div>
                             </div>
-                            <button onClick={() => setSelectedWeek(Math.min(26, selectedWeek+1))} className="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all rotate-180"><Icons.Undo /></button>
+                            <button onClick={() => setSelectedWeek(Math.min(26, selectedWeek+1))} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all rotate-180"><Icons.Undo /></button>
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <div className="flex flex-col gap-1 border-r pr-4">
-                                <label className="text-[8px] font-black uppercase text-slate-400">Pilih Semester (Filter)</label>
-                                <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="bg-blue-50 text-blue-800 text-xs font-black p-1.5 rounded-lg outline-none cursor-pointer">
+                            <div className="flex flex-col gap-1 border-r pr-4 border-slate-200">
+                                <label className="text-[8px] font-black uppercase text-slate-400 tracking-widest">Paparan Semester</label>
+                                <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg outline-none cursor-pointer">
                                     <option value="SEMUA">Semua Semester</option>
                                     {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
                                 </select>
                             </div>
-                            <div className="flex flex-col gap-1 border-r pr-4">
-                                <label className="text-[8px] font-black uppercase text-slate-400">Mula M1</label>
-                                <input type="date" value={sessionStartDate} onChange={e => setSessionStartDate(e.target.value)} className="bg-slate-100 text-slate-800 text-[10px] font-black p-1 rounded outline-none" />
+                            <div className="flex flex-col gap-1 border-r pr-4 border-slate-200">
+                                <label className="text-[8px] font-black uppercase text-slate-400 tracking-widest">Mula M1</label>
+                                <input type="date" value={sessionStartDate} onChange={e => setSessionStartDate(e.target.value)} className="bg-slate-50 text-slate-800 text-[10px] font-black p-1 rounded outline-none" />
                             </div>
-                            <button onClick={() => window.print()} className="bg-slate-800 text-white px-6 py-3 rounded-2xl text-xs font-black hover:bg-black transition-all shadow-lg flex items-center gap-2">
-                                <Icons.Save /> CETAK JADUAL
+                            <button onClick={() => window.print()} className="bg-slate-800 text-white px-6 py-3 rounded-2xl text-xs font-black hover:bg-black transition-all shadow-md flex items-center gap-2">
+                                <Icons.Save /> CETAK
                             </button>
-                            <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-3 bg-slate-100 text-slate-400 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all"><Icons.Lock /></button>
+                            <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all"><Icons.Lock /></button>
                         </div>
                     </nav>
 
@@ -285,52 +290,59 @@
                         
                         {/* HEADER RASMI KKM */}
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 bg-white">
-                            <div className="absolute top-0 right-0 text-[10px] font-bold text-right">BPL.KKM.PK(T) 048B/17</div>
+                            {/* Kod Dokumen Sudut Kanan */}
+                            <div className="absolute top-0 right-0 text-[10px] font-bold text-right text-black">BPL.KKM.PK(T) 048B/17</div>
 
-                            <img 
-                                src="JATA_NEGARA_MALAYSIA.jpg" 
-                                alt="Jata Negara" 
-                                className="h-20 mx-auto mb-2" 
-                                onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png'"
-                            />
-                            <h1 className="text-lg font-black tracking-widest text-black">KEMENTERIAN KESIHATAN MALAYSIA</h1>
-                            <h2 className="text-md font-bold tracking-[0.2em] text-black mt-1">JADUAL WAKTU MINGGUAN</h2>
+                            {/* JATA NEGARA BERWARNA */}
+                            <div className="flex justify-center mb-2">
+                                <img 
+                                    src="JATA_NEGARA_MALAYSIA.jpg" 
+                                    alt="Jata Negara Malaysia" 
+                                    className="h-24 w-auto object-contain" 
+                                    onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png'"
+                                />
+                            </div>
+                            
+                            <h1 className="text-xl font-black tracking-[0.1em] text-black">KEMENTERIAN KESIHATAN MALAYSIA</h1>
+                            <h2 className="text-lg font-bold tracking-[0.15em] text-black mt-1 uppercase">Jadual Waktu Mingguan</h2>
                             
                             <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-end text-left gap-4">
                                 <div className="space-y-1">
                                     <div className="flex gap-2">
-                                        <span className="font-black text-[10px] uppercase shrink-0">NAMA INSTITUSI:</span>
-                                        <span className="font-bold text-[10px] uppercase">INSTITUT LATIHAN KEMENTERIAN KESIHATAN MALAYSIA KUCHING, SARAWAK</span>
+                                        <span className="font-black text-[10px] uppercase shrink-0 text-black">NAMA INSTITUSI:</span>
+                                        <span className="font-bold text-[10px] uppercase text-black">INSTITUT LATIHAN KEMENTERIAN KESIHATAN MALAYSIA KUCHING, SARAWAK</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="font-black text-[10px] uppercase">TARIKH:</span>
-                                        <input type="date" value={currentDate} onChange={e => setCurrentDate(e.target.value)} className="font-bold text-[10px] outline-none" />
+                                        <span className="font-black text-[10px] uppercase text-black">TARIKH:</span>
+                                        <input type="date" value={currentDate} onChange={e => setCurrentDate(e.target.value)} className="font-bold text-[10px] outline-none text-black bg-transparent" />
                                     </div>
                                 </div>
 
-                                <div className="md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center gap-2">
-                                    <span className="font-black text-[10px] uppercase">SEMESTER:</span>
-                                    <span className="font-bold text-[10px] uppercase">
-                                        {filterSemester === 'SEMUA' ? 'Tahun 1 Semester II, Tahun 2 Semester I & Tahun 2 Semester II' : semesterLabels[filterSemester]}
-                                    </span>
+                                <div className="md:absolute md:left-1/2 md:-translate-x-1/2 text-center">
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-black text-[10px] uppercase text-black">SEMESTER:</span>
+                                        <span className="font-bold text-[10px] uppercase text-black">
+                                            {filterSemester === 'SEMUA' ? 'Tahun 1 Semester II, Tahun 2 Semester I & Tahun 2 Semester II' : semesterLabels[filterSemester]}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <div className="text-right ml-auto">
-                                    <h2 className="text-2xl font-black text-black uppercase tracking-tighter">MINGGU {selectedWeek}</h2>
-                                    {weekStatus !== "NORMAL" && <div className="text-xs font-black text-red-600">{weekStatus}</div>}
+                                    <h2 className="text-3xl font-black text-black uppercase tracking-tighter leading-none">MINGGU {selectedWeek}</h2>
+                                    {weekStatus !== "NORMAL" && <div className="text-[10px] font-black text-red-600 mt-1 uppercase tracking-widest">{weekStatus}</div>}
                                 </div>
                             </div>
                         </div>
 
                         {/* JADUAL UTAMA */}
-                        <div className="bg-white border-2 border-slate-200 overflow-hidden print:border-0 print:shadow-none relative">
+                        <div className="bg-white border border-black overflow-hidden print:border-0 print:shadow-none relative">
                             <div className="overflow-x-auto print:overflow-visible">
                                 <table className="w-full border-collapse table-fixed min-w-[1600px] print:min-w-full">
                                     <thead>
-                                        <tr className="bg-slate-50 border-b-2 text-center text-slate-800 font-black text-[9px] uppercase">
-                                            <th className="w-40 p-4 border-r-2">Hari / Tarikh</th>
-                                            <th className="w-24 border-r-2">Sem</th>
-                                            {timeSlots.map(slot => (<th key={slot} className="p-3 border-r last:border-0">{slot}</th>))}
+                                        <tr className="bg-white border-b-2 border-black text-center text-black font-black text-[9px] uppercase">
+                                            <th className="w-40 p-4 border-r border-black">Hari / Tarikh</th>
+                                            <th className="w-20 border-r border-black">Sem</th>
+                                            {timeSlots.map(slot => (<th key={slot} className="p-3 border-r border-black last:border-0">{slot}</th>))}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -343,14 +355,14 @@
                                                     {visibleSemesters.map((sem, semIdx) => {
                                                         const skips = [];
                                                         return (
-                                                            <tr key={`${day}-${sem}`} className={`border-b border-slate-100 ${semIdx === visibleSemesters.length - 1 ? 'border-b-4 border-slate-200' : ''}`}>
+                                                            <tr key={`${day}-${sem}`} className={`border-b border-black/20 ${semIdx === visibleSemesters.length - 1 ? 'border-b-2 border-black' : ''}`}>
                                                                 {semIdx === 0 && (
-                                                                    <td rowSpan={visibleSemesters.length} className="p-4 bg-white border-r-2 text-center align-middle">
+                                                                    <td rowSpan={visibleSemesters.length} className="p-4 bg-white border-r border-black text-center align-middle">
                                                                         <div className="font-black text-black text-md uppercase mb-1">{day}</div>
-                                                                        <div className="text-[10px] font-black text-blue-700 bg-white px-2 py-1 rounded-lg border border-blue-100 inline-block">{dateStr}</div>
+                                                                        <div className="text-[10px] font-black text-blue-700 bg-blue-50/30 px-2 py-1 rounded border border-blue-100 inline-block">{dateStr}</div>
                                                                     </td>
                                                                 )}
-                                                                <td className="p-2 bg-white text-center font-black text-[10px] text-slate-500 border-r-2">{sem}</td>
+                                                                <td className="p-2 bg-white text-center font-black text-[10px] text-slate-500 border-r border-black">{sem}</td>
                                                                 {timeSlots.map((slot, slotIdx) => {
                                                                     if (skips.includes(slotIdx)) return null;
                                                                     const key = `${selectedWeek}-${day}-${sem}-${slotIdx}`;
@@ -359,8 +371,8 @@
                                                                     
                                                                     if (weekStatus !== 'NORMAL' || isBreak) {
                                                                         if (semIdx === 0) return (
-                                                                            <td key={slotIdx} rowSpan={visibleSemesters.length} className="bg-slate-50 border-r-2 p-2 text-center align-middle">
-                                                                                <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">{isBreak ? 'REHAT' : weekStatus}</span>
+                                                                            <td key={slotIdx} rowSpan={visibleSemesters.length} className="bg-slate-50 border-r border-black p-2 text-center align-middle">
+                                                                                <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30 text-black">{isBreak ? 'REHAT' : weekStatus}</span>
                                                                             </td>
                                                                         );
                                                                         return null;
@@ -370,15 +382,15 @@
                                                                         for(let i=1; i<event.duration; i++) { if(!((slotIdx+i) < timeSlots.length) || isSlotBreak(day, slotIdx+i)) break; colSpan++; skips.push(slotIdx+i); }
                                                                     }
                                                                     return (
-                                                                        <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-slate-100 h-32 align-top hover:bg-blue-50/20 transition-all ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
+                                                                        <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top transition-all ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
                                                                             {event ? (
-                                                                                <div onClick={() => handleOpenModal(day, sem, slotIdx, event)} className={`h-full w-full rounded-xl border-l-[4px] p-3 text-[10px] cursor-pointer shadow-sm flex flex-col gap-1 overflow-hidden transition-all active:scale-95 ${sessionTypes.find(t => t.value === event.type)?.color || 'bg-white'}`}>
+                                                                                <div onClick={() => handleOpenModal(day, sem, slotIdx, event)} className={`h-full w-full rounded border-l-[4px] p-3 text-[10px] cursor-pointer flex flex-col gap-1 overflow-hidden active:scale-95 ${sessionTypes.find(t => t.value === event.type)?.color || 'bg-white'}`}>
                                                                                     <div className="font-black truncate uppercase text-black border-b border-black/5 pb-1 mb-1 leading-tight">{event.courseCode}</div>
                                                                                     <div className="font-bold line-clamp-3 leading-snug text-slate-800 flex-1">{event.topic}</div>
-                                                                                    <div className="mt-2 font-black opacity-60 text-[8px] truncate bg-white/60 rounded px-1.5 py-0.5 uppercase">{event.instructor}</div>
+                                                                                    <div className="mt-2 font-black opacity-60 text-[8px] truncate bg-white/60 rounded px-1.5 py-0.5 uppercase text-black">{event.instructor}</div>
                                                                                 </div>
                                                                             ) : (
-                                                                                <button onClick={() => handleOpenModal(day, sem, slotIdx)} className="w-full h-full rounded-2xl border-2 border-dashed border-slate-100 hover:border-blue-400 flex items-center justify-center text-slate-200 transition-all no-print"><Icons.Plus /></button>
+                                                                                <button onClick={() => handleOpenModal(day, sem, slotIdx)} className="w-full h-full rounded border border-dashed border-slate-200 hover:border-blue-400 flex items-center justify-center text-slate-300 transition-all no-print"><Icons.Plus /></button>
                                                                             )}
                                                                         </td>
                                                                     );
@@ -396,27 +408,27 @@
                             {/* FOOTER PENGESAHAN */}
                             <div className="p-12 border-t-2 border-black grid grid-cols-2 gap-40 bg-white">
                                 <div className="space-y-1">
-                                    <h4 className="text-[10px] font-black text-black uppercase tracking-widest">DISEDIAKAN OLEH:</h4>
+                                    <h4 className="text-[10px] font-black text-black uppercase tracking-[0.2em]">DISEDIAKAN OLEH:</h4>
                                     <div className="pt-10 pb-2 border-b border-black flex items-center gap-2">
                                         <span className="text-[9px] font-black text-black uppercase shrink-0">NAMA:</span>
                                         <input type="text" value={footerData.preparedName || ''} onChange={e => handleFooterChange('preparedName', e.target.value)} className="w-full bg-transparent font-black text-sm outline-none text-black uppercase" />
                                     </div>
-                                    <p className="text-[9px] font-black text-black uppercase">PENGAJAR PENYELARAS</p>
+                                    <p className="text-[10px] font-black text-black uppercase mt-1 tracking-tight">PENGAJAR PENYELARAS</p>
                                     <div className="flex items-center gap-2 pt-4">
                                         <span className="text-[9px] font-black text-black uppercase">TARIKH:</span>
-                                        <input type="date" value={footerData.preparedDate || ''} onChange={e => handleFooterChange('preparedDate', e.target.value)} className="bg-transparent font-bold text-[10px] outline-none cursor-pointer text-black" />
+                                        <input type="date" value={footerData.preparedDate || ''} onChange={e => handleFooterChange('preparedDate', e.target.value)} className="bg-transparent font-bold text-[11px] outline-none cursor-pointer text-black" />
                                     </div>
                                 </div>
                                 <div className="space-y-1 text-left">
-                                    <h4 className="text-[10px] font-black text-black uppercase tracking-widest">DISAHKAN OLEH:</h4>
+                                    <h4 className="text-[10px] font-black text-black uppercase tracking-[0.2em]">DISAHKAN OLEH:</h4>
                                     <div className="pt-10 pb-2 border-b border-black flex items-center gap-2">
                                         <span className="text-[9px] font-black text-black uppercase shrink-0">NAMA:</span>
                                         <input type="text" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} className="w-full bg-transparent font-black text-sm outline-none text-black uppercase" />
                                     </div>
-                                    <p className="text-[9px] font-black text-black uppercase mt-1 leading-tight">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
+                                    <p className="text-[10px] font-black text-black uppercase mt-1 leading-tight tracking-tight uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
                                     <div className="flex items-center gap-2 pt-4">
                                         <span className="text-[9px] font-black text-black uppercase">TARIKH:</span>
-                                        <input type="date" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} className="bg-transparent font-bold text-[10px] outline-none cursor-pointer text-black" />
+                                        <input type="date" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} className="bg-transparent font-bold text-[11px] outline-none cursor-pointer text-black" />
                                     </div>
                                 </div>
                             </div>
@@ -426,29 +438,29 @@
                     {/* MODAL EDITOR */}
                     {isModalOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm no-print animate-in fade-in duration-300">
-                            <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
-                                <div className="bg-slate-50 px-10 py-6 border-b-2 flex justify-between items-center shrink-0">
-                                    <h3 className="font-black text-lg uppercase">KEMAS KINI SLOT</h3>
-                                    <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-3 rounded-2xl hover:rotate-90 transition-all"><Icons.X /></button>
+                            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
+                                <div className="bg-white px-10 py-6 border-b-2 border-slate-100 flex justify-between items-center shrink-0">
+                                    <h3 className="font-black text-lg uppercase text-black tracking-tight">KEMAS KINI SLOT</h3>
+                                    <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-3 rounded-2xl hover:rotate-90 transition-all shadow-md"><Icons.X /></button>
                                 </div>
-                                <div className="p-10 space-y-6 overflow-y-auto flex-1">
+                                <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white">
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-1">
-                                            <label className="text-[11px] font-black uppercase">Kod Kursus</label>
-                                            <select className="w-full px-6 py-4 bg-slate-50 border-2 rounded-3xl font-black text-sm outline-none" value={formData.courseCode} onChange={e => setFormData({...formData, courseCode: e.target.value})}>
+                                            <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Kod Kursus</label>
+                                            <select className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-sm outline-none" value={formData.courseCode} onChange={e => setFormData({...formData, courseCode: e.target.value})}>
                                                 {courseCodes.map(c => <option key={c} value={c}>{c}</option>)}
                                             </select>
                                         </div>
                                         <div className="space-y-1">
-                                            <label className="text-[11px] font-black uppercase">Tempoh Slot</label>
-                                            <select className="w-full px-6 py-4 bg-slate-50 border-2 rounded-3xl font-black text-sm outline-none" value={formData.duration} onChange={e => setFormData({...formData, duration: parseInt(e.target.value)})}>
+                                            <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Tempoh Masa</label>
+                                            <select className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-sm outline-none" value={formData.duration} onChange={e => setFormData({...formData, duration: parseInt(e.target.value)})}>
                                                 {[1,2,3,4].map(n => <option key={n} value={n}>{n} Slot</option>)}
                                             </select>
                                         </div>
                                     </div>
-                                    {formData.courseCode === 'Lain-lain' && <input type="text" className="w-full px-6 py-4 bg-blue-50 border-2 rounded-3xl font-black text-sm outline-none" value={formData.customCourseCode} onChange={e => setFormData({...formData, customCourseCode: e.target.value})} placeholder="Taip kod..." />}
+                                    {formData.courseCode === 'Lain-lain' && <input type="text" className="w-full px-6 py-4 bg-blue-50 border border-blue-200 rounded-2xl font-black text-sm outline-none" value={formData.customCourseCode} onChange={e => setFormData({...formData, customCourseCode: e.target.value})} placeholder="Sila taip kod..." />}
                                     <div className="space-y-3">
-                                        <label className="text-[11px] font-black uppercase">Jenis Sesi</label>
+                                        <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Jenis Sesi</label>
                                         <div className="flex flex-wrap gap-2">
                                             {sessionTypes.map(t => (
                                                 <button key={t.value} onClick={() => setFormData({...formData, type: t.value})} className={`px-5 py-2 rounded-2xl text-[10px] font-black border-2 transition-all ${formData.type === t.value ? t.color + ' border-blue-600' : 'bg-white border-slate-100 text-slate-400'}`}>
@@ -457,13 +469,19 @@
                                             ))}
                                         </div>
                                     </div>
-                                    <textarea rows="3" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-[2rem] outline-none font-bold text-sm" placeholder="Topik..." value={formData.topic} onChange={e => setFormData({...formData, topic: e.target.value})}></textarea>
-                                    <input type="text" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-3xl outline-none font-black text-sm" placeholder="Nama Pengajar..." value={formData.instructor} onChange={(e) => setFormData({...formData, instructor: e.target.value})} />
+                                    <div className="space-y-1">
+                                        <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Tajuk Pembelajaran</label>
+                                        <textarea rows="3" className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-sm" placeholder="Topik..." value={formData.topic} onChange={e => setFormData({...formData, topic: e.target.value})}></textarea>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Nama Pengajar</label>
+                                        <input type="text" className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-black text-sm" placeholder="Nama..." value={formData.instructor} onChange={(e) => setFormData({...formData, instructor: e.target.value})} />
+                                    </div>
                                 </div>
-                                <div className="p-10 bg-slate-50 border-t-2 flex gap-4 shrink-0 shadow-inner">
-                                    <button onClick={() => { if(editingEvent) setFormData({...editingEvent}); else setFormData(prev => ({...prev, topic: '', instructor: ''})); }} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-[2rem] border-2 border-slate-200 active:scale-90 shadow-sm"><Icons.Undo /> UNDO</button>
-                                    {editingEvent && <button onClick={handleDelete} className="p-5 bg-white text-red-600 border-2 border-red-100 rounded-[2rem] hover:bg-red-600 hover:text-white transition-all"><Icons.Trash /></button>}
-                                    <button onClick={handleSave} disabled={isSaving} className="flex-[3] py-5 bg-blue-600 text-white rounded-[2rem] text-sm font-black hover:bg-blue-700 active:scale-95 transition-all shadow-xl">{isSaving ? 'Tunggu...' : 'SIMPAN REKOD'}</button>
+                                <div className="p-10 bg-white border-t border-slate-100 flex gap-4 shrink-0">
+                                    <button onClick={() => { if(editingEvent) setFormData({...editingEvent}); else setFormData(prev => ({...prev, topic: '', instructor: ''})); }} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border border-slate-200 active:scale-90"><Icons.Undo /> UNDO</button>
+                                    {editingEvent && <button onClick={handleDelete} className="p-5 bg-white text-red-600 border border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all"><Icons.Trash /></button>}
+                                    <button onClick={handleSave} disabled={isSaving} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 active:scale-95 transition-all shadow-lg">{isSaving ? 'Menyimpan...' : 'SIMPAN REKOD'}</button>
                                 </div>
                             </div>
                         </div>
