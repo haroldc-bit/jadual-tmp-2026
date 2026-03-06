@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v6.1</title>
+    <title>Jadual Waktu Mingguan TMP Digital v6.2</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -39,25 +39,20 @@
         .highlight-new { animation: high-visibility-flash 2.5s ease-out forwards; }
         
         /* Custom Scrollbar for the week selector */
-        .week-scrollbar::-webkit-scrollbar {
-            height: 8px;
-            display: block;
-        }
-        .week-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 10px;
-        }
-        .week-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        .week-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        .week-scrollbar::-webkit-scrollbar { height: 8px; display: block; }
+        .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .week-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Top dummy scrollbar */
+        .top-scrollbar-container { overflow-x: auto; overflow-y: hidden; height: 20px; }
+        .top-scrollbar-dummy { height: 1px; }
 
         /* General layout scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="bg-white min-h-screen text-black font-sans">
@@ -72,7 +67,8 @@
             Undo: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-15 9 9 0 0 0-8.31 5.5"></path></svg>,
             Save: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>,
             Lock: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
-            Trash: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Trash: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
+            External: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
         };
 
         const App = () => {
@@ -91,6 +87,7 @@
             const [isAuthorized, setIsAuthorized] = useState(() => sessionStorage.getItem('tmp_auth') === 'true');
             const [accessCode, setAccessCode] = useState("");
             const [isCloudEnabled, setIsCloudEnabled] = useState(false);
+            const [isSyncing, setIsSyncing] = useState(false);
             const [appId] = useState('tmp-jadual-v26-master');
 
             const [selectedWeek, setSelectedWeek] = useState(1);
@@ -99,14 +96,18 @@
             const [events, setEvents] = useState({});
             const [footerData, setFooterData] = useState({ preparedName: '', preparedDate: '', verifiedName: '', verifiedDate: '' });
             const [filterSemester, setFilterSemester] = useState('SEMUA');
-            
-            // Sabtu Config per Minggu
             const [saturdayConfigs, setSaturdayConfigs] = useState({});
 
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [editingEvent, setEditingEvent] = useState(null);
             const [lastUpdatedKey, setLastUpdatedKey] = useState(null);
             const [isSaving, setIsSaving] = useState(false);
+
+            // Refs for synchronized scrolling
+            const topScrollRef = useRef(null);
+            const tableContainerRef = useRef(null);
+            const tableElementRef = useRef(null);
+            const [tableWidth, setTableWidth] = useState(0);
 
             const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTBC 2032", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTBT 2193", "MTPC 2203", "MTNF 2162", "MTHE 2182", "MTVS 2142", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "CCRM 2013", "GCSF 2013", "Lain-lain"];
             const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
@@ -138,13 +139,37 @@
                 return "NORMAL";
             }, [selectedWeek]);
 
-            const currentWeekHasSaturday = useMemo(() => {
-                return saturdayConfigs[selectedWeek] === true;
-            }, [saturdayConfigs, selectedWeek]);
-
+            const currentWeekHasSaturday = useMemo(() => saturdayConfigs[selectedWeek] === true, [saturdayConfigs, selectedWeek]);
             const visibleDays = useMemo(() => currentWeekHasSaturday ? days : days.slice(0, 5), [currentWeekHasSaturday]);
 
             const [formData, setFormData] = useState({ id: '', day: '', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', semester: '', duration: 1 });
+
+            // Sync top and bottom scrollbars
+            useEffect(() => {
+                const top = topScrollRef.current;
+                const bottom = tableContainerRef.current;
+                if (!top || !bottom) return;
+
+                const syncTop = () => { bottom.scrollLeft = top.scrollLeft; };
+                const syncBottom = () => { top.scrollLeft = bottom.scrollLeft; };
+
+                top.addEventListener('scroll', syncTop);
+                bottom.addEventListener('scroll', syncBottom);
+                
+                // Observer to update dummy width when table changes
+                const resizeObserver = new ResizeObserver(() => {
+                    if (tableElementRef.current) {
+                        setTableWidth(tableElementRef.current.scrollWidth);
+                    }
+                });
+                if (tableElementRef.current) resizeObserver.observe(tableElementRef.current);
+
+                return () => {
+                    top.removeEventListener('scroll', syncTop);
+                    bottom.removeEventListener('scroll', syncBottom);
+                    resizeObserver.disconnect();
+                };
+            }, [isAuthorized, selectedWeek, filterSemester, saturdayConfigs]);
 
             // Firebase Startup
             useEffect(() => {
@@ -166,12 +191,14 @@
                     return;
                 }
                 const db = firebase.firestore();
+                setIsSyncing(true);
                 const unsubEvents = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_master')
                     .onSnapshot((snap) => {
                         const data = {};
                         snap.forEach(doc => data[doc.id] = doc.data());
                         setEvents(data);
-                    });
+                        setIsSyncing(false);
+                    }, () => setIsSyncing(false));
                 const unsubFooter = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('signatures')
                     .onSnapshot((doc) => { if (doc.exists) setFooterData(doc.data()); });
                 const unsubSat = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('saturday_configs')
@@ -181,7 +208,7 @@
             }, [user, isAuthorized, isCloudEnabled]);
 
             const loadLocalData = () => {
-                const saved = localStorage.getItem('tmp_v6.1_local');
+                const saved = localStorage.getItem('tmp_v6.2_local');
                 if (saved) {
                     const p = JSON.parse(saved);
                     setEvents(p.events || {});
@@ -193,7 +220,7 @@
 
             const saveLocally = () => {
                 if (!isCloudEnabled) {
-                    localStorage.setItem('tmp_v6.1_local', JSON.stringify({ events, footer: footerData, saturdayConfigs, start: sessionStartDate }));
+                    localStorage.setItem('tmp_v6.2_local', JSON.stringify({ events, footer: footerData, saturdayConfigs, start: sessionStartDate }));
                 }
             };
             useEffect(() => saveLocally(), [events, footerData, saturdayConfigs, sessionStartDate]);
@@ -210,7 +237,6 @@
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true;
                 if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true;
-                // Hari Jumaat: Slot 4 (11.30-12.30) DIBUKA. Slot 5 & 6 (12.30-2.15ptg) REHAT.
                 if (day === 'Jumaat') return [5, 6].includes(slotIdx); 
                 return false;
             };
@@ -280,12 +306,12 @@
             if (!isAuthorized) {
                 return (
                     <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6">
-                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full">
-                            <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6"><Icons.Lock /></div>
-                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 tracking-tight">Kunci Akses TMP</h2>
-                            <form onSubmit={(e) => { e.preventDefault(); if(accessCode === "TMP2026"){ setIsAuthorized(true); sessionStorage.setItem('tmp_auth', 'true'); } }}>
-                                <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses Jabatan" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-50 transition-all" autoFocus />
-                                <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all">Masuk</button>
+                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full border-4 border-white animate-in zoom-in duration-300">
+                            <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl"><Icons.Lock /></div>
+                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 tracking-tight">Kunci Akses Jadual</h2>
+                            <form onSubmit={(e) => { e.preventDefault(); if(accessCode === "TMP2026"){ setIsAuthorized(true); sessionStorage.setItem('tmp_auth', 'true'); } else { alert("Kod Akses Salah"); } }}>
+                                <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses Jabatan" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 transition-all" autoFocus />
+                                <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all">Sahkan</button>
                             </form>
                         </div>
                     </div>
@@ -294,25 +320,26 @@
 
             return (
                 <div className="pb-20 bg-white">
-                    {/* Navigation with Horizontal Scrollbar */}
                     <nav className="bg-white border-b-2 border-slate-100 sticky top-0 z-40 px-6 py-4 no-print shadow-sm flex flex-col gap-4">
                         <div className="max-w-[98%] mx-auto w-full flex flex-wrap items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
                                 <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic shadow-lg">TMP</div>
                                 <div>
                                     <h1 className="font-black text-slate-800 text-lg leading-none uppercase tracking-tight">JWM MASTER</h1>
-                                    <p className="text-[9px] font-black text-blue-600 uppercase mt-1">Struktur 26 Minggu</p>
+                                    <p className="text-[10px] font-black text-blue-600 uppercase mt-1 tracking-widest">
+                                        {isCloudEnabled ? 'Awan Aktif' : 'Mod Luar Talian'}
+                                    </p>
                                 </div>
                             </div>
 
                             {/* Horizontal Scrollbar Week Selector */}
-                            <div className="flex-1 max-w-3xl bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner">
+                            <div className="flex-1 max-w-3xl bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner overflow-hidden">
                                 <div className="week-scrollbar flex gap-2 overflow-x-auto pb-2 px-1 scroll-smooth">
                                     {Array.from({length: 26}, (_, i) => i + 1).map(w => (
                                         <button 
                                             key={w} 
                                             onClick={() => setSelectedWeek(w)}
-                                            className={`shrink-0 min-w-[50px] py-2.5 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white shadow-md scale-105' : 'bg-white text-slate-400 hover:bg-slate-100'}`}
+                                            className={`shrink-0 min-w-[50px] py-2 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-400 hover:bg-slate-100'}`}
                                         >
                                             M{w}
                                         </button>
@@ -322,7 +349,7 @@
 
                             <div className="flex flex-wrap items-center gap-3">
                                 <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
-                                    <span className="text-[9px] font-black uppercase text-slate-400">Sabtu (M{selectedWeek}):</span>
+                                    <span className="text-[9px] font-black uppercase text-slate-400 tracking-tighter">Sabtu (M{selectedWeek}):</span>
                                     <button 
                                         onClick={toggleSaturday}
                                         className={`w-10 h-5 rounded-full relative transition-all ${currentWeekHasSaturday ? 'bg-green-500' : 'bg-slate-300'}`}
@@ -334,14 +361,15 @@
                                     <option value="SEMUA">Semua Semester</option>
                                     {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
                                 </select>
-                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-6 py-2.5 rounded-xl text-xs font-black hover:bg-black transition-all shadow-md flex items-center gap-2">
-                                    <Icons.Save /> CETAK
+                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-6 py-2.5 rounded-xl text-[10px] font-black hover:bg-black shadow-md flex items-center gap-2 uppercase tracking-widest">
+                                    <Icons.Save /> Cetak
                                 </button>
+                                <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Keluar"><Icons.External /></button>
                             </div>
                         </div>
                     </nav>
 
-                    <main className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0 bg-white">
+                    <main className="max-w-[99%] mx-auto p-4 md:p-10 print:p-0 bg-white">
                         
                         {/* HEADER RASMI KKM */}
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 bg-white">
@@ -359,11 +387,11 @@
                                 />
                             </div>
                             
-                            <h1 className="text-xl font-black tracking-[0.1em] text-black">KEMENTERIAN KESIHATAN MALAYSIA</h1>
+                            <h1 className="text-xl font-black tracking-[0.1em] text-black uppercase">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-lg font-bold tracking-[0.15em] text-black mt-1 uppercase underline underline-offset-8">Jadual Waktu Mingguan</h2>
                             
                             <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-end text-left gap-4">
-                                <div className="space-y-1">
+                                <div className="space-y-1 flex-1">
                                     <div className="flex gap-2">
                                         <span className="font-black text-[10px] uppercase shrink-0 text-black">NAMA INSTITUSI:</span>
                                         <span className="font-bold text-[10px] uppercase text-black">INSTITUT LATIHAN KEMENTERIAN KESIHATAN MALAYSIA KUCHING, SARAWAK</span>
@@ -382,16 +410,21 @@
                                     </div>
                                 </div>
 
-                                <div className="text-right ml-auto">
+                                <div className="text-right">
                                     <h2 className="text-3xl font-black text-black uppercase tracking-tighter leading-none">MINGGU {selectedWeek}</h2>
                                     {weekStatus !== "NORMAL" && <div className="text-[10px] font-black text-red-600 mt-1 uppercase tracking-widest">{weekStatus}</div>}
                                 </div>
                             </div>
                         </div>
 
+                        {/* TOP SCROLLBAR (SYCHRONIZED) */}
+                        <div ref={topScrollRef} className="top-scrollbar-container no-print mb-1">
+                            <div className="top-scrollbar-dummy" style={{ width: `${tableWidth}px` }}></div>
+                        </div>
+
                         {/* JADUAL UTAMA */}
-                        <div className="bg-white border-2 border-black overflow-hidden print:border-0 relative">
-                            <div className="overflow-x-auto print:overflow-visible">
+                        <div ref={tableContainerRef} className="bg-white border-2 border-black overflow-x-auto print:overflow-visible relative shadow-sm">
+                            <div ref={tableElementRef}>
                                 <table className="w-full border-collapse table-fixed min-w-[1600px] print:min-w-full">
                                     <thead>
                                         <tr className="bg-white border-b-2 border-black text-center text-black font-black text-[9px] uppercase">
@@ -491,7 +524,7 @@
                                 </div>
 
                                 {/* Trademark Signature */}
-                                <div className="absolute bottom-4 right-8 text-[10px]">
+                                <div className="absolute bottom-4 right-8 text-[10px] text-black">
                                     <span className="font-black italic">**Harold Criso Anak Ajin**</span>
                                 </div>
                             </div>
@@ -500,10 +533,10 @@
 
                     {/* MODAL EDITOR */}
                     {isModalOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm no-print animate-in fade-in duration-300">
-                            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
-                                <div className="bg-slate-50 px-10 py-6 border-b-2 border-slate-100 flex justify-between items-center shrink-0">
-                                    <h3 className="font-black text-lg uppercase text-black tracking-tight">KEMAS KINI SLOT</h3>
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm no-print animate-in fade-in duration-300">
+                            <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
+                                <div className="bg-white px-10 py-6 border-b-2 border-slate-100 flex justify-between items-center shrink-0">
+                                    <h3 className="font-black text-lg uppercase text-slate-800">KEMAS KINI SLOT</h3>
                                     <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-3 rounded-2xl hover:rotate-90 transition-all shadow-md"><Icons.X /></button>
                                 </div>
                                 <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white">
@@ -515,15 +548,15 @@
                                             </select>
                                         </div>
                                         <div className="space-y-1">
-                                            <label className="text-[11px] font-black uppercase text-slate-400">Tempoh Masa</label>
+                                            <label className="text-[11px] font-black uppercase text-slate-400">Bil. Slot</label>
                                             <select className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-sm outline-none" value={formData.duration} onChange={e => setFormData({...formData, duration: parseInt(e.target.value)})}>
                                                 {[1,2,3,4].map(n => <option key={n} value={n}>{n} Slot</option>)}
                                             </select>
                                         </div>
                                     </div>
-                                    {formData.courseCode === 'Lain-lain' && <input type="text" className="w-full px-6 py-4 bg-blue-50 border border-blue-200 rounded-2xl font-black text-sm outline-none shadow-inner" value={formData.customCourseCode} onChange={e => setFormData({...formData, customCourseCode: e.target.value})} placeholder="Sila taip kod..." />}
+                                    {formData.courseCode === 'Lain-lain' && <input type="text" className="w-full px-6 py-4 bg-blue-50 border border-blue-200 rounded-2xl font-black text-sm outline-none shadow-inner" value={formData.customCourseCode} onChange={e => setFormData({...formData, customCourseCode: e.target.value})} placeholder="Sila taip kod manual..." />}
                                     <div className="space-y-3">
-                                        <label className="text-[11px] font-black uppercase text-slate-400">Jenis Sesi</label>
+                                        <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Jenis Sesi</label>
                                         <div className="flex flex-wrap gap-2">
                                             {sessionTypes.map(t => (
                                                 <button key={t.value} onClick={() => setFormData({...formData, type: t.value})} className={`px-5 py-2 rounded-2xl text-[10px] font-black border-2 transition-all ${formData.type === t.value ? t.color + ' border-blue-600' : 'bg-white border-slate-100 text-slate-400'}`}>
@@ -541,9 +574,9 @@
                                         <input type="text" className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-black text-sm" placeholder="Nama..." value={formData.instructor} onChange={(e) => setFormData({...formData, instructor: e.target.value})} />
                                     </div>
                                 </div>
-                                <div className="p-10 bg-white border-t border-slate-100 flex gap-4 shrink-0 shadow-inner">
+                                <div className="p-10 bg-slate-50 border-t border-slate-100 flex gap-4 shrink-0">
                                     <button onClick={() => { if(editingEvent) setFormData({...editingEvent}); else setFormData(prev => ({...prev, topic: '', instructor: ''})); }} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border border-slate-200 active:scale-90 shadow-sm uppercase"><Icons.Undo /> Undo</button>
-                                    {editingEvent && <button onClick={handleDelete} className="p-5 bg-white text-red-600 border border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all"><Icons.Trash /></button>}
+                                    {editingEvent && <button onClick={handleDelete} className="p-5 bg-white text-red-600 border border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.Trash /></button>}
                                     <button onClick={handleSave} disabled={isSaving} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 active:scale-95 transition-all shadow-xl">{isSaving ? 'Menyimpan...' : 'SIMPAN REKOD'}</button>
                                 </div>
                             </div>
