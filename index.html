@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Jadual Waktu TMP Digital v4.9</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        /* TETAPAN CETAKAN LANDSKAP */
+        @media print {
+            @page { 
+                size: landscape; 
+                margin: 0.5cm; 
+            }
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; margin: 0; }
+            .print-border-0 { border: none !important; box-shadow: none !important; }
+            main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            .overflow-x-auto { overflow: visible !important; }
+            table { width: 100% !important; table-layout: fixed !important; font-size: 7pt; border-collapse: collapse; }
+            .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
+            .shadow-2xl, .shadow-xl, .shadow-md { box-shadow: none !important; }
+            .bg-white { background-color: white !important; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            input, select, textarea { border: none !important; padding: 0 !important; background: transparent !important; color: black !important; }
+        }
+
+        .vertical-text { 
+            writing-mode: vertical-rl; 
+            text-orientation: mixed; 
+            transform: rotate(180deg); 
+            display: inline-block; 
+        }
+
+        @keyframes high-visibility-flash {
+            0% { background-color: #3b82f6; color: white; transform: scale(1.02); box-shadow: 0 0 20px rgba(59,130,246,0.6); z-index: 50; }
+            100% { background-color: transparent; transform: scale(1); box-shadow: none; z-index: 1; }
+        }
+        .highlight-new { animation: high-visibility-flash 2.5s ease-out forwards; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+    <div id="root"></div>
+
+    <!-- Firebase Modular SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase Interface for React
+        window.FirebaseModular = {
+            initializeApp, getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken,
+            getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc
+        };
+    </script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useMemo } = React;
+
+        const Icons = {
+            Plus: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
+            X: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+            Undo: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-15 9 9 0 0 0-8.31 5.5"></path></svg>,
+            Save: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>,
+            Calendar: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
+            Printer: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>,
+            Trash: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
+            Lock: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
+            Cloud: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 19A3.5 3.5 0 0 0 21 15.5c0-1.63-1.11-3-2.61-3.41C18.17 9.44 15.34 7 12 7c-2.76 0-5.13 1.67-6.15 4.09C3.11 11.72 1 13.88 1 16.5A3.5 3.5 0 0 0 4.5 20h13"></path></svg>
+        };
+
+        const App = () => {
+            // AUTH & AUTHORIZATION
+            const [user, setUser] = useState(null);
+            const [isAuthorized, setIsAuthorized] = useState(() => sessionStorage.getItem('tmp_auth') === 'true');
+            const [accessCode, setAccessCode] = useState("");
+            const [loginError, setLoginError] = useState(false);
+            const [db, setDb] = useState(null);
+            const [isCloudEnabled, setIsCloudEnabled] = useState(false);
+            const [appId, setAppId] = useState('tmp-jadual-v26-final');
+
+            // DATA STATES
+            const [selectedWeek, setSelectedWeek] = useState(1);
+            const [sessionStartDate, setSessionStartDate] = useState('2026-01-05');
+            const [events, setEvents] = useState({});
+            const [footerData, setFooterData] = useState({ preparedName: '', preparedDate: '', verifiedName: '', verifiedDate: '' });
+            
+            // UI STATES
+            const [history, setHistory] = useState([]);
+            const [lastUpdatedKey, setLastUpdatedKey] = useState(null);
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingEvent, setEditingEvent] = useState(null);
+            const [isSyncing, setIsSyncing] = useState(false);
+            
+            const [formData, setFormData] = useState({
+                id: '', day: 'Isnin', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '',
+                topic: '', type: 'Kuliah', instructor: '', semester: 'T1SI', duration: 1
+            });
+
+            // PEMBOLEHUBAH TETAP
+            const MASTER_CODE = "TMP2026";
+            const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTBC 2032", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTBT 2193", "MTPC 2203", "MTNF 2162", "MTHE 2182", "MTVS 2142", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "CCRM 2013", "GCSF 2013", "Lain-lain"];
+            const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu']; 
+            const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
+            const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
+            
+            const sessionTypes = [
+                { label: 'Kuliah (L)', value: 'Kuliah', color: 'bg-blue-50 border-blue-500 text-blue-700' },
+                { label: 'Amali (P)', value: 'Amali', color: 'bg-emerald-50 border-emerald-500 text-emerald-700' },
+                { label: 'IL (Self Learning)', value: 'IL', color: 'bg-amber-50 border-amber-500 text-amber-700' },
+                { label: 'Tutorial (T)', value: 'Tutorial', color: 'bg-purple-50 border-purple-400 text-purple-700' },
+                { label: 'CA (Assessment)', value: 'CA', color: 'bg-red-50 border-red-400 text-red-700' },
+                { label: 'Ulangkaji', value: 'Ulangkaji', color: 'bg-orange-50 border-orange-400 text-orange-700' }
+            ];
+
+            const weekStatus = useMemo(() => {
+                if (selectedWeek === 10) return "CUTI PERTENGAHAN SEMESTER";
+                if ([21, 22, 23].includes(selectedWeek)) return "MINGGU PEPERIKSAAN";
+                if ([24, 25, 26].includes(selectedWeek)) return "CUTI AKHIR SEMESTER";
+                return "NORMAL";
+            }, [selectedWeek]);
+
+            // 1. INITIALIZE AUTH FIRST (Rule 3)
+            useEffect(() => {
+                if (!window.FirebaseModular) {
+                    console.log("Firebase not found. Offline mode.");
+                    loadLocalData();
+                    return;
+                }
+
+                const setup = async () => {
+                    const { initializeApp, getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, getFirestore } = window.FirebaseModular;
+                    
+                    try {
+                        const config = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+                        if (!config) throw new Error("No config");
+                        
+                        const app = initializeApp(config);
+                        const auth = getAuth(app);
+                        const firestoreDb = getFirestore(app);
+                        setDb(firestoreDb);
+                        
+                        const aId = typeof __app_id !== 'undefined' ? __app_id : 'tmp-jadual-v26-final';
+                        setAppId(aId);
+
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+
+                        onAuthStateChanged(auth, (u) => {
+                            setUser(u);
+                            if (u) setIsCloudEnabled(true);
+                        });
+                    } catch (e) {
+                        console.log("Local Mode Active.");
+                        loadLocalData();
+                    }
+                };
+                setup();
+            }, []);
+
+            // 2. FETCH DATA ONLY AFTER AUTH (Rule 3 Guard)
+            useEffect(() => {
+                if (!user || !db || !isAuthorized) {
+                    if (!isCloudEnabled) loadLocalData();
+                    return;
+                }
+
+                const { collection, onSnapshot, doc } = window.FirebaseModular;
+                setIsSyncing(true);
+
+                // Events Listener
+                const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'jadual_master');
+                const unsubEvents = onSnapshot(eventsRef, (snapshot) => {
+                    const data = {};
+                    snapshot.forEach(d => { data[d.id] = d.data(); });
+                    setEvents(data);
+                    setIsSyncing(false);
+                }, (err) => { 
+                    console.error("Permission error on events", err); 
+                    setIsSyncing(false);
+                });
+
+                // Signature Listener
+                const sigDoc = doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta', 'signatures');
+                const unsubSig = onSnapshot(sigDoc, (d) => {
+                    if (d.exists()) setFooterData(d.data());
+                }, (err) => { console.error("Permission error on meta", err); });
+
+                return () => { unsubEvents(); unsubSig(); };
+            }, [user, db, isAuthorized, isCloudEnabled, appId]);
+
+            const loadLocalData = () => {
+                const saved = localStorage.getItem('tmp_data_v4.9_fixed');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    setEvents(parsed.events || {});
+                    setFooterData(parsed.footer || { preparedName: '', preparedDate: '', verifiedName: '', verifiedDate: '' });
+                    setSessionStartDate(parsed.startDate || '2026-01-05');
+                }
+            };
+
+            useEffect(() => {
+                if (!isCloudEnabled) {
+                    localStorage.setItem('tmp_data_v4.9_fixed', JSON.stringify({ events, footer: footerData, startDate: sessionStartDate }));
+                }
+            }, [events, footerData, sessionStartDate, isCloudEnabled]);
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                if (accessCode === MASTER_CODE) {
+                    setIsAuthorized(true);
+                    sessionStorage.setItem('tmp_auth', 'true');
+                    setLoginError(false);
+                } else { setLoginError(true); }
+            };
+
+            const getFullDate = (dayIdx, weekNum) => {
+                const start = new Date(sessionStartDate);
+                const daysToAdd = (weekNum - 1) * 7 + dayIdx;
+                const target = new Date(start);
+                target.setDate(start.getDate() + daysToAdd);
+                return target.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            };
+
+            const isSlotBreak = (day, slotIdx) => {
+                const slot = timeSlots[slotIdx];
+                if (slot === '10.00 - 10.30') return true;
+                if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true;
+                if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx); 
+                return false;
+            };
+
+            const handleOpenModal = (day, sem, slotIdx, event = null) => {
+                if (isSlotBreak(day, slotIdx) || weekStatus.includes("CUTI")) return;
+                if (event) {
+                    setFormData({ ...event, customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode });
+                    setEditingEvent(event);
+                } else {
+                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', duration: 1 });
+                    setEditingEvent(null);
+                }
+                setIsModalOpen(true);
+            };
+
+            const handleSave = async () => {
+                setHistory([...history, events]); 
+                const finalCode = formData.courseCode === 'Lain-lain' ? formData.customCourseCode : formData.courseCode;
+                const key = `${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
+                const dataToSave = { ...formData, courseCode: finalCode, lastUpdate: Date.now() };
+
+                if (isCloudEnabled && db && user) {
+                    const { doc, setDoc } = window.FirebaseModular;
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_master', key), dataToSave);
+                } else {
+                    setEvents(prev => ({ ...prev, [key]: dataToSave }));
+                }
+
+                setLastUpdatedKey(key);
+                setIsModalOpen(false);
+                setTimeout(() => setLastUpdatedKey(null), 3000);
+            };
+
+            const handleFooterChange = async (field, value) => {
+                const next = { ...footerData, [field]: value };
+                setFooterData(next);
+                if (isCloudEnabled && db && user) {
+                    const { doc, setDoc } = window.FirebaseModular;
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta', 'signatures'), next);
+                }
+            };
+
+            const handleModalUndo = () => {
+                if (editingEvent) {
+                    setFormData({ ...editingEvent, customCourseCode: courseCodes.includes(editingEvent.courseCode) ? '' : editingEvent.courseCode });
+                } else {
+                    setFormData({ ...formData, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', duration: 1 });
+                }
+            };
+
+            const handleDelete = async () => {
+                const key = `${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
+                if (isCloudEnabled && db && user) {
+                    const { doc, deleteDoc } = window.FirebaseModular;
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_master', key));
+                } else {
+                    const next = { ...events };
+                    delete next[key];
+                    setEvents(next);
+                }
+                setIsModalOpen(false);
+            };
+
+            if (!isAuthorized) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6">
+                        <div className="bg-white/95 backdrop-blur w-full max-w-md p-10 rounded-[3rem] text-center shadow-2xl">
+                            <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6"><Icons.Lock /></div>
+                            <h2 className="text-xl font-black text-slate-800 mb-8 uppercase">Akses Jadual TMP</h2>
+                            <form onSubmit={handleLogin} className="space-y-4">
+                                <input type="password" value={accessCode} onChange={(e) => setAccessCode(e.target.value)} placeholder="Kod Akses" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center outline-none focus:border-blue-600" autoFocus />
+                                <button type="submit" className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all">Buka</button>
+                            </form>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="pb-20 animate-in fade-in duration-500">
+                    <nav className="bg-white border-b-4 border-blue-700 sticky top-0 z-40 px-6 py-4 no-print shadow-xl">
+                        <div className="max-w-[98%] mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-blue-700 p-3 rounded-2xl text-white shadow-lg"><Icons.Calendar /></div>
+                                <div>
+                                    <h1 className="font-black text-slate-800 text-xl leading-none uppercase">JWM MASTER TMP</h1>
+                                    <p className={`text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 ${isCloudEnabled ? 'text-green-600' : 'text-slate-400'}`}>
+                                        <Icons.Cloud /> {isCloudEnabled ? (isSyncing ? 'Segerak Data...' : 'Segerak Awan Aktif') : 'Mod Luar Talian (Offline)'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-4">
+                                <div className="flex flex-col gap-1 px-4 border-l-2 border-slate-200">
+                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Mula Sesi (M1)</label>
+                                    <input type="date" value={sessionStartDate} onChange={(e) => setSessionStartDate(e.target.value)} className="bg-blue-50 text-blue-800 text-xs font-black p-2 rounded-xl border-2 border-blue-100 outline-none" />
+                                </div>
+                                <div className="flex items-center bg-slate-900 text-white rounded-2xl p-1.5 shadow-xl">
+                                    <button onClick={() => setSelectedWeek(Math.max(1, selectedWeek - 1))} className="p-2 hover:bg-slate-700 rounded-xl"><Icons.Undo /></button>
+                                    <div className="px-6 text-center min-w-[100px]">
+                                        <div className="text-[8px] text-slate-400 font-black uppercase mb-1 leading-none">Minggu</div>
+                                        <div className="text-xl font-black leading-none">{selectedWeek}</div>
+                                    </div>
+                                    <button onClick={() => setSelectedWeek(Math.min(26, selectedWeek + 1))} className="p-2 hover:bg-slate-700 rounded-xl rotate-180"><Icons.Undo /></button>
+                                </div>
+                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-6 py-3 rounded-2xl text-xs font-black flex items-center gap-2 hover:bg-black transition-all">
+                                    <Icons.Printer /> CETAK LANDSKAP
+                                </button>
+                                <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-3 bg-slate-100 text-slate-400 hover:text-red-600 rounded-2xl transition-all"><Icons.Lock /></button>
+                            </div>
+                        </div>
+                    </nav>
+
+                    <main className="max-w-[99%] mx-auto p-4 md:p-6 print:p-0">
+                        <div className="flex justify-between items-end mb-4 no-print px-2">
+                            <div className="flex items-center gap-3">
+                                {weekStatus !== "NORMAL" && <div className="bg-orange-500 text-white px-4 py-2 rounded-xl text-xs font-black animate-bounce shadow-lg">{weekStatus}</div>}
+                            </div>
+                            <div className="text-right">
+                                <h2 className="text-3xl font-black text-slate-800 uppercase leading-none">MINGGU {selectedWeek}</h2>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Sesi Akademik TMP 2026</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-[3.5rem] shadow-2xl border border-slate-200 overflow-hidden print:border-0 relative">
+                            <div className="absolute top-6 right-10 hidden print:block text-right">
+                                <h2 className="text-2xl font-black text-black">MINGGU {selectedWeek}</h2>
+                            </div>
+
+                            <div className="overflow-x-auto print:overflow-visible">
+                                <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full">
+                                    <thead>
+                                        <tr className="bg-slate-50 border-b-2 border-slate-200 text-center text-slate-500 uppercase font-black text-[10px]">
+                                            <th className="w-36 p-6 border-r-2">Hari / Tarikh</th>
+                                            <th className="w-24 p-6 border-r-2">Sem</th>
+                                            {timeSlots.map(slot => (<th key={slot} className="p-4 border-r last:border-0">{slot}</th>))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {days.map((day, dayIdx) => {
+                                            const dateStr = getFullDate(dayIdx, selectedWeek);
+                                            return (
+                                                <React.Fragment key={day}>
+                                                    {semesters.map((sem, semIdx) => {
+                                                        const skips = [];
+                                                        return (
+                                                            <tr key={`${day}-${sem}`} className={`border-b border-slate-100 ${semIdx === 3 ? 'border-b-4 border-slate-200' : ''}`}>
+                                                                {semIdx === 0 && (
+                                                                    <td rowSpan={4} className="p-4 bg-slate-50/50 border-r-2 border-slate-200 text-center align-middle relative">
+                                                                        <div className="font-black text-slate-800 text-base uppercase mb-1">{day}</div>
+                                                                        <div className="text-[10px] font-black text-blue-700 bg-white px-3 py-1.5 rounded-xl border-2 border-blue-50 shadow-sm inline-block">{dateStr}</div>
+                                                                    </td>
+                                                                )}
+                                                                <td className="p-2 bg-slate-50/50 border-r-2 border-slate-200 text-center font-black text-[11px] text-slate-400">{sem}</td>
+                                                                {timeSlots.map((slot, slotIdx) => {
+                                                                    if (skips.includes(slotIdx)) return null;
+                                                                    const key = `${selectedWeek}-${day}-${sem}-${slotIdx}`;
+                                                                    const event = events[key];
+                                                                    const isBreak = isSlotBreak(day, slotIdx);
+                                                                    
+                                                                    if (weekStatus !== 'NORMAL') {
+                                                                        if (semIdx === 0) return (
+                                                                            <td key={slotIdx} rowSpan={4} className="bg-slate-200/40 border-r border-slate-200 p-2 text-center align-middle">
+                                                                                <span className="text-[9px] font-black uppercase vertical-text tracking-[0.6em] text-slate-400 opacity-60">{weekStatus}</span>
+                                                                            </td>
+                                                                        );
+                                                                        return null;
+                                                                    }
+
+                                                                    if (isBreak) {
+                                                                        if (semIdx === 0) return (
+                                                                            <td key={slotIdx} rowSpan={4} className="bg-slate-100/60 border-r border-slate-200 p-2 text-center align-middle">
+                                                                                <span className="text-[10px] font-black text-slate-400 uppercase vertical-text tracking-[0.5em] opacity-50">REHAT</span>
+                                                                            </td>
+                                                                        );
+                                                                        return null;
+                                                                    }
+                                                                    
+                                                                    let colSpan = 1;
+                                                                    if (event && event.duration > 1) {
+                                                                        for(let i = 1; i < event.duration; i++) {
+                                                                            const targetIdx = slotIdx + i;
+                                                                            if (targetIdx < timeSlots.length && !isSlotBreak(day, targetIdx)) {
+                                                                                colSpan++; skips.push(targetIdx);
+                                                                            } else { break; }
+                                                                        }
+                                                                    }
+                                                                    return (
+                                                                        <td key={slotIdx} colSpan={colSpan} className={`p-1.5 border-r border-slate-100 h-32 align-top hover:bg-blue-50/50 transition-all ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
+                                                                            {event ? (
+                                                                                <div onClick={() => handleOpenModal(day, sem, slotIdx, event)} className={`h-full w-full rounded-3xl border-l-[6px] p-3 text-[10px] cursor-pointer shadow-lg flex flex-col gap-1 overflow-hidden transition-all active:scale-95 ${sessionTypes.find(t => t.value === event.type)?.color || 'bg-white'}`}>
+                                                                                    <div className="font-black truncate uppercase text-slate-900 border-b border-black/10 pb-1">{event.courseCode}</div>
+                                                                                    <div className="font-bold line-clamp-3 leading-snug text-slate-700 flex-1">{event.topic}</div>
+                                                                                    <div className="mt-2 font-black opacity-60 text-[9px] truncate bg-white/60 rounded-lg px-2 py-1 flex items-center justify-between">
+                                                                                        <span>{event.instructor}</span>
+                                                                                        <span className="bg-black/10 px-1.5 rounded">{event.duration}H</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <button onClick={() => handleOpenModal(day, sem, slotIdx)} className="w-full h-full rounded-3xl border-2 border-dashed border-slate-100 hover:border-blue-400 hover:bg-blue-50 flex items-center justify-center text-slate-300 hover:text-blue-500 no-print transition-all">
+                                                                                    <Icons.Plus />
+                                                                                </button>
+                                                                            )}
+                                                                        </td>
+                                                                    );
+                                                                })}
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </React.Fragment>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* FOOTER PENGESAHAN */}
+                            <div className="p-10 border-t-2 border-slate-100 grid grid-cols-2 gap-20">
+                                <div className="space-y-1">
+                                    <h4 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">DISEDIAKAN OLEH:</h4>
+                                    <div className="pt-8 pb-1 border-b border-slate-400 flex items-center gap-2">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase">NAMA:</span>
+                                        <input type="text" value={footerData.preparedName} onChange={(e) => handleFooterChange('preparedName', e.target.value)} className="w-full bg-transparent font-black text-sm text-slate-800 outline-none" placeholder="................................................." />
+                                    </div>
+                                    <p className="text-[9px] font-black text-slate-600 uppercase">PENGAJAR PENYELARAS</p>
+                                    <div className="flex items-center gap-2 pt-1">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase">TARIKH:</span>
+                                        <input type="date" value={footerData.preparedDate} onChange={(e) => handleFooterChange('preparedDate', e.target.value)} className="bg-transparent font-bold text-[10px] outline-none cursor-pointer" />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1 text-left">
+                                    <h4 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">DISAHKAN OLEH:</h4>
+                                    <div className="pt-8 pb-1 border-b border-slate-400 flex items-center gap-2">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase">NAMA:</span>
+                                        <input type="text" value={footerData.verifiedName} onChange={(e) => handleFooterChange('verifiedName', e.target.value)} className="w-full bg-transparent font-black text-sm text-slate-800 outline-none" placeholder="................................................." />
+                                    </div>
+                                    <p className="text-[9px] font-black text-slate-600 uppercase leading-tight">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
+                                    <div className="flex items-center gap-2 pt-1">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase">TARIKH:</span>
+                                        <input type="date" value={footerData.verifiedDate} onChange={(e) => handleFooterChange('verifiedDate', e.target.value)} className="bg-transparent font-bold text-[10px] outline-none cursor-pointer" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+
+                    {/* MODAL EDITOR: Header & Footer Sticky */}
+                    {isModalOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm no-print animate-in fade-in duration-300">
+                            <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-blue-700 flex flex-col">
+                                
+                                <div className="bg-slate-50 px-10 py-6 border-b-2 border-slate-100 flex justify-between items-center shrink-0">
+                                    <div className="flex items-center gap-4">
+                                        <div className="bg-blue-700 p-3 rounded-2xl text-white shadow-lg"><Icons.Calendar /></div>
+                                        <h3 className="font-black text-slate-800 text-xl uppercase tracking-tight">KEMAS KINI SLOT</h3>
+                                    </div>
+                                    <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-3 rounded-2xl hover:rotate-90 transition-all shadow-xl active:scale-75"><Icons.X /></button>
+                                </div>
+
+                                <div className="p-10 space-y-6 overflow-y-auto flex-1">
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div className="space-y-1">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase ml-2">Kod Kursus</label>
+                                            <select className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-3xl focus:border-blue-500 font-black text-sm outline-none shadow-sm cursor-pointer" value={formData.courseCode} onChange={(e) => setFormData({...formData, courseCode: e.target.value})}>
+                                                {courseCodes.map(c => <option key={c} value={c}>{c}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase ml-2">Tempoh Masa</label>
+                                            <select className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-3xl focus:border-blue-500 font-black text-sm outline-none shadow-sm cursor-pointer" value={formData.duration} onChange={(e) => setFormData({...formData, duration: parseInt(e.target.value)})}>
+                                                <option value="1">1 Slot</option><option value="2">2 Slot</option><option value="3">3 Slot</option><option value="4">4 Slot</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {formData.courseCode === 'Lain-lain' && (
+                                        <input type="text" className="w-full px-6 py-4 bg-blue-50 border-2 border-blue-200 rounded-3xl focus:border-blue-500 font-black text-sm outline-none animate-in slide-in-from-top-2 shadow-inner" value={formData.customCourseCode} onChange={(e) => setFormData({...formData, customCourseCode: e.target.value})} placeholder="Sila taip kod..." />
+                                    )}
+                                    
+                                    <div className="space-y-3">
+                                        <label className="text-[11px] font-black text-slate-400 uppercase ml-2">Jenis Sesi</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {sessionTypes.map(t => (
+                                                <button key={t.value} onClick={() => setFormData({...formData, type: t.value})} className={`px-5 py-2.5 rounded-2xl text-[10px] font-black transition-all border-2 ${formData.type === t.value ? t.color + ' border-blue-600 shadow-md scale-105' : 'bg-white border-slate-100 text-slate-400 hover:bg-slate-50'}`}>
+                                                    {t.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <textarea rows="3" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-[2rem] focus:border-blue-500 outline-none font-bold text-sm shadow-sm" placeholder="Topik pengajaran..." value={formData.topic} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
+                                    <input type="text" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-3xl focus:border-blue-500 outline-none font-black text-sm shadow-sm" placeholder="Nama Pengajar..." value={formData.instructor} onChange={(e) => setFormData({...formData, instructor: e.target.value})} />
+                                </div>
+
+                                <div className="p-10 bg-slate-50 border-t-2 border-slate-100 flex gap-4 shrink-0 shadow-inner">
+                                    <button onClick={handleModalUndo} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black hover:bg-slate-100 rounded-[2rem] transition-all border-2 border-slate-200 flex items-center justify-center gap-2 active:scale-90 shadow-sm" title="Undo Taipan"><Icons.Undo /> UNDO</button>
+                                    {editingEvent && (
+                                        <button onClick={handleDelete} className="p-5 bg-white text-red-600 hover:bg-red-600 hover:text-white rounded-[2rem] transition-all border-2 border-red-100 flex items-center justify-center shadow-sm"><Icons.Trash /></button>
+                                    )}
+                                    <button onClick={handleSave} className="flex-[3] py-5 bg-blue-700 text-white rounded-[2rem] text-sm font-black hover:bg-blue-800 shadow-2xl flex items-center justify-center gap-3 active:scale-95 transition-all"><Icons.Save /> SIMPAN REKOD</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
