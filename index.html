@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v6.4</title>
+    <title>Jadual Waktu Mingguan TMP Digital v6.5</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -25,8 +25,8 @@
             .print-border-0 { border: none !important; box-shadow: none !important; }
             main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
             .overflow-x-auto { overflow: visible !important; }
-            table { width: 100% !important; table-layout: fixed !important; font-size: 7pt; border-collapse: collapse; border: 1px solid black !important; }
-            th, td { border: 1px solid black !important; background: white !important; color: black !important; }
+            table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: 1px solid black !important; }
+            th, td { border: 1px solid black !important; }
             .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
             input, select, textarea { border: none !important; background: transparent !important; color: black !important; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -38,18 +38,22 @@
         }
         .highlight-new { animation: high-visibility-flash 2.5s ease-out forwards; }
         
+        /* Week selector scrollbar */
         .week-scrollbar::-webkit-scrollbar { height: 8px; display: block; }
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .week-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        .top-scrollbar-container { overflow-x: auto; overflow-y: hidden; height: 16px; margin-bottom: 2px; }
+        /* Top dummy scrollbar */
+        .top-scrollbar-container { overflow-x: auto; overflow-y: hidden; height: 18px; margin-bottom: 2px; }
         .top-scrollbar-dummy { height: 1px; }
 
+        /* General layout scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f8fafc; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .font-table-content { font-size: 14px !important; }
     </style>
 </head>
 <body class="bg-white min-h-screen text-black font-sans">
@@ -69,6 +73,7 @@
         };
 
         const App = () => {
+            // FIREBASE CONFIG (KEKAL)
             const firebaseConfig = {
                 apiKey: "AIzaSyBOCPBrZ-xkwEgi4OnkBwDB8YqGgWEuMVE",
                 authDomain: "jadual-tmp-digital.firebaseapp.com",
@@ -83,13 +88,13 @@
             const [isAuthorized, setIsAuthorized] = useState(() => sessionStorage.getItem('tmp_auth') === 'true');
             const [accessCode, setAccessCode] = useState("");
             const [isCloudEnabled, setIsCloudEnabled] = useState(false);
-            const [isSyncing, setIsSyncing] = useState(false);
             const [appId] = useState('tmp-jadual-v26-master');
 
             const [selectedWeek, setSelectedWeek] = useState(1);
             const [sessionStartDate, setSessionStartDate] = useState('2026-01-05');
-            const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
+            const [academicSession, setAcademicSession] = useState('Januari - Jun');
             const [events, setEvents] = useState({});
+            const [customDates, setCustomDates] = useState({});
             const [footerData, setFooterData] = useState({ preparedName: '', preparedDate: '', verifiedName: '', verifiedDate: '' });
             const [filterSemester, setFilterSemester] = useState('SEMUA');
             const [saturdayConfigs, setSaturdayConfigs] = useState({});
@@ -117,15 +122,6 @@
 
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
             
-            const sessionTypes = [
-                { label: 'Kuliah (L)', value: 'Kuliah', color: 'bg-blue-50 border-blue-500 text-blue-700' },
-                { label: 'Amali (P)', value: 'Amali', color: 'bg-emerald-50 border-emerald-500 text-emerald-700' },
-                { label: 'IL (Self Learning)', value: 'IL', color: 'bg-amber-50 border-amber-500 text-amber-700' },
-                { label: 'Tutorial (T)', value: 'Tutorial', color: 'bg-purple-50 border-purple-400 text-purple-700' },
-                { label: 'CA (Assessment)', value: 'CA', color: 'bg-red-50 border-red-400 text-red-700' },
-                { label: 'Ulangkaji', value: 'Ulangkaji', color: 'bg-orange-50 border-orange-400 text-orange-700' }
-            ];
-
             const sessionInitials = {
                 'Kuliah': '(L)',
                 'Amali': '(P)',
@@ -146,20 +142,23 @@
             const currentWeekHasSaturday = useMemo(() => saturdayConfigs[selectedWeek] === true, [saturdayConfigs, selectedWeek]);
             const visibleDays = useMemo(() => currentWeekHasSaturday ? days : days.slice(0, 5), [currentWeekHasSaturday]);
 
-            const [formData, setFormData] = useState({ id: '', day: '', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', semester: '', duration: 1 });
-
+            // Sync Horizontal Scrollbars
             useEffect(() => {
                 const top = topScrollRef.current;
                 const bottom = tableContainerRef.current;
                 if (!top || !bottom) return;
+
                 const syncTop = () => { bottom.scrollLeft = top.scrollLeft; };
                 const syncBottom = () => { top.scrollLeft = bottom.scrollLeft; };
+
                 top.addEventListener('scroll', syncTop);
                 bottom.addEventListener('scroll', syncBottom);
+                
                 const resizeObserver = new ResizeObserver(() => {
                     if (tableElementRef.current) setTableWidth(tableElementRef.current.scrollWidth);
                 });
                 if (tableElementRef.current) resizeObserver.observe(tableElementRef.current);
+
                 return () => {
                     top.removeEventListener('scroll', syncTop);
                     bottom.removeEventListener('scroll', syncBottom);
@@ -167,6 +166,7 @@
                 };
             }, [isAuthorized, selectedWeek, filterSemester, saturdayConfigs]);
 
+            // Firebase Init
             useEffect(() => {
                 if (!firebase.apps.length) {
                     try {
@@ -179,64 +179,63 @@
                 }
             }, []);
 
+            // Real-time Sync
             useEffect(() => {
                 if (!isAuthorized || !isCloudEnabled || !user) {
                     if (isAuthorized) loadLocalData();
                     return;
                 }
                 const db = firebase.firestore();
-                setIsSyncing(true);
                 const unsubEvents = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_master')
                     .onSnapshot((snap) => {
                         const data = {};
                         snap.forEach(doc => data[doc.id] = doc.data());
                         setEvents(data);
-                        setIsSyncing(false);
-                    }, () => setIsSyncing(false));
+                    });
                 const unsubFooter = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('signatures')
                     .onSnapshot((doc) => { if (doc.exists) setFooterData(doc.data()); });
                 const unsubSat = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('saturday_configs')
                     .onSnapshot((doc) => { if (doc.exists) setSaturdayConfigs(doc.data()); });
-                return () => { unsubEvents(); unsubFooter(); unsubSat(); };
+                const unsubDates = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('custom_dates')
+                    .onSnapshot((doc) => { if (doc.exists) setCustomDates(doc.data()); });
+
+                return () => { unsubEvents(); unsubFooter(); unsubSat(); unsubDates(); };
             }, [user, isAuthorized, isCloudEnabled]);
 
             const loadLocalData = () => {
-                const saved = localStorage.getItem('tmp_v6.3_local');
+                const saved = localStorage.getItem('tmp_v6.5_local');
                 if (saved) {
                     const p = JSON.parse(saved);
                     setEvents(p.events || {});
-                    setFooterData(p.footer || { preparedName: '', preparedDate: '', verifiedName: '', verifiedDate: '' });
+                    setFooterData(p.footer || {});
                     setSaturdayConfigs(p.saturdayConfigs || {});
+                    setCustomDates(p.customDates || {});
                     setSessionStartDate(p.start || '2026-01-05');
+                    setAcademicSession(p.academicSession || 'Januari - Jun');
                 }
             };
 
-            const getFullDate = (dayIdx, weekNum) => {
+            const getCalculatedDate = (dayIdx, weekNum) => {
                 const start = new Date(sessionStartDate);
                 const daysToAdd = (weekNum - 1) * 7 + dayIdx;
                 const target = new Date(start);
                 target.setDate(start.getDate() + daysToAdd);
-                return target.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                return target.toISOString().split('T')[0];
             };
 
-            const isSlotBreak = (day, slotIdx) => {
-                const slot = timeSlots[slotIdx];
-                if (slot === '10.00 - 10.30') return true;
-                if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true;
-                if (day === 'Jumaat') return [5, 6].includes(slotIdx); 
-                return false;
+            const formatDisplayDate = (dateIso) => {
+                if (!dateIso) return "";
+                const d = new Date(dateIso);
+                return d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
             };
 
-            const handleOpenModal = (day, sem, slotIdx, event = null) => {
-                if (isSlotBreak(day, slotIdx) || weekStatus.includes("CUTI")) return;
-                if (event) {
-                    setFormData({ ...event, customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode });
-                    setEditingEvent({...event});
-                } else {
-                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', duration: 1 });
-                    setEditingEvent(null);
+            const handleDateChange = async (day, dateVal) => {
+                const key = `${selectedWeek}-${day}`;
+                const nextDates = { ...customDates, [key]: dateVal };
+                setCustomDates(nextDates);
+                if (isCloudEnabled && user) {
+                    await firebase.firestore().collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('custom_dates').set(nextDates);
                 }
-                setIsModalOpen(true);
             };
 
             const handleSave = async () => {
@@ -247,8 +246,7 @@
                 const data = { ...formData, courseCode: finalCode };
                 try {
                     if (isCloudEnabled && user) {
-                        const db = firebase.firestore();
-                        await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_master').doc(key).set(data);
+                        await firebase.firestore().collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_master').doc(key).set(data);
                     } else {
                         setEvents(prev => ({ ...prev, [key]: data }));
                     }
@@ -262,41 +260,19 @@
                 const next = { ...footerData, [field]: val };
                 setFooterData(next);
                 if (isCloudEnabled && user) {
-                    const db = firebase.firestore();
-                    db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('signatures').set(next).catch(console.error);
+                    await firebase.firestore().collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('signatures').set(next);
                 }
-            };
-
-            const toggleSaturday = async () => {
-                const nextVal = !currentWeekHasSaturday;
-                const nextConfigs = { ...saturdayConfigs, [selectedWeek]: nextVal };
-                setSaturdayConfigs(nextConfigs);
-                if (isCloudEnabled && user) {
-                    const db = firebase.firestore();
-                    db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('saturday_configs').set(nextConfigs).catch(console.error);
-                }
-            };
-
-            const handleDelete = async () => {
-                if (!confirm("Padam slot ini?")) return;
-                const key = `${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
-                if (isCloudEnabled && user) {
-                    await firebase.firestore().collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_master').doc(key).delete();
-                } else {
-                    const next = { ...events }; delete next[key]; setEvents(next);
-                }
-                setIsModalOpen(false);
             };
 
             if (!isAuthorized) {
                 return (
                     <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6">
-                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full border-4 border-white animate-in zoom-in duration-300">
+                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full animate-in zoom-in duration-300">
                             <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl"><Icons.Lock /></div>
-                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 tracking-tight">Kunci Akses Jadual</h2>
-                            <form onSubmit={(e) => { e.preventDefault(); if(accessCode === "TMP2026"){ setIsAuthorized(true); sessionStorage.setItem('tmp_auth', 'true'); } else { alert("Kod Akses Salah"); } }}>
-                                <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses Jabatan" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 transition-all" autoFocus />
-                                <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all">Sahkan</button>
+                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 tracking-tight">Log Masuk Jadual</h2>
+                            <form onSubmit={(e) => { e.preventDefault(); if(accessCode === "TMP2026"){ setIsAuthorized(true); sessionStorage.setItem('tmp_auth', 'true'); } }}>
+                                <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 transition-all" autoFocus />
+                                <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase hover:bg-blue-700 transition-all">Sahkan</button>
                             </form>
                         </div>
                     </div>
@@ -305,47 +281,49 @@
 
             return (
                 <div className="pb-20 bg-white">
+                    {/* Navigation Dashboard */}
                     <nav className="bg-white border-b-2 border-slate-100 sticky top-0 z-40 px-6 py-4 no-print shadow-sm flex flex-col gap-4">
                         <div className="max-w-[98%] mx-auto w-full flex flex-wrap items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
                                 <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic shadow-lg">TMP</div>
                                 <div>
-                                    <h1 className="font-black text-slate-800 text-lg leading-none uppercase tracking-tight">JWM MASTER</h1>
+                                    <h1 className="font-black text-slate-800 text-lg leading-none uppercase">JWM MASTER</h1>
                                     <p className="text-[10px] font-black text-blue-600 uppercase mt-1 tracking-widest leading-none">
-                                        {isCloudEnabled ? 'Data Awan Aktif' : 'Mod Offline'}
+                                        Versi 6.5 Pro
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="flex-1 max-w-3xl bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner overflow-hidden">
-                                <div className="week-scrollbar flex gap-2 overflow-x-auto pb-2 px-1 scroll-smooth">
+                            <div className="flex-1 max-w-2xl bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner overflow-hidden">
+                                <div className="week-scrollbar flex gap-2 overflow-x-auto pb-2 px-1">
                                     {Array.from({length: 26}, (_, i) => i + 1).map(w => (
-                                        <button 
-                                            key={w} 
-                                            onClick={() => setSelectedWeek(w)}
-                                            className={`shrink-0 min-w-[50px] py-2 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-400 hover:bg-slate-100'}`}
-                                        >
-                                            M{w}
-                                        </button>
+                                        <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[45px] py-2 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 hover:bg-slate-100'}`}>M{w}</button>
                                     ))}
                                 </div>
                             </div>
 
                             <div className="flex flex-wrap items-center gap-3">
+                                <div className="flex flex-col gap-1 border-r pr-3 border-slate-100">
+                                    <label className="text-[8px] font-black uppercase text-slate-400">Sesi Akademik</label>
+                                    <select value={academicSession} onChange={e => setAcademicSession(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg border border-blue-100">
+                                        <option value="Januari - Jun">Januari - Jun</option>
+                                        <option value="Julai - Disember">Julai - Disember</option>
+                                    </select>
+                                </div>
                                 <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
-                                    <span className="text-[9px] font-black uppercase text-slate-400 tracking-tighter">Sabtu (M{selectedWeek}):</span>
-                                    <button onClick={toggleSaturday} className={`w-10 h-5 rounded-full relative transition-all ${currentWeekHasSaturday ? 'bg-green-500' : 'bg-slate-300'}`}>
-                                        <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${currentWeekHasSaturday ? 'left-6' : 'left-1'}`}></div>
+                                    <span className="text-[9px] font-black uppercase text-slate-400">Sabtu:</span>
+                                    <button onClick={() => {
+                                        const next = !currentWeekHasSaturday;
+                                        setSaturdayConfigs({...saturdayConfigs, [selectedWeek]: next});
+                                        if(isCloudEnabled) firebase.firestore().collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('saturday_configs').set({...saturdayConfigs, [selectedWeek]: next});
+                                    }} className={`w-8 h-4 rounded-full relative transition-all ${currentWeekHasSaturday ? 'bg-green-500' : 'bg-slate-300'}`}>
+                                        <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${currentWeekHasSaturday ? 'left-4' : 'left-0.5'}`}></div>
                                     </button>
                                 </div>
-                                <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-2.5 rounded-xl outline-none cursor-pointer border border-blue-100">
-                                    <option value="SEMUA">Semua Semester</option>
-                                    {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
-                                </select>
-                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-6 py-2.5 rounded-xl text-[10px] font-black hover:bg-black transition-all shadow-md flex items-center gap-2 uppercase tracking-widest">
+                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-5 py-2 rounded-xl text-[10px] font-black hover:bg-black flex items-center gap-2 uppercase">
                                     <Icons.Save /> Cetak
                                 </button>
-                                <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Keluar"><Icons.External /></button>
+                                <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.External /></button>
                             </div>
                         </div>
                     </nav>
@@ -354,72 +332,72 @@
                         
                         {/* HEADER RASMI KKM */}
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 bg-white">
-                            {/* PENAMBAHBAIKAN SAIZ FON: BPL KKM -> 12px */}
                             <div className="absolute top-0 right-0 text-[12px] font-bold text-right text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
 
                             <div className="flex justify-center mb-1">
-                                <img 
-                                    src="JATA_NEGARA_MALAYSIA.jpg" 
-                                    alt="Jata Negara" 
-                                    className="h-24 w-auto object-contain" 
-                                    onError={(e) => {
-                                        e.target.onerror = null; 
-                                        e.target.src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png";
-                                    }}
-                                />
+                                <img src="JATA_NEGARA_MALAYSIA.jpg" alt="Jata Negara" className="h-24 w-auto object-contain" 
+                                    onError={(e) => { e.target.onerror = null; e.target.src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png"; }} />
                             </div>
                             
-                            <h1 className="text-xl font-black tracking-[0.1em] text-black uppercase leading-tight">KEMENTERIAN KESIHATAN MALAYSIA</h1>
-                            <h2 className="text-lg font-bold tracking-[0.15em] text-black mt-1 uppercase underline underline-offset-8">Jadual Waktu Mingguan</h2>
+                            <h1 className="text-xl font-black text-black uppercase">KEMENTERIAN KESIHATAN MALAYSIA</h1>
+                            <h2 className="text-lg font-bold text-black mt-1 uppercase underline underline-offset-8">Jadual Waktu Mingguan</h2>
                             
                             <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-end text-left gap-4">
                                 <div className="space-y-1 flex-1">
-                                    {/* PENAMBAHBAIKAN SAIZ FON: NAMA INSTITUSI -> 12px */}
                                     <div className="flex gap-2">
                                         <span className="font-black text-[12px] uppercase shrink-0 text-black">NAMA INSTITUSI:</span>
                                         <span className="font-bold text-[12px] uppercase text-black">INSTITUT LATIHAN KEMENTERIAN KESIHATAN MALAYSIA KUCHING, SARAWAK</span>
                                     </div>
                                     <div className="flex items-center gap-10">
-                                        {/* PENAMBAHBAIKAN SAIZ FON: TARIKH -> 12px */}
                                         <div className="flex items-center gap-2">
                                             <span className="font-black text-[12px] uppercase text-black">TARIKH:</span>
-                                            <input type="date" value={currentDate} onChange={e => setCurrentDate(e.target.value)} className="font-bold text-[12px] outline-none text-black bg-transparent" />
+                                            <span className="font-bold text-[12px] text-black">Pilihan Tarikh Mingguan</span>
                                         </div>
-                                        {/* PENAMBAHBAIKAN SAIZ FON: SEMESTER -> 12px */}
                                         <div className="flex items-center gap-2">
                                             <span className="font-black text-[12px] uppercase text-black">SEMESTER:</span>
                                             <span className="font-bold text-[12px] uppercase text-black">
                                                 {filterSemester === 'SEMUA' ? 'Tahun 1 Semester II, Tahun 2 Semester I & Tahun 2 Semester II' : semesterLabels[filterSemester]}
                                             </span>
                                         </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-black text-[12px] uppercase text-black">SESI AKADEMIK:</span>
+                                            <span className="font-bold text-[12px] uppercase text-black">{academicSession}</span>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="text-right">
-                                    <h2 className="text-3xl font-black text-black uppercase tracking-tighter leading-none">MINGGU {selectedWeek}</h2>
-                                    {weekStatus !== "NORMAL" && <div className="text-[11px] font-black text-red-600 mt-1 uppercase tracking-widest">{weekStatus}</div>}
+                                    {/* PENAMBAHBAIKAN: Font Size 16px untuk MINGGU */}
+                                    <h2 className="text-[16px] font-black text-black uppercase tracking-tighter leading-none">MINGGU {selectedWeek}</h2>
+                                    {weekStatus !== "NORMAL" && <div className="text-[11px] font-black text-red-600 mt-1 uppercase">{weekStatus}</div>}
                                 </div>
                             </div>
                         </div>
 
+                        {/* TOP SCROLLBAR */}
                         <div ref={topScrollRef} className="top-scrollbar-container no-print">
                             <div className="top-scrollbar-dummy" style={{ width: `${tableWidth}px` }}></div>
                         </div>
 
+                        {/* JADUAL UTAMA */}
                         <div ref={tableContainerRef} className="bg-white border-2 border-black overflow-x-auto print:overflow-visible relative shadow-sm">
                             <div ref={tableElementRef}>
                                 <table className="w-full border-collapse table-fixed min-w-[1600px] print:min-w-full">
                                     <thead>
-                                        <tr className="bg-white border-b-2 border-black text-center text-black font-black text-[9px] uppercase">
-                                            <th className="w-40 p-4 border-r border-black">Hari / Tarikh</th>
-                                            <th className="w-20 border-r border-black">Sem</th>
-                                            {timeSlots.map(slot => (<th key={slot} className="p-3 border-r border-black last:border-0">{slot}</th>))}
+                                        {/* PENAMBAHBAIKAN: Font Size 14px untuk Header Dalam */}
+                                        <tr className="bg-white border-b-2 border-black text-center text-black font-black text-[14px] uppercase">
+                                            <th className="w-40 p-4 border-r border-black font-table-content">Hari / Tarikh</th>
+                                            <th className="w-20 border-r border-black font-table-content">Sem</th>
+                                            {timeSlots.map(slot => (<th key={slot} className="p-3 border-r border-black last:border-0 font-table-content">{slot}</th>))}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {visibleDays.map((day, dayIdx) => {
-                                            const dateStr = getFullDate(dayIdx, selectedWeek);
+                                            const keyDate = `${selectedWeek}-${day}`;
+                                            const calcDate = getCalculatedDate(dayIdx, selectedWeek);
+                                            const displayDate = customDates[keyDate] || calcDate;
                                             const visibleSemesters = filterSemester === 'SEMUA' ? semesters : [filterSemester];
+                                            
                                             return (
                                                 <React.Fragment key={day}>
                                                     {visibleSemesters.map((sem, semIdx) => {
@@ -428,20 +406,29 @@
                                                             <tr key={`${day}-${sem}`} className={`border-b border-black/20 ${semIdx === visibleSemesters.length - 1 ? 'border-b-2 border-black' : ''}`}>
                                                                 {semIdx === 0 && (
                                                                     <td rowSpan={visibleSemesters.length} className="p-4 bg-white border-r border-black text-center align-middle">
-                                                                        <div className="font-black text-black text-md uppercase mb-1 tracking-tight">{day}</div>
-                                                                        <div className="text-[10px] font-black text-blue-700 bg-blue-50/20 px-2 py-1 rounded border border-blue-100 inline-block">{dateStr}</div>
+                                                                        <div className="font-black text-black text-[14px] uppercase mb-1 tracking-tight font-table-content">{day}</div>
+                                                                        {/* PENAMBAHBAIKAN: Option Pilihan Tarikh Haribulan */}
+                                                                        <div className="mt-1 no-print">
+                                                                            <input type="date" value={displayDate} onChange={e => handleDateChange(day, e.target.value)} className="text-[10px] font-black text-blue-700 bg-blue-50/30 px-1 rounded border border-blue-200" />
+                                                                        </div>
+                                                                        <div className="text-[11px] font-black text-blue-700 bg-blue-50/20 px-2 py-1 rounded border border-blue-100 hidden print:inline-block">
+                                                                            {formatDisplayDate(displayDate)}
+                                                                        </div>
                                                                     </td>
                                                                 )}
-                                                                <td className="p-2 bg-white text-center font-black text-[10px] text-slate-500 border-r border-black uppercase">{sem}</td>
+                                                                {/* PENAMBAHBAIKAN: Font Size 14px untuk Label Semester */}
+                                                                <td className="p-2 bg-white text-center font-black text-[14px] text-slate-500 border-r border-black uppercase font-table-content">{sem}</td>
                                                                 {timeSlots.map((slot, slotIdx) => {
                                                                     if (skips.includes(slotIdx)) return null;
                                                                     const key = `${selectedWeek}-${day}-${sem}-${slotIdx}`;
                                                                     const event = events[key];
-                                                                    const isBreak = isSlotBreak(day, slotIdx);
+                                                                    const isBreak = (slot === '10.00 - 10.30' || (day !== 'Jumaat' && slot === '1.00 - 2.00') || (day === 'Jumaat' && [5, 6].includes(slotIdx)));
+                                                                    
                                                                     if (weekStatus !== 'NORMAL' || isBreak) {
                                                                         if (semIdx === 0) return (
                                                                             <td key={slotIdx} rowSpan={visibleSemesters.length} className="bg-slate-50 border-r border-black p-2 text-center align-middle">
-                                                                                <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30 text-black">{isBreak ? 'REHAT' : weekStatus}</span>
+                                                                                {/* PENAMBAHBAIKAN: Font Size 14px untuk REHAT/CUTI */}
+                                                                                <span className="text-[14px] font-black uppercase vertical-text tracking-[0.4em] opacity-30 text-black font-table-content">{isBreak ? 'REHAT' : weekStatus}</span>
                                                                             </td>
                                                                         );
                                                                         return null;
@@ -449,7 +436,7 @@
                                                                     let colSpan = 1;
                                                                     if (event && event.duration > 1) {
                                                                         for(let i=1; i<event.duration; i++) { 
-                                                                            if(!((slotIdx+i) < timeSlots.length) || isSlotBreak(day, slotIdx+i)) break; 
+                                                                            if(!((slotIdx+i) < timeSlots.length) || (slotIdx+i === 5 && day === 'Jumaat')) break; 
                                                                             colSpan++; skips.push(slotIdx+i); 
                                                                         }
                                                                     }
@@ -482,33 +469,25 @@
                             {/* FOOTER PENGESAHAN */}
                             <div className="p-12 border-t-2 border-black grid grid-cols-2 gap-40 bg-white relative">
                                 <div className="space-y-1">
-                                    {/* PENAMBAHBAIKAN SAIZ FON: DISEDIAKAN OLEH -> 12px */}
                                     <h4 className="text-[12px] font-black text-black uppercase tracking-[0.2em]">DISEDIAKAN OLEH:</h4>
                                     <div className="pt-10 pb-2 border-b border-black flex items-center gap-2">
-                                        {/* PENAMBAHBAIKAN SAIZ FON: NAMA -> 11px */}
                                         <span className="text-[11px] font-black text-black uppercase shrink-0">NAMA:</span>
                                         <input type="text" value={footerData.preparedName || ''} onChange={e => handleFooterChange('preparedName', e.target.value)} className="w-full bg-transparent font-black text-sm outline-none text-black uppercase" />
                                     </div>
-                                    {/* PENAMBAHBAIKAN SAIZ FON: PENGAJAR PENYELARAS -> 11px */}
                                     <p className="text-[11px] font-black text-black uppercase mt-1 tracking-tight">PENGAJAR PENYELARAS</p>
                                     <div className="flex items-center gap-2 pt-4">
-                                        {/* PENAMBAHBAIKAN SAIZ FON: TARIKH -> 11px */}
                                         <span className="text-[11px] font-black text-black uppercase">TARIKH:</span>
                                         <input type="date" value={footerData.preparedDate || ''} onChange={e => handleFooterChange('preparedDate', e.target.value)} className="bg-transparent font-bold text-[11px] outline-none cursor-pointer text-black" />
                                     </div>
                                 </div>
                                 <div className="space-y-1 text-left">
-                                    {/* PENAMBAHBAIKAN SAIZ FON: DISAHKAN OLEH -> 12px */}
                                     <h4 className="text-[12px] font-black text-black uppercase tracking-[0.2em]">DISAHKAN OLEH:</h4>
                                     <div className="pt-10 pb-2 border-b border-black flex items-center gap-2">
-                                        {/* PENAMBAHBAIKAN SAIZ FON: NAMA -> 11px */}
                                         <span className="text-[11px] font-black text-black uppercase shrink-0">NAMA:</span>
                                         <input type="text" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} className="w-full bg-transparent font-black text-sm outline-none text-black uppercase" />
                                     </div>
-                                    {/* PENAMBAHBAIKAN SAIZ FON: TIMBALAN PENGARAH... -> 11px */}
                                     <p className="text-[11px] font-black text-black uppercase mt-1 leading-tight tracking-tight uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
                                     <div className="flex items-center gap-2 pt-4">
-                                        {/* PENAMBAHBAIKAN SAIZ FON: TARIKH -> 11px */}
                                         <span className="text-[11px] font-black text-black uppercase">TARIKH:</span>
                                         <input type="date" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} className="bg-transparent font-bold text-[11px] outline-none cursor-pointer text-black" />
                                     </div>
@@ -521,9 +500,10 @@
                         </div>
                     </main>
 
+                    {/* MODAL EDITOR */}
                     {isModalOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm no-print animate-in fade-in duration-300">
-                            <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
+                            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
                                 <div className="bg-white px-10 py-6 border-b-2 border-slate-100 flex justify-between items-center shrink-0">
                                     <h3 className="font-black text-lg uppercase text-slate-800">KEMAS KINI SLOT</h3>
                                     <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-3 rounded-2xl hover:rotate-90 transition-all shadow-md"><Icons.X /></button>
@@ -565,7 +545,7 @@
                                 </div>
                                 <div className="p-10 bg-slate-50 border-t border-slate-100 flex gap-4 shrink-0">
                                     <button onClick={() => { if(editingEvent) setFormData({...editingEvent}); else setFormData(prev => ({...prev, topic: '', instructor: ''})); }} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border border-slate-200 active:scale-90 shadow-sm uppercase"><Icons.Undo /> Undo</button>
-                                    {editingEvent && <button onClick={handleDelete} className="p-5 bg-white text-red-600 border border-red-100 border rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.Trash /></button>}
+                                    {editingEvent && <button onClick={handleDelete} className="p-5 bg-white text-red-600 border border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.Trash /></button>}
                                     <button onClick={handleSave} disabled={isSaving} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 active:scale-95 transition-all shadow-xl">{isSaving ? 'Menyimpan...' : 'SIMPAN REKOD'}</button>
                                 </div>
                             </div>
