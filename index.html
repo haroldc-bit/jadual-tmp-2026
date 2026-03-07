@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v7.0</title>
+    <title>Jadual Waktu Mingguan TMP Digital v7.1</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -29,6 +29,8 @@
             .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
             input, select, textarea { border: none !important; background: transparent !important; color: black !important; appearance: none; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            /* Mematikan sticky semasa cetak */
+            thead, .sticky-top-scroll { position: static !important; }
         }
         .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); display: inline-block; }
         @keyframes high-visibility-flash {
@@ -51,10 +53,19 @@
         /* PENAMBAHBAIKAN: Sticky Horizontal Scroll */
         .sticky-top-scroll {
             position: sticky;
-            top: 72px; /* Menyesuaikan dengan ketinggian nav */
+            top: 72px; /* Ketinggian navigasi */
             z-index: 40;
             background: white;
             border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* PENAMBAHBAIKAN: Freeze Header (Excel style) */
+        .sticky-header th {
+            position: sticky;
+            top: 90px; /* nav (72px) + sync scroll (18px) */
+            z-index: 30;
+            background: #f8fafc; /* bg-slate-50 */
+            box-shadow: inset 0 -2px 0 #000; /* Garisan bawah tebal sedikit */
         }
 
         .font-table-content { font-size: 14px !important; }
@@ -149,12 +160,10 @@
             const currentWeekHasSaturday = useMemo(() => saturdayConfigs[selectedWeek] === true, [saturdayConfigs, selectedWeek]);
             const visibleDays = useMemo(() => currentWeekHasSaturday ? days : days.slice(0, 5), [currentWeekHasSaturday]);
 
-            // PENAMBAHBAIKAN: Tarikh Sabtu Automatik
             const autoWeekRange = useMemo(() => {
                 const start = new Date(sessionStartDate);
                 start.setDate(start.getDate() + (selectedWeek - 1) * 7);
                 const end = new Date(start);
-                // Jika Sabtu ada, tambah 5 hari dari Isnin. Jika tiada, tambah 4 hari (Jumaat).
                 end.setDate(start.getDate() + (currentWeekHasSaturday ? 5 : 4));
                 return `${start.toLocaleDateString('en-GB')} - ${end.toLocaleDateString('en-GB')}`;
             }, [sessionStartDate, selectedWeek, currentWeekHasSaturday]);
@@ -244,7 +253,7 @@
             }, [user, isAuthorized, isCloudEnabled, appId]);
 
             const loadLocalData = () => {
-                const saved = localStorage.getItem('tmp_v6.9_local');
+                const saved = localStorage.getItem('tmp_v7.1_local');
                 if (saved) {
                     const p = JSON.parse(saved);
                     setEvents(p.events || {}); setFooterData(p.footer || {}); setSaturdayConfigs(p.saturdayConfigs || {}); setSessionStartDate(p.start || '2026-01-05'); setAcademicSession(p.academicSession || 'Januari - Jun');
@@ -302,10 +311,10 @@
             if (!isAuthorized) {
                 return (
                     <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6">
-                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full border-4 border-white">
+                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full border-4 border-white animate-in zoom-in duration-300">
                             <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl"><Icons.Lock /></div>
-                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 tracking-tight">Log Masuk Jadual</h2>
-                            <form onSubmit={(e) => { e.preventDefault(); if(accessCode === "TMP2026"){ setIsAuthorized(true); sessionStorage.setItem('tmp_auth', 'true'); } else { alert("Kod Akses Salah"); } }}>
+                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 tracking-tight text-center">Akses TMP</h2>
+                            <form onSubmit={(e) => { e.preventDefault(); if(accessCode === "TMP2026"){ setIsAuthorized(true); sessionStorage.setItem('tmp_auth', 'true'); } else { alert("Kod Salah"); } }}>
                                 <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 transition-all" autoFocus />
                                 <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase hover:bg-blue-700 transition-all">Sahkan</button>
                             </form>
@@ -322,7 +331,9 @@
                                 <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic shadow-lg">TMP</div>
                                 <div>
                                     <h1 className="font-black text-slate-800 text-lg leading-none uppercase">JWM MASTER</h1>
-                                    <p className="text-[10px] font-black text-blue-600 uppercase mt-1">Versi 7.0 Pro</p>
+                                    <p className="text-[10px] font-black text-blue-600 uppercase mt-1 tracking-widest leading-none">
+                                        Versi 7.1 Pro
+                                    </p>
                                 </div>
                             </div>
 
@@ -336,14 +347,16 @@
 
                             <div className="flex flex-wrap items-center gap-3">
                                 <div className="flex flex-col gap-1 border-r pr-3 border-slate-100">
-                                    <label className="text-[8px] font-black uppercase text-slate-400">Sesi Akademik</label>
+                                    {/* PENAMBAHBAIKAN SAIZ LABEL KEPADA 10 */}
+                                    <label className="text-[10px] font-black uppercase text-slate-400">Sesi Akademik</label>
                                     <select value={academicSession} onChange={e => setAcademicSession(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg border border-blue-100">
                                         <option value="Januari - Jun">Januari - Jun</option>
                                         <option value="Julai - Disember">Julai - Disember</option>
                                     </select>
                                 </div>
                                 <div className="flex flex-col gap-1 border-r pr-3 border-slate-100">
-                                    <label className="text-[8px] font-black uppercase text-slate-400">Mula M1</label>
+                                    {/* PENAMBAHBAIKAN SAIZ LABEL KEPADA 10 */}
+                                    <label className="text-[10px] font-black uppercase text-slate-400">Mula M1</label>
                                     <input type="date" value={sessionStartDate} onChange={e => setSessionStartDate(e.target.value)} className="bg-slate-100 text-slate-800 text-[10px] font-black p-1 rounded outline-none" />
                                 </div>
                                 <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
@@ -357,7 +370,7 @@
                                         <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${currentWeekHasSaturday ? 'left-4' : 'left-0.5'}`}></div>
                                     </button>
                                 </div>
-                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-5 py-2 rounded-xl text-[10px] font-black hover:bg-black flex items-center gap-2 uppercase">
+                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-5 py-2 rounded-xl text-[10px] font-black hover:bg-black flex items-center gap-2 uppercase shadow-md transition-all active:scale-95">
                                     <Icons.Save /> Cetak
                                 </button>
                                 <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.External /></button>
@@ -406,6 +419,7 @@
                                 </div>
 
                                 <div className="text-right">
+                                    {/* PENAMBAHBAIKAN SAIZ FON MINGGU KEPADA 16 */}
                                     <h2 className="text-[16px] font-black text-black uppercase tracking-tighter leading-none">MINGGU {selectedWeek}</h2>
                                     {weekStatus !== "NORMAL" && <div className="text-[11px] font-black text-red-600 mt-1 uppercase">{weekStatus}</div>}
                                 </div>
@@ -417,10 +431,19 @@
                             <div style={{ width: `${tableWidth}px`, height: '1px' }}></div>
                         </div>
 
+                        {/* JADUAL UTAMA DENGAN STICKY HEADER */}
                         <div ref={tableContainerRef} className="sync-scroll-container bg-white border-2 border-black print:overflow-visible relative shadow-sm">
                             <div ref={tableElementRef}>
                                 <table className="w-full border-collapse table-fixed min-w-[1600px] print:min-w-full">
-                                    <thead>
+                                    <thead className="sticky-header no-print">
+                                        <tr className="bg-white border-b-2 border-black text-center text-black font-black text-[14px] uppercase">
+                                            <th className="w-40 p-4 border-r border-black font-table-content">Hari / Tarikh</th>
+                                            <th className="w-20 border-r border-black font-table-content">Sem</th>
+                                            {timeSlots.map(slot => (<th key={slot} className="p-3 border-r border-black last:border-0 font-table-content">{slot}</th>))}
+                                        </tr>
+                                    </thead>
+                                    {/* Header berasingan untuk Cetakan bagi mengelakkan masalah kedudukan sticky */}
+                                    <thead className="hidden print:table-header-group">
                                         <tr className="bg-white border-b-2 border-black text-center text-black font-black text-[14px] uppercase">
                                             <th className="w-40 p-4 border-r border-black font-table-content">Hari / Tarikh</th>
                                             <th className="w-20 border-r border-black font-table-content">Sem</th>
