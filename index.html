@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v7.1</title>
+    <title>Jadual Waktu Mingguan TMP Digital v7.3</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -29,46 +29,50 @@
             .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
             input, select, textarea { border: none !important; background: transparent !important; color: black !important; appearance: none; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            /* Mematikan sticky semasa cetak */
-            thead, .sticky-top-scroll { position: static !important; }
+            thead { position: static !important; }
         }
+        
         .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); display: inline-block; }
+        
         @keyframes high-visibility-flash {
             0% { background-color: #3b82f6; color: white; transform: scale(1.02); }
             100% { background-color: transparent; transform: scale(1); }
         }
         .highlight-new { animation: high-visibility-flash 2.5s ease-out forwards; }
         
+        /* Navigasi Minggu */
         .week-scrollbar::-webkit-scrollbar { height: 8px; display: block; }
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         /* Sync Scrollbar Styles */
         .sync-scroll-container { overflow-x: auto; overflow-y: hidden; }
-        .sync-scroll-container::-webkit-scrollbar { height: 12px; }
+        .sync-scroll-container::-webkit-scrollbar { height: 10px; }
         .sync-scroll-container::-webkit-scrollbar-track { background: #f8fafc; }
-        .sync-scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 3px solid #f8fafc; }
-        .sync-scroll-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .sync-scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* PENAMBAHBAIKAN: Sticky Horizontal Scroll */
-        .sticky-top-scroll {
+        /* FIXED: Freeze Header (Baris Pertama Tidak Bergerak) */
+        /* Kita sasarkan TH secara langsung */
+        .table-to-scroll thead th {
             position: sticky;
-            top: 72px; /* Ketinggian navigasi */
+            top: 0;
             z-index: 40;
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        /* PENAMBAHBAIKAN: Freeze Header (Excel style) */
-        .sticky-header th {
-            position: sticky;
-            top: 90px; /* nav (72px) + sync scroll (18px) */
-            z-index: 30;
-            background: #f8fafc; /* bg-slate-50 */
-            box-shadow: inset 0 -2px 0 #000; /* Garisan bawah tebal sedikit */
+            background: #f8fafc !important;
+            box-shadow: inset 0 -2px 0 #000;
         }
 
         .font-table-content { font-size: 14px !important; }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Container untuk mengawal skrol menegak dan mendatar secara berasingan untuk freeze header */
+        .freeze-container {
+            max-height: 80vh; /* Hadkan ketinggian untuk membolehkan skrol dalaman jadual */
+            overflow: auto;
+            border: 2px solid black;
+        }
     </style>
 </head>
 <body class="bg-white min-h-screen text-black font-sans">
@@ -88,7 +92,6 @@
         };
 
         const App = () => {
-            // FIREBASE CONFIG (Dikekalkan sepenuhnya)
             const firebaseConfig = {
                 apiKey: "AIzaSyBOCPBrZ-xkwEgi4OnkBwDB8YqGgWEuMVE",
                 authDomain: "jadual-tmp-digital.firebaseapp.com",
@@ -169,9 +172,8 @@
             }, [sessionStartDate, selectedWeek, currentWeekHasSaturday]);
 
             const currentYear = new Date().getFullYear();
-            const [formData, setFormData] = useState({ id: '', day: '', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', semester: '', duration: 1 });
 
-            // SYNC SCROLLBARS LOGIC
+            // SYNC SCROLLBARS
             useEffect(() => {
                 const top = topScrollRef.current;
                 const bottom = tableContainerRef.current;
@@ -182,14 +184,14 @@
                     if (!isSyncing) {
                         isSyncing = true;
                         bottom.scrollLeft = top.scrollLeft;
-                        setTimeout(() => { isSyncing = false; }, 10);
+                        setTimeout(() => { isSyncing = false; }, 20);
                     }
                 };
                 const syncBottom = () => {
                     if (!isSyncing) {
                         isSyncing = true;
                         top.scrollLeft = bottom.scrollLeft;
-                        setTimeout(() => { isSyncing = false; }, 10);
+                        setTimeout(() => { isSyncing = false; }, 20);
                     }
                 };
 
@@ -206,7 +208,7 @@
                     bottom.removeEventListener('scroll', syncBottom);
                     resizeObserver.disconnect();
                 };
-            }, [isAuthorized, selectedWeek, filterSemester, currentWeekHasSaturday, appId]);
+            }, [isAuthorized, selectedWeek, filterSemester, currentWeekHasSaturday]);
 
             useEffect(() => {
                 const initFirebase = async () => {
@@ -216,10 +218,7 @@
                             const cred = await firebase.auth().signInAnonymously();
                             setUser(cred.user);
                             setIsCloudEnabled(true);
-                        } catch (e) { 
-                            console.error("Firebase Auth Error:", e);
-                            loadLocalData(); 
-                        }
+                        } catch (e) { loadLocalData(); }
                     }
                 };
                 initFirebase();
@@ -238,22 +237,16 @@
                         snap.forEach(doc => data[doc.id] = doc.data());
                         setEvents(data);
                         setIsSyncing(false);
-                    }, (err) => {
-                        console.error("Firestore Error:", err);
-                        setIsSyncing(false);
-                    });
-                
+                    }, () => setIsSyncing(false));
                 const unsubFooter = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('signatures')
                     .onSnapshot((doc) => { if (doc.exists) setFooterData(doc.data()); });
-                
                 const unsubSat = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('saturday_configs')
                     .onSnapshot((doc) => { if (doc.exists) setSaturdayConfigs(doc.data()); });
-
                 return () => { unsubEvents(); unsubFooter(); unsubSat(); };
             }, [user, isAuthorized, isCloudEnabled, appId]);
 
             const loadLocalData = () => {
-                const saved = localStorage.getItem('tmp_v7.1_local');
+                const saved = localStorage.getItem('tmp_v7.3_local');
                 if (saved) {
                     const p = JSON.parse(saved);
                     setEvents(p.events || {}); setFooterData(p.footer || {}); setSaturdayConfigs(p.saturdayConfigs || {}); setSessionStartDate(p.start || '2026-01-05'); setAcademicSession(p.academicSession || 'Januari - Jun');
@@ -272,8 +265,8 @@
                     } else {
                         setEvents(prev => ({ ...prev, [key]: data }));
                     }
-                    setLastUpdatedKey(key); setIsModalOpen(false); setTimeout(() => setLastUpdatedKey(null), 3000);
-                } catch (e) { alert("Ralat menyimpan."); } finally { setIsSaving(false); }
+                    setIsModalOpen(false);
+                } catch (e) { alert("Ralat."); } finally { setIsSaving(false); }
             };
 
             const handleFooterChange = async (field, val) => {
@@ -310,13 +303,13 @@
 
             if (!isAuthorized) {
                 return (
-                    <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6">
-                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full border-4 border-white animate-in zoom-in duration-300">
+                    <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6 text-center">
+                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full">
                             <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl"><Icons.Lock /></div>
-                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 tracking-tight text-center">Akses TMP</h2>
-                            <form onSubmit={(e) => { e.preventDefault(); if(accessCode === "TMP2026"){ setIsAuthorized(true); sessionStorage.setItem('tmp_auth', 'true'); } else { alert("Kod Salah"); } }}>
-                                <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 transition-all" autoFocus />
-                                <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase hover:bg-blue-700 transition-all">Sahkan</button>
+                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800">Akses TMP</h2>
+                            <form onSubmit={(e) => { e.preventDefault(); if(accessCode === "TMP2026"){ setIsAuthorized(true); sessionStorage.setItem('tmp_auth', 'true'); } }}>
+                                <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600" autoFocus />
+                                <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase hover:bg-blue-700">Masuk</button>
                             </form>
                         </div>
                     </div>
@@ -325,62 +318,57 @@
 
             return (
                 <div className="pb-20 bg-white">
-                    <nav className="bg-white border-b-2 border-slate-100 sticky top-0 z-50 px-6 py-4 no-print shadow-sm flex flex-col gap-4">
+                    <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 px-6 py-4 no-print shadow-sm flex flex-col gap-4">
                         <div className="max-w-[98%] mx-auto w-full flex flex-wrap items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
                                 <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic shadow-lg">TMP</div>
                                 <div>
                                     <h1 className="font-black text-slate-800 text-lg leading-none uppercase">JWM MASTER</h1>
-                                    <p className="text-[10px] font-black text-blue-600 uppercase mt-1 tracking-widest leading-none">
-                                        Versi 7.1 Pro
-                                    </p>
+                                    <p className="text-[10px] font-black text-blue-600 uppercase mt-1">Versi 7.3 Pro</p>
                                 </div>
                             </div>
 
-                            <div className="flex-1 max-w-2xl bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner overflow-hidden">
+                            <div className="flex-1 max-w-xl bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner overflow-hidden">
                                 <div className="week-scrollbar flex gap-2 overflow-x-auto pb-2 px-1">
                                     {Array.from({length: 26}, (_, i) => i + 1).map(w => (
-                                        <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[45px] py-2 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 hover:bg-slate-100'}`}>M{w}</button>
+                                        <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[45px] py-2 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-400 hover:bg-slate-100'}`}>M{w}</button>
                                     ))}
                                 </div>
                             </div>
 
                             <div className="flex flex-wrap items-center gap-3">
                                 <div className="flex flex-col gap-1 border-r pr-3 border-slate-100">
-                                    {/* PENAMBAHBAIKAN SAIZ LABEL KEPADA 10 */}
-                                    <label className="text-[10px] font-black uppercase text-slate-400">Sesi Akademik</label>
-                                    <select value={academicSession} onChange={e => setAcademicSession(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg border border-blue-100">
+                                    <label className="text-[12px] font-black uppercase text-slate-400">Sesi Akademik</label>
+                                    <select value={academicSession} onChange={e => setAcademicSession(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg border border-blue-100 outline-none">
                                         <option value="Januari - Jun">Januari - Jun</option>
                                         <option value="Julai - Disember">Julai - Disember</option>
                                     </select>
                                 </div>
                                 <div className="flex flex-col gap-1 border-r pr-3 border-slate-100">
-                                    {/* PENAMBAHBAIKAN SAIZ LABEL KEPADA 10 */}
-                                    <label className="text-[10px] font-black uppercase text-slate-400">Mula M1</label>
+                                    <label className="text-[12px] font-black uppercase text-slate-400">Mula M1</label>
                                     <input type="date" value={sessionStartDate} onChange={e => setSessionStartDate(e.target.value)} className="bg-slate-100 text-slate-800 text-[10px] font-black p-1 rounded outline-none" />
                                 </div>
                                 <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
-                                    <span className="text-[9px] font-black uppercase text-slate-400">Sabtu:</span>
+                                    <span className="text-[9px] font-black uppercase text-slate-400 tracking-tighter leading-none">Sabtu (M{selectedWeek})</span>
                                     <button onClick={() => {
                                         const next = !currentWeekHasSaturday;
-                                        const nextConfigs = {...saturdayConfigs, [selectedWeek]: next};
-                                        setSaturdayConfigs(nextConfigs);
-                                        if(isCloudEnabled) firebase.firestore().collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('saturday_configs').set(nextConfigs);
+                                        setSaturdayConfigs({...saturdayConfigs, [selectedWeek]: next});
+                                        if(isCloudEnabled) firebase.firestore().collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('saturday_configs').set({...saturdayConfigs, [selectedWeek]: next});
                                     }} className={`w-8 h-4 rounded-full relative transition-all ${currentWeekHasSaturday ? 'bg-green-500' : 'bg-slate-300'}`}>
                                         <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${currentWeekHasSaturday ? 'left-4' : 'left-0.5'}`}></div>
                                     </button>
                                 </div>
-                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-5 py-2 rounded-xl text-[10px] font-black hover:bg-black flex items-center gap-2 uppercase shadow-md transition-all active:scale-95">
+                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-[10px] font-black hover:bg-black transition-all shadow-md flex items-center gap-2">
                                     <Icons.Save /> Cetak
                                 </button>
-                                <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.External /></button>
+                                <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.External /></button>
                             </div>
                         </div>
                     </nav>
 
-                    <main className="max-w-[99%] mx-auto p-4 md:p-10 print:p-0 bg-white">
+                    <main className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0 bg-white">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 bg-white">
-                            <div className="absolute top-0 right-0 text-[12px] font-bold text-right text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
+                            <div className="absolute top-0 right-0 text-[12px] font-bold text-black uppercase">BPL.KKM.PK(T) 048B/17</div>
 
                             <div className="flex justify-center mb-1">
                                 <img src="JATA_NEGARA_MALAYSIA.jpg" alt="Jata Negara" className="h-24 w-auto object-contain" 
@@ -403,7 +391,7 @@
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className="font-black text-[12px] uppercase text-black">SEMESTER:</span>
-                                            <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="font-bold text-[12px] uppercase text-black bg-slate-50 px-2 py-0.5 rounded no-print">
+                                            <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="font-bold text-[12px] uppercase text-black bg-slate-50 px-2 py-0.5 rounded no-print outline-none">
                                                 <option value="SEMUA">Pilihan Semester (Semua)</option>
                                                 {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
                                             </select>
@@ -419,32 +407,23 @@
                                 </div>
 
                                 <div className="text-right">
-                                    {/* PENAMBAHBAIKAN SAIZ FON MINGGU KEPADA 16 */}
-                                    <h2 className="text-[16px] font-black text-black uppercase tracking-tighter leading-none">MINGGU {selectedWeek}</h2>
-                                    {weekStatus !== "NORMAL" && <div className="text-[11px] font-black text-red-600 mt-1 uppercase">{weekStatus}</div>}
+                                    <h2 className="text-[16px] font-black text-black uppercase leading-none">MINGGU {selectedWeek}</h2>
+                                    {weekStatus !== "NORMAL" && <div className="text-[11px] font-black text-red-600 mt-1 uppercase tracking-widest">{weekStatus}</div>}
                                 </div>
                             </div>
                         </div>
 
-                        {/* SYNCED TOP SCROLLBAR (STICKY) */}
-                        <div ref={topScrollRef} className="sync-scroll-container no-print sticky-top-scroll">
+                        {/* DOUBLE SCROLLBAR - ATAS */}
+                        <div ref={topScrollRef} className="sync-scroll-container no-print mb-1">
                             <div style={{ width: `${tableWidth}px`, height: '1px' }}></div>
                         </div>
 
-                        {/* JADUAL UTAMA DENGAN STICKY HEADER */}
-                        <div ref={tableContainerRef} className="sync-scroll-container bg-white border-2 border-black print:overflow-visible relative shadow-sm">
+                        {/* JADUAL UTAMA DENGAN FREEZE HEADER */}
+                        <div ref={tableContainerRef} className="freeze-container table-to-scroll bg-white relative">
                             <div ref={tableElementRef}>
                                 <table className="w-full border-collapse table-fixed min-w-[1600px] print:min-w-full">
-                                    <thead className="sticky-header no-print">
-                                        <tr className="bg-white border-b-2 border-black text-center text-black font-black text-[14px] uppercase">
-                                            <th className="w-40 p-4 border-r border-black font-table-content">Hari / Tarikh</th>
-                                            <th className="w-20 border-r border-black font-table-content">Sem</th>
-                                            {timeSlots.map(slot => (<th key={slot} className="p-3 border-r border-black last:border-0 font-table-content">{slot}</th>))}
-                                        </tr>
-                                    </thead>
-                                    {/* Header berasingan untuk Cetakan bagi mengelakkan masalah kedudukan sticky */}
-                                    <thead className="hidden print:table-header-group">
-                                        <tr className="bg-white border-b-2 border-black text-center text-black font-black text-[14px] uppercase">
+                                    <thead>
+                                        <tr className="bg-slate-50 border-b-2 border-black text-center text-black font-black text-[14px] uppercase">
                                             <th className="w-40 p-4 border-r border-black font-table-content">Hari / Tarikh</th>
                                             <th className="w-20 border-r border-black font-table-content">Sem</th>
                                             {timeSlots.map(slot => (<th key={slot} className="p-3 border-r border-black last:border-0 font-table-content">{slot}</th>))}
@@ -463,9 +442,7 @@
                                                                 {semIdx === 0 && (
                                                                     <td rowSpan={visibleSemesters.length} className="p-4 bg-white border-r border-black text-center align-middle">
                                                                         <div className="font-black text-black text-[14px] uppercase mb-1 font-table-content">{day}</div>
-                                                                        <div className="text-[12px] font-black text-blue-700 bg-blue-50/20 px-2 py-1 rounded border border-blue-100 inline-block">
-                                                                            {displayDate}
-                                                                        </div>
+                                                                        <div className="text-[12px] font-black text-blue-700 bg-blue-50/20 px-2 py-1 rounded border border-blue-100 inline-block">{displayDate}</div>
                                                                     </td>
                                                                 )}
                                                                 <td className="p-2 bg-white text-center font-black text-[14px] text-slate-500 border-r border-black uppercase font-table-content">{sem}</td>
@@ -476,7 +453,7 @@
                                                                     const isBreak = isSlotBreak(day, slotIdx);
                                                                     if (weekStatus !== 'NORMAL' || isBreak) {
                                                                         if (semIdx === 0) return (
-                                                                            <td key={slotIdx} rowSpan={visibleSemesters.length} className="bg-slate-50 border-r border-black p-2 text-center align-middle">
+                                                                            <td key={slotIdx} rowSpan={visibleSemesters.length} className="bg-slate-100 border-r border-black p-2 text-center align-middle">
                                                                                 <span className="text-[14px] font-black uppercase vertical-text tracking-[0.4em] opacity-30 text-black font-table-content">{isBreak ? 'REHAT' : weekStatus}</span>
                                                                             </td>
                                                                         );
@@ -515,6 +492,7 @@
                                 </table>
                             </div>
 
+                            {/* PENGESAHAN */}
                             <div className="p-12 border-t-2 border-black grid grid-cols-2 gap-40 bg-white relative">
                                 <div className="space-y-1">
                                     <h4 className="text-[12px] font-black text-black uppercase tracking-[0.2em]">DISEDIAKAN OLEH:</h4>
@@ -547,12 +525,13 @@
                         </div>
                     </main>
 
+                    {/* MODAL EDITOR */}
                     {isModalOpen && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm no-print animate-in fade-in duration-300">
                             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
                                 <div className="bg-white px-10 py-6 border-b-2 border-slate-100 flex justify-between items-center shrink-0">
                                     <h3 className="font-black text-lg uppercase text-slate-800">KEMAS KINI SLOT</h3>
-                                    <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-3 rounded-2xl hover:rotate-90 transition-all shadow-md"><Icons.X /></button>
+                                    <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-3 rounded-2xl hover:rotate-90 shadow-md transition-all active:scale-75"><Icons.X /></button>
                                 </div>
                                 <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white">
                                     <div className="grid grid-cols-2 gap-6">
@@ -569,9 +548,9 @@
                                             </select>
                                         </div>
                                     </div>
-                                    {formData.courseCode === 'Lain-lain' && <input type="text" className="w-full px-6 py-4 bg-blue-50 border border-blue-200 rounded-2xl font-black text-sm outline-none shadow-inner" value={formData.customCourseCode} onChange={e => setFormData({...formData, customCourseCode: e.target.value})} placeholder="Sila taip kod..." />}
+                                    {formData.courseCode === 'Lain-lain' && <input type="text" className="w-full px-6 py-4 bg-blue-50 border border-blue-200 rounded-2xl font-black text-sm outline-none shadow-inner" value={formData.customCourseCode} onChange={e => setFormData({...formData, customCourseCode: e.target.value})} placeholder="Sila taip kod manual..." />}
                                     <div className="space-y-3">
-                                        <label className="text-[11px] font-black uppercase text-slate-400">Jenis Sesi</label>
+                                        <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Jenis Sesi</label>
                                         <div className="flex flex-wrap gap-2">
                                             {sessionTypes.map(t => (
                                                 <button key={t.value} onClick={() => setFormData({...formData, type: t.value})} className={`px-5 py-2 rounded-2xl text-[10px] font-black border-2 transition-all ${formData.type === t.value ? t.color + ' border-blue-600' : 'bg-white border-slate-100 text-slate-400'}`}>
@@ -589,7 +568,7 @@
                                         <input type="text" className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-black text-sm" placeholder="Nama..." value={formData.instructor} onChange={(e) => setFormData({...formData, instructor: e.target.value})} />
                                     </div>
                                 </div>
-                                <div className="p-10 bg-slate-50 border-t border-slate-100 flex gap-4 shrink-0">
+                                <div className="p-10 bg-slate-50 border-t border-slate-100 flex gap-4 shrink-0 shadow-inner">
                                     <button onClick={() => { if(editingEvent) setFormData({...editingEvent}); else setFormData(prev => ({...prev, topic: '', instructor: ''})); }} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border border-slate-200 active:scale-90 shadow-sm uppercase"><Icons.Undo /> Undo</button>
                                     {editingEvent && <button onClick={async () => { if(confirm("Padam?")) { const key = `${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`; if(isCloudEnabled) await firebase.firestore().collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_master').doc(key).delete(); else { const n = {...events}; delete n[key]; setEvents(n); } setIsModalOpen(false); } }} className="p-5 bg-white text-red-600 border border-red-100 border rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.Trash /></button>}
                                     <button onClick={handleSave} disabled={isSaving} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 active:scale-95 transition-all shadow-xl">{isSaving ? 'Menyimpan...' : 'SIMPAN REKOD'}</button>
