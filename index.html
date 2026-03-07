@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v7.7</title>
+    <title>Jadual Waktu Mingguan TMP Digital v7.8</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -47,13 +47,11 @@
         }
         .highlight-new { animation: high-visibility-flash 2.5s ease-out forwards; }
         
-        /* Week Selector Scrollbar */
         .week-scrollbar::-webkit-scrollbar { height: 8px; display: block; }
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Sync Scrollbar */
-        .sync-scroll-container { overflow-x: auto; overflow-y: hidden; }
+        .sync-scroll-container { overflow-x: auto; overflow-y: hidden; height: 10px; }
         .sync-scroll-container::-webkit-scrollbar { height: 10px; }
         .sync-scroll-container::-webkit-scrollbar-track { background: #f8fafc; }
         .sync-scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -100,7 +98,7 @@
         };
 
         const App = () => {
-            // FIREBASE CONFIG (KEKAL)
+            // FIREBASE CONFIG (Dikekalkan sepenuhnya)
             const firebaseConfig = {
                 apiKey: "AIzaSyBOCPBrZ-xkwEgi4OnkBwDB8YqGgWEuMVE",
                 authDomain: "jadual-tmp-digital.firebaseapp.com",
@@ -239,7 +237,7 @@
             }, [user, isAuthorized, isCloudEnabled, appId]);
 
             const loadLocalData = () => {
-                const saved = localStorage.getItem('tmp_v7.7_local');
+                const saved = localStorage.getItem('tmp_v7.8_local');
                 if (saved) {
                     const p = JSON.parse(saved);
                     setEvents(p.events || {}); setFooterData(p.footer || {}); setSaturdayConfigs(p.saturdayConfigs || {}); setSessionStartDate(p.start || '2026-01-05'); setAcademicSession(p.academicSession || 'Januari - Jun');
@@ -275,12 +273,10 @@
                 return start.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
             };
 
-            // FIXED: Friday 11.30 - 12.30 is index 4. This function returns TRUE if it's a break.
             const isSlotBreak = (day, slotIdx) => {
                 const slot = timeSlots[slotIdx];
-                if (slot === '10.00 - 10.30') return true; // Index 2
-                if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true; // Index 6
-                // Jumaat Break starts at 12.30 (Index 5). Index 4 (11.30-12.30) is now OPEN.
+                if (slot === '10.00 - 10.30') return true; 
+                if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true; 
                 if (day === 'Jumaat') return [5, 6].includes(slotIdx); 
                 return false;
             };
@@ -320,7 +316,7 @@
                                 <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic shadow-lg">TMP</div>
                                 <div>
                                     <h1 className="font-black text-slate-800 text-lg leading-none uppercase">JWM MASTER</h1>
-                                    <p className="text-[10px] font-black text-blue-600 uppercase mt-1">Versi 7.7 Pro</p>
+                                    <p className="text-[10px] font-black text-blue-600 uppercase mt-1">Versi 7.8 Pro</p>
                                 </div>
                             </div>
 
@@ -338,6 +334,8 @@
                                     <select value={academicSession} onChange={e => setAcademicSession(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg border border-blue-100 outline-none">
                                         <option value="Januari - Jun">Januari - Jun</option>
                                         <option value="Julai - Disember">Julai - Disember</option>
+                                        <option value="Oktober - Mac">Oktober - Mac</option>
+                                        <option value="April - September">April - September</option>
                                     </select>
                                 </div>
                                 <div className="flex flex-col gap-1 border-r pr-3 border-slate-100">
@@ -552,7 +550,7 @@
                                         <input type="text" className="w-full px-6 py-4 bg-blue-50 border border-blue-200 rounded-2xl font-black text-sm outline-none shadow-inner" value={formData.customCourseCode} onChange={(e) => setFormData({...formData, customCourseCode: e.target.value})} placeholder="Sila taip kod manual..." />
                                     )}
                                     <div className="space-y-3">
-                                        <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Jenis Sesi</label>
+                                        <label className="text-[11px] font-black uppercase text-slate-400">Jenis Sesi</label>
                                         <div className="flex flex-wrap gap-2">
                                             {sessionTypes.map(t => (
                                                 <button key={t.value} onClick={() => setFormData({...formData, type: t.value})} className={`px-5 py-2 rounded-2xl text-[10px] font-black border-2 transition-all ${formData.type === t.value ? t.color + ' border-blue-600 shadow-md scale-105' : 'bg-white border-slate-100 text-slate-400 hover:bg-slate-50'}`}>
@@ -562,11 +560,11 @@
                                         </div>
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Tajuk Pembelajaran</label>
+                                        <label className="text-[11px] font-black uppercase text-slate-400">Tajuk Pembelajaran</label>
                                         <textarea rows="3" className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-sm shadow-sm" placeholder="Topik..." value={formData.topic} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Nama Pengajar</label>
+                                        <label className="text-[11px] font-black uppercase text-slate-400">Nama Pengajar</label>
                                         <input type="text" className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-black text-sm shadow-sm" placeholder="Nama..." value={formData.instructor} onChange={(e) => setFormData({...formData, instructor: e.target.value})} />
                                     </div>
                                 </div>
