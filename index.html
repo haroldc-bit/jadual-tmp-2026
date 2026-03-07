@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v6.7</title>
+    <title>Jadual Waktu Mingguan TMP Digital v6.9</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -68,7 +68,7 @@
         };
 
         const App = () => {
-            // FIREBASE CONFIG (Dikekalkan sepenuhnya)
+            // FIREBASE CONFIG (Dikekalkan sepenuhnya mengikut arahan)
             const firebaseConfig = {
                 apiKey: "AIzaSyBOCPBrZ-xkwEgi4OnkBwDB8YqGgWEuMVE",
                 authDomain: "jadual-tmp-digital.firebaseapp.com",
@@ -137,6 +137,12 @@
                 return "NORMAL";
             }, [selectedWeek]);
 
+            const getDisplayDateForDay = (dayIdx) => {
+                const start = new Date(sessionStartDate);
+                start.setDate(start.getDate() + (selectedWeek - 1) * 7 + dayIdx);
+                return start.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            };
+
             const autoWeekRange = useMemo(() => {
                 const start = new Date(sessionStartDate);
                 start.setDate(start.getDate() + (selectedWeek - 1) * 7);
@@ -158,20 +164,18 @@
                 if (!top || !bottom) return;
 
                 let isSyncing = false;
-
                 const syncTop = () => {
                     if (!isSyncing) {
                         isSyncing = true;
                         bottom.scrollLeft = top.scrollLeft;
-                        setTimeout(() => { isSyncing = false; }, 50);
+                        setTimeout(() => { isSyncing = false; }, 10);
                     }
                 };
-
                 const syncBottom = () => {
                     if (!isSyncing) {
                         isSyncing = true;
                         top.scrollLeft = bottom.scrollLeft;
-                        setTimeout(() => { isSyncing = false; }, 50);
+                        setTimeout(() => { isSyncing = false; }, 10);
                     }
                 };
 
@@ -188,7 +192,7 @@
                     bottom.removeEventListener('scroll', syncBottom);
                     resizeObserver.disconnect();
                 };
-            }, [isAuthorized, selectedWeek, filterSemester, saturdayConfigs]);
+            }, [isAuthorized, selectedWeek, filterSemester, currentWeekHasSaturday, appId]);
 
             useEffect(() => {
                 const initFirebase = async () => {
@@ -225,17 +229,18 @@
                         setIsSyncing(false);
                     });
                 
+                // FIXED: Using .exists (property) instead of .exists() (function) for Firestore Compat SDK
                 const unsubFooter = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('signatures')
-                    .onSnapshot((doc) => { if (doc.exists()) setFooterData(doc.data()); });
+                    .onSnapshot((doc) => { if (doc.exists) setFooterData(doc.data()); });
                 
                 const unsubSat = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('saturday_configs')
-                    .onSnapshot((doc) => { if (doc.exists()) setSaturdayConfigs(doc.data()); });
+                    .onSnapshot((doc) => { if (doc.exists) setSaturdayConfigs(doc.data()); });
 
                 return () => { unsubEvents(); unsubFooter(); unsubSat(); };
-            }, [user, isAuthorized, isCloudEnabled]);
+            }, [user, isAuthorized, isCloudEnabled, appId]);
 
             const loadLocalData = () => {
-                const saved = localStorage.getItem('tmp_v6.7_local');
+                const saved = localStorage.getItem('tmp_v6.8_local');
                 if (saved) {
                     const p = JSON.parse(saved);
                     setEvents(p.events || {}); setFooterData(p.footer || {}); setSaturdayConfigs(p.saturdayConfigs || {}); setSessionStartDate(p.start || '2026-01-05'); setAcademicSession(p.academicSession || 'Januari - Jun');
@@ -289,8 +294,8 @@
                     <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6">
                         <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full animate-in zoom-in duration-300">
                             <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl"><Icons.Lock /></div>
-                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 tracking-tight">Log Masuk Jadual</h2>
-                            <form onSubmit={(e) => { e.preventDefault(); if(accessCode === "TMP2026"){ setIsAuthorized(true); sessionStorage.setItem('tmp_auth', 'true'); } }}>
+                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 tracking-tight text-center">Akses TMP</h2>
+                            <form onSubmit={(e) => { e.preventDefault(); if(accessCode === "TMP2026"){ setIsAuthorized(true); sessionStorage.setItem('tmp_auth', 'true'); } else { alert("Kod Salah"); } }}>
                                 <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 transition-all" autoFocus />
                                 <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase hover:bg-blue-700 transition-all">Sahkan</button>
                             </form>
@@ -308,7 +313,7 @@
                                 <div>
                                     <h1 className="font-black text-slate-800 text-lg leading-none uppercase">JWM MASTER</h1>
                                     <p className="text-[10px] font-black text-blue-600 uppercase mt-1 tracking-widest leading-none">
-                                        Versi 6.7 Pro
+                                        Versi 6.9 Pro
                                     </p>
                                 </div>
                             </div>
@@ -316,7 +321,7 @@
                             <div className="flex-1 max-w-2xl bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner overflow-hidden">
                                 <div className="week-scrollbar flex gap-2 overflow-x-auto pb-2 px-1">
                                     {Array.from({length: 26}, (_, i) => i + 1).map(w => (
-                                        <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[45px] py-2 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 hover:bg-slate-100'}`}>M{w}</button>
+                                        <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[45px] py-2 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-400 hover:bg-slate-100'}`}>M{w}</button>
                                     ))}
                                 </div>
                             </div>
@@ -333,7 +338,18 @@
                                     <label className="text-[8px] font-black uppercase text-slate-400">Mula M1</label>
                                     <input type="date" value={sessionStartDate} onChange={e => setSessionStartDate(e.target.value)} className="bg-slate-100 text-slate-800 text-[10px] font-black p-1 rounded outline-none" />
                                 </div>
-                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-5 py-2 rounded-xl text-[10px] font-black hover:bg-black flex items-center gap-2 uppercase">
+                                <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
+                                    <span className="text-[9px] font-black uppercase text-slate-400">Sabtu:</span>
+                                    <button onClick={() => {
+                                        const next = !currentWeekHasSaturday;
+                                        const nextConfigs = {...saturdayConfigs, [selectedWeek]: next};
+                                        setSaturdayConfigs(nextConfigs);
+                                        if(isCloudEnabled) firebase.firestore().collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta').doc('saturday_configs').set(nextConfigs);
+                                    }} className={`w-8 h-4 rounded-full relative transition-all ${currentWeekHasSaturday ? 'bg-green-500' : 'bg-slate-300'}`}>
+                                        <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${currentWeekHasSaturday ? 'left-4' : 'left-0.5'}`}></div>
+                                    </button>
+                                </div>
+                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-5 py-2 rounded-xl text-[10px] font-black hover:bg-black flex items-center gap-2 uppercase shadow-md transition-all active:scale-95">
                                     <Icons.Save /> Cetak
                                 </button>
                                 <button onClick={() => {setIsAuthorized(false); sessionStorage.removeItem('tmp_auth');}} className="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.External /></button>
@@ -366,7 +382,6 @@
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className="font-black text-[12px] uppercase text-black">SEMESTER:</span>
-                                            {/* Pilihan Semester Diaktifkan Semula */}
                                             <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="font-bold text-[12px] uppercase text-black bg-slate-50 px-2 py-0.5 rounded no-print">
                                                 <option value="SEMUA">Pilihan Semester (Semua)</option>
                                                 {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
@@ -384,7 +399,7 @@
 
                                 <div className="text-right">
                                     <h2 className="text-[16px] font-black text-black uppercase tracking-tighter leading-none">MINGGU {selectedWeek}</h2>
-                                    {weekStatus !== "NORMAL" && <div className="text-[11px] font-black text-red-600 mt-1 uppercase">{weekStatus}</div>}
+                                    {weekStatus !== "NORMAL" && <div className="text-[11px] font-black text-red-600 mt-1 uppercase tracking-widest">{weekStatus}</div>}
                                 </div>
                             </div>
                         </div>
