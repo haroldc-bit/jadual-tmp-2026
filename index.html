@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v10.2</title>
+    <title>Jadual Waktu Mingguan TMP Digital v10.4</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -33,7 +33,7 @@
         }
         
         .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); display: inline-block; }
-        @keyframes high-visibility-flash { 0% { background-color: #3b82f6; color: white; transform: scale(1.02); } 100% { background-color: transparent; transform: scale(1); } }
+        @keyframes high-visibility-flash { 0% { background-color: #3b82f6; color: white; transform: scale(1.02); } 100% { background-color: transparent; } }
         .highlight-new { animation: high-visibility-flash 2.5s ease-out forwards; }
         .week-scrollbar::-webkit-scrollbar { height: 8px; display: block; }
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
@@ -42,10 +42,10 @@
         .sync-scroll-container { 
             overflow-x: auto; 
             overflow-y: hidden; 
-            height: 14px; 
+            height: 16px; 
             background: #f1f5f9;
             border-radius: 10px;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
         .sync-scroll-container::-webkit-scrollbar { height: 10px; }
         .sync-scroll-container::-webkit-scrollbar-track { background: #f8fafc; }
@@ -78,7 +78,7 @@
             User: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
             Bell: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>,
             Check: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>,
-            Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
+            Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
             Info: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
             Chart: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>,
             Printer: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
@@ -101,7 +101,6 @@
             const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
             const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTMM 2153", "MTBC 2032", "MTBC 2114", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTBT 2193", "MTPC 2203", "MTNF 2162", "MTHE 2182", "MTVS 2142", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "CCRM 2013", "GCSF 2013", "Lain-lain"];
             const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA’IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMIESHA BINTI ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL", "LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
-            const semesterLabels = { 'T1SI': 'Tahun 1 Semester I', 'T1SII': 'Tahun 1 Semester II', 'T2SI': 'Tahun 2 Semester I', 'T2SII': 'Tahun 2 Semester II' };
             const sessionInitials = { 'Kuliah': '(L)', 'Amali': '(P)', 'IL': '(IL)', 'Tutorial': '(T)', 'CA': '(CA)', 'Ulangkaji': '(UK)', 'Lain-lain': '(LL)' };
             const sessionTypes = [
                 { label: 'Kuliah (L)', value: 'Kuliah', color: 'bg-blue-50 border-blue-500 text-blue-700' },
@@ -112,12 +111,13 @@
                 { label: 'Ulangkaji', value: 'Ulangkaji', color: 'bg-orange-50 border-orange-400 text-orange-700' },
                 { label: 'Lain-lain (LL)', value: 'Lain-lain', color: 'bg-slate-50 border-slate-400 text-slate-700' }
             ];
+            const semesterLabels = { 'T1SI': 'Tahun 1 Semester I', 'T1SII': 'Tahun 1 Semester II', 'T2SI': 'Tahun 2 Semester I', 'T2SII': 'Tahun 2 Semester II' };
             const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
 
-            // --- 2. PEMBOLEHUBAH KEADAAN (MANDATORI DI ATAS) ---
-            const [user, setUser] = useState(null);
+            // --- 2. SEMUA STATES ---
             const [isAuthorized, setIsAuthorized] = useState(() => sessionStorage.getItem('tmp_auth') === 'true');
             const [userRole, setUserRole] = useState(() => sessionStorage.getItem('tmp_role') || null);
+            const [user, setUser] = useState(null);
             const [accessCode, setAccessCode] = useState("");
             const [loginError, setLoginError] = useState("");
             const [isCloudEnabled, setIsCloudEnabled] = useState(false);
@@ -149,7 +149,7 @@
             const tableElementRef = useRef(null);
             const [tableWidth, setTableWidth] = useState(0);
 
-            // --- 3. FUNGSI LOGIK ---
+            // --- 3. FUNGSI LOGIK KRITIKAL ---
 
             const isSlotBreak = (day, slotIdx) => {
                 const slot = timeSlots[slotIdx];
@@ -171,29 +171,27 @@
                 return start.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
             };
 
+            // PEMBETULAN LOG KELUAR: Membersihkan semua kunci sesi secara agresif
+            const handleLogout = () => {
+                sessionStorage.removeItem('tmp_auth');
+                sessionStorage.removeItem('tmp_role');
+                sessionStorage.clear();
+                setIsAuthorized(false);
+                setUserRole(null);
+                window.location.reload(); 
+            };
+
             const getCourseSemesterCount = (courseCode) => {
                 const cleanCode = courseCode === 'Lain-lain' ? formData.customCourseCode : courseCode;
                 if (!cleanCode) return 0;
                 return Object.values(events).filter(ev => ev.courseCode === cleanCode && ev.session === academicSession && ev.cycle === academicCycle).length;
             };
 
-            const handleLogout = () => {
-                try {
-                    if (window.firebase && window.firebase.apps.length > 0) {
-                        window.firebase.auth().signOut().catch(() => {});
-                    }
-                } catch (e) {}
-                sessionStorage.clear();
-                window.location.reload(); 
-            };
-
             // --- 4. MEMOIZED DATA ---
 
             const currentYear = new Date().getFullYear();
             const displayAcademicSession = useMemo(() => {
-                if (academicSession === 'Oktober - Mac') {
-                    return `Oktober ${currentYear} - Mac ${currentYear + 1}`;
-                }
+                if (academicSession === 'Oktober - Mac') return `Oktober ${currentYear} - Mac ${currentYear + 1}`;
                 return `${academicSession} ${currentYear}`;
             }, [academicSession, currentYear]);
 
@@ -277,18 +275,30 @@
                 return () => { unsubEvents(); unsubReq(); unsubFooter(); unsubSat(); unsubLimits(); };
             }, [user, isAuthorized, isCloudEnabled, appId, academicCycle]);
 
-            useEffect(() => { setAcademicSession(sessionOptions[0]); }, [academicCycle, sessionOptions]);
-
+            // Sync Scrollbars
             useEffect(() => {
                 const top = topScrollRef.current;
                 const bottom = tableContainerRef.current;
                 if (!top || !bottom) return;
+                
                 const syncTop = () => { bottom.scrollLeft = top.scrollLeft; };
                 const syncBottom = () => { top.scrollLeft = bottom.scrollLeft; };
+
                 top.addEventListener('scroll', syncTop);
                 bottom.addEventListener('scroll', syncBottom);
-                const resizeObserver = new ResizeObserver(() => { if (tableElementRef.current) setTableWidth(tableElementRef.current.scrollWidth); });
+
+                const resizeObserver = new ResizeObserver(() => {
+                    if (tableElementRef.current) {
+                        const w = tableElementRef.current.scrollWidth;
+                        setTableWidth(w);
+                    }
+                });
+                
                 if (tableElementRef.current) resizeObserver.observe(tableElementRef.current);
+
+                // Paksa pengiraan width pada kali pertama
+                if (tableElementRef.current) setTableWidth(tableElementRef.current.scrollWidth);
+
                 return () => {
                     top.removeEventListener('scroll', syncTop);
                     bottom.removeEventListener('scroll', syncBottom);
@@ -297,6 +307,22 @@
             }, [isAuthorized, selectedWeek, academicCycle, filterSemester, saturdayConfigs]);
 
             // --- 6. ACTIONS ---
+
+            const handleLogin = (e) => {
+                e.preventDefault(); setLoginError("");
+                if(accessCode === "ADMIN2026"){ 
+                    setIsAuthorized(true); setUserRole('superuser'); 
+                    sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'superuser'); 
+                } else if (accessCode === "DTMP2026") { 
+                    setIsAuthorized(true); setUserRole('admin'); 
+                    sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'admin'); 
+                } else if (accessCode === "JTMP2026") { 
+                    setIsAuthorized(true); setUserRole('viewer'); 
+                    sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'viewer'); 
+                } else { 
+                    setLoginError("Kod Akses Salah"); 
+                }
+            };
 
             const handleSave = async () => {
                 if (isSaving || userRole === 'viewer') return;
@@ -361,12 +387,34 @@
                 try { await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('jadual_meta_shared').doc('course_limits').set(newLimits); setIsLimitModalOpen(false); } catch (e) { alert("Gagal menyimpan agihan."); }
             };
 
+            const handleFooterChange = (field, val) => {
+                const next = { ...footerData, [field]: val };
+                setFooterData(next);
+                if (isCloudEnabled) window.firebase.firestore().collection('artifacts').doc(appId).collection('public').doc('data').collection(`jadual_meta_${academicCycle}`).doc('signatures').set(next);
+            };
+
             // --- 7. RENDER ---
+            if (!isAuthorized) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6 text-center text-black">
+                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full border-4 border-white text-black">
+                            <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl"><Icons.Lock /></div>
+                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 tracking-tight text-black">Jadual Waktu Mingguan Program DTMP</h2>
+                            <form onSubmit={handleLogin}>
+                                <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 transition-all text-black" autoFocus />
+                                <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase hover:bg-blue-700 transition-all shadow-md">Masuk Sistem</button>
+                                {loginError && <p className="mt-4 text-red-600 font-bold text-xs uppercase">{loginError}</p>}
+                            </form>
+                        </div>
+                    </div>
+                );
+            }
+
             return (
-                <div className="pb-20 bg-white min-h-screen text-black">
-                    <nav className="bg-white border-b border-slate-200 sticky top-0 z-[100] px-6 py-4 no-print shadow-sm flex flex-col gap-4 font-sans text-black">
-                        <div className="max-w-[98%] mx-auto w-full flex flex-wrap items-center justify-between gap-4 text-black">
-                            <div className="flex items-center gap-4 text-black text-black">
+                <div className="pb-20 bg-white min-h-screen text-black font-sans">
+                    <nav className="bg-white border-b border-slate-200 sticky top-0 z-[100] px-6 py-4 no-print shadow-sm flex flex-col gap-4 text-black">
+                        <div className="max-w-[98%] mx-auto w-full flex flex-wrap items-center justify-between gap-4">
+                            <div className="flex items-center gap-4 text-black">
                                 <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic shadow-lg">TMP</div>
                                 <div className="flex flex-col">
                                     <h1 className="font-black text-slate-800 text-lg leading-none uppercase tracking-tight text-black text-black">JWM MASTER</h1>
@@ -375,10 +423,10 @@
                                         <button onClick={() => setAcademicCycle('B')} className={`px-2 py-0.5 rounded text-[9px] font-black uppercase transition-all ${academicCycle === 'B' ? 'bg-orange-600 text-white shadow-md' : 'bg-slate-100 text-slate-400'}`}>Kitaran Apr-Mac</button>
                                         <span className="ml-2 px-2 py-0.5 bg-slate-800 text-white rounded text-[8px] font-black uppercase flex items-center gap-1 shadow-sm"><Icons.User /> {userRole}</span>
                                         {(userRole === 'admin' || userRole === 'superuser') && (
-                                            <button onClick={() => setIsDashboardOpen(true)} className="ml-2 px-2 py-0.5 bg-green-600 text-white rounded text-[8px] font-black uppercase flex items-center gap-1 shadow-sm hover:bg-green-700"><Icons.Chart /> Dashboard</button>
+                                            <button onClick={() => setIsDashboardOpen(true)} className="ml-2 px-2 py-0.5 bg-green-600 text-white rounded text-[8px] font-black uppercase flex items-center gap-1 shadow-sm hover:bg-green-700 transition-all"><Icons.Chart /> Dashboard</button>
                                         )}
                                         {userRole === 'superuser' && (
-                                            <div className="flex items-center gap-2 ml-4 border-l pl-4 border-slate-200">
+                                            <div className="flex items-center gap-2 ml-4 border-l pl-4 border-slate-200 text-black">
                                                 <button onClick={() => setIsLimitModalOpen(true)} className="px-2 py-0.5 bg-indigo-600 text-white rounded text-[8px] font-black uppercase flex items-center gap-1 shadow-sm"><Icons.Settings /> Set Agihan</button>
                                                 {Object.keys(changeRequests).length > 0 && (
                                                     <button onClick={() => setIsRequestModalOpen(true)} className="px-2 py-0.5 bg-red-600 text-white rounded text-[8px] font-black uppercase flex items-center gap-1 shadow-md animate-pulse"><Icons.Bell /> {Object.keys(changeRequests).length} Permohonan</button>
@@ -390,15 +438,15 @@
                             </div>
 
                             <div className="flex-1 max-w-lg bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner overflow-hidden text-black">
-                                <div className="week-scrollbar flex gap-2 overflow-x-auto pb-2 px-1 text-black">
+                                <div className="week-scrollbar flex gap-2 overflow-x-auto pb-2 px-1">
                                     {Array.from({length: 26}, (_, i) => i + 1).map(w => (
                                         <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[45px] py-2 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? (academicCycle === 'A' ? 'bg-blue-600 text-white shadow-md' : 'bg-orange-600 text-white shadow-md') : 'bg-white text-slate-400 hover:bg-slate-100'}`}>M{w}</button>
                                     ))}
                                 </div>
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-3 text-black">
-                                <div className="flex flex-col gap-1 border-r pr-3 border-slate-100">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <div className="flex flex-col gap-1 border-r pr-3 border-slate-100 text-black">
                                     <label className="text-[12px] font-black uppercase text-slate-400 leading-none">Sesi Akademik</label>
                                     <select disabled={userRole === 'viewer'} value={academicSession} onChange={e => setAcademicSession(e.target.value)} className={`bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg border border-blue-100 outline-none ${userRole === 'viewer' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                                         {sessionOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -438,38 +486,39 @@
                             </div>
                             <h1 className="text-xl font-black text-black uppercase leading-tight text-black text-black">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-lg font-bold text-black mt-1 uppercase underline underline-offset-8 tracking-wide text-black text-black text-black">Jadual Waktu Mingguan</h2>
-                            <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-end text-left gap-4 font-sans text-black text-black">
-                                <div className="space-y-1 flex-1 text-black text-black">
-                                    <div className="flex gap-2 text-black text-black text-black">
+                            <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-end text-left gap-4">
+                                <div className="space-y-1 flex-1">
+                                    <div className="flex gap-2">
                                         <span className="font-black text-[12px] uppercase shrink-0 text-black">NAMA INSTITUSI:</span>
-                                        <span className="font-bold text-[12px] uppercase text-black text-black">INSTITUT LATIHAN KEMENTERIAN KESIHATAN MALAYSIA KUCHING, SARAWAK</span>
+                                        <span className="font-bold text-[12px] uppercase text-black">INSTITUT LATIHAN KEMENTERIAN KESIHATAN MALAYSIA KUCHING, SARAWAK</span>
                                     </div>
-                                    <div className="flex flex-wrap items-center gap-10 text-black">
-                                        <div className="flex items-center gap-2 text-black text-black">
-                                            <span className="font-black text-[12px] uppercase text-black text-black">TARIKH:</span>
-                                            <span className="font-bold text-[12px] text-black uppercase tracking-tight text-black text-black">{autoWeekRange}</span>
+                                    <div className="flex flex-wrap items-center gap-10">
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-black text-[12px] uppercase text-black">TARIKH:</span>
+                                            <span className="font-bold text-[12px] text-black uppercase tracking-tight">{autoWeekRange}</span>
                                         </div>
-                                        <div className="flex items-center gap-2 text-black">
-                                            <span className="font-black text-[12px] uppercase text-black text-black text-black">SEMESTER:</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-black text-[12px] uppercase text-black">SEMESTER:</span>
                                             <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="font-bold text-[12px] uppercase text-black bg-slate-50 px-2 py-0.5 rounded no-print outline-none cursor-pointer border border-slate-200 text-black text-black">
                                                 <option value="SEMUA">Pilihan Semester (Semua)</option>
                                                 {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
                                             </select>
                                             <span className="hidden print:inline font-bold text-[12px] uppercase">{filterSemester === 'SEMUA' ? 'Tahun 1 Sem II, Tahun 2 Sem I & II' : semesterLabels[filterSemester]}</span>
                                         </div>
-                                        <div className="flex items-center gap-2 text-black">
-                                            <span className="font-black text-[12px] uppercase text-black text-black">SESI AKADEMIK:</span>
-                                            <span className="font-bold text-[12px] uppercase text-black text-black text-black">{displayAcademicSession}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-black text-[12px] uppercase text-black">SESI AKADEMIK:</span>
+                                            <span className="font-bold text-[12px] uppercase text-black">{displayAcademicSession}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="text-right text-black text-black">
+                                <div className="text-right">
                                     <h2 className="text-[16px] font-black text-black uppercase leading-none">MINGGU {selectedWeek}</h2>
                                     {weekStatus !== "NORMAL" && <div className="text-[11px] font-black text-red-600 mt-1 uppercase tracking-widest leading-none">{weekStatus}</div>}
                                 </div>
                             </div>
                         </div>
 
+                        {/* --- FIXED TOP SCROLLBAR --- */}
                         <div ref={topScrollRef} className="sync-scroll-container no-print">
                             <div style={{ width: `${tableWidth}px`, height: '1px' }}></div>
                         </div>
@@ -478,10 +527,10 @@
                             <div ref={tableElementRef}>
                                 <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full text-black">
                                     <thead>
-                                        <tr className="bg-slate-50 border-b-2 border-black text-center text-black font-black text-[14px] uppercase tracking-tighter text-black text-black">
-                                            <th className="w-40 p-4 border-r border-black font-table-content text-black">Hari / Tarikh</th>
-                                            <th className="w-20 border-r border-black font-table-content text-black">Sem</th>
-                                            {timeSlots.map(slot => (<th key={slot} className="p-3 border-r border-black last:border-0 font-table-content text-black text-black">{slot}</th>))}
+                                        <tr className="bg-slate-50 border-b-2 border-black text-center text-black font-black text-[14px] uppercase tracking-tighter text-black">
+                                            <th className="w-40 p-4 border-r border-black font-table-content">Hari / Tarikh</th>
+                                            <th className="w-20 border-r border-black font-table-content">Sem</th>
+                                            {timeSlots.map(slot => (<th key={slot} className="p-3 border-r border-black last:border-0 font-table-content text-black">{slot}</th>))}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -495,7 +544,7 @@
                                                         return (
                                                             <tr key={`${day}-${sem}`} className={`border-b border-black/20 ${semIdx === visibleSemesters.length - 1 ? 'border-b-2 border-black' : ''}`}>
                                                                 {semIdx === 0 && (
-                                                                    <td rowSpan={visibleSemesters.length} className="p-4 bg-white border-r border-black text-center align-middle text-black text-black">
+                                                                    <td rowSpan={visibleSemesters.length} className="p-4 bg-white border-r border-black text-center align-middle text-black">
                                                                         <div className="font-black text-black text-[14px] uppercase mb-1 font-table-content leading-none text-black text-black">{day}</div>
                                                                         <div className="text-[12px] font-black text-blue-700 bg-blue-50/20 px-2 py-1 rounded border border-blue-100 inline-block leading-none text-black">{displayDate}</div>
                                                                     </td>
@@ -507,17 +556,17 @@
                                                                     const event = events[key];
                                                                     const isBreak = isSlotBreak(day, slotIdx);
                                                                     if (isBreak) {
-                                                                        if (semIdx === 0) return ( <td key={slotIdx} rowSpan={visibleSemesters.length} className="bg-slate-100 border-r border-black p-2 text-center align-middle text-black"> <span className="text-[14px] font-black uppercase vertical-text tracking-[0.4em] opacity-30 text-black font-table-content font-sans text-black text-black">REHAT</span> </td> );
+                                                                        if (semIdx === 0) return ( <td key={slotIdx} rowSpan={visibleSemesters.length} className="bg-slate-100 border-r border-black p-2 text-center align-middle text-black text-black"> <span className="text-[14px] font-black uppercase vertical-text tracking-[0.4em] opacity-30 text-black font-table-content font-sans text-black">REHAT</span> </td> );
                                                                         return null;
                                                                     }
                                                                     let colSpan = 1;
                                                                     if (event && event.duration > 1) { for(let i=1; i<event.duration; i++) { const targetIdx = slotIdx+i; if(targetIdx < timeSlots.length && !isSlotBreak(day, targetIdx)) { colSpan++; skips.push(targetIdx); } else break; } }
                                                                     return (
-                                                                        <td key={slotIdx} colSpan={colSpan} className={`p-1.5 border-r border-black/20 h-32 align-top transition-all text-black ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
-                                                                            <div onClick={() => handleOpenModal(day, sem, slotIdx, event)} className={`h-full w-full rounded-2xl p-2 text-[10px] ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : 'cursor-default'} flex flex-col gap-1 overflow-hidden text-black ${event ? (sessionTypes.find(t => t.value === event.type)?.color || 'bg-white border-l-4') : (userRole !== 'viewer' ? 'border-2 border-dashed border-slate-100 hover:border-blue-400 flex items-center justify-center text-slate-200' : 'bg-slate-50/20')}`}>
+                                                                        <td key={slotIdx} colSpan={colSpan} className={`p-1.5 border-r border-black/20 h-32 align-top transition-all text-black text-black ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
+                                                                            <div onClick={() => handleOpenModal(day, sem, slotIdx, event)} className={`h-full w-full rounded-2xl p-2 text-[10px] ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : 'cursor-default'} flex flex-col gap-1 overflow-hidden text-black text-black ${event ? (sessionTypes.find(t => t.value === event.type)?.color || 'bg-white border-l-4') : (userRole !== 'viewer' ? 'border-2 border-dashed border-slate-100 hover:border-blue-400 flex items-center justify-center text-slate-200' : 'bg-slate-50/20')}`}>
                                                                                 {event ? (
                                                                                     <React.Fragment>
-                                                                                        <div className="font-black truncate uppercase text-black border-b border-black/5 pb-1 mb-1 leading-tight text-[11px] font-sans text-black">
+                                                                                        <div className="font-black truncate uppercase text-black border-b border-black/5 pb-1 mb-1 leading-tight text-[11px] font-sans text-black text-black">
                                                                                             {event.courseCode} { (event.type === 'Kuliah' || event.type === 'Amali') && event.sessionNumber ? sessionInitials[event.type].replace(')', `${event.sessionNumber})`) : sessionInitials[event.type] }
                                                                                             {isLocked(event) && <span className="ml-1 text-red-500 text-black text-black"><Icons.Lock /></span>}
                                                                                         </div>
@@ -539,100 +588,95 @@
                                 </table>
                             </div>
 
-                            <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 bg-white relative font-sans text-black text-black text-black text-black text-black">
-                                <div className="space-y-1 text-black text-black text-black text-black">
-                                    <h4 className="text-[12px] font-black text-black uppercase tracking-[0.2em] text-black">DISEDIAKAN OLEH:</h4>
-                                    <div className="pt-10 pb-2 border-b border-black flex items-center gap-2 text-black text-black text-black text-black">
+                            <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 bg-white relative font-sans text-black">
+                                <div className="space-y-1">
+                                    <h4 className="text-[12px] font-black text-black uppercase tracking-[0.2em]">DISEDIAKAN OLEH:</h4>
+                                    <div className="pt-10 pb-2 border-b border-black flex items-center gap-2 text-black">
                                         <span className="text-[11px] font-black text-black uppercase shrink-0 leading-none text-black text-black">NAMA:</span>
-                                        <input disabled={userRole === 'viewer'} type="text" value={footerData.preparedName || ''} onChange={e => handleFooterChange('preparedName', e.target.value)} className={`w-full bg-transparent font-black text-sm outline-none text-black uppercase leading-none font-sans text-black text-black text-black text-black ${userRole === 'viewer' ? 'cursor-default' : ''}`} />
+                                        <input disabled={userRole === 'viewer'} type="text" value={footerData.preparedName} onChange={e => handleFooterChange('preparedName', e.target.value)} className={`w-full bg-transparent font-black text-sm outline-none text-black uppercase leading-none font-sans text-black text-black ${userRole === 'viewer' ? 'cursor-default' : ''}`} />
                                     </div>
-                                    <p className="text-[11px] font-black text-black uppercase mt-1 tracking-tight leading-none font-bold text-black text-black text-black">PENGAJAR PENYELARAS</p>
-                                    <div className="flex items-center gap-2 pt-4 text-black text-black text-black text-black text-black">
-                                        <span className="text-[11px] font-black text-black uppercase leading-none text-black text-black text-black">TARIKH:</span>
-                                        <input disabled={userRole === 'viewer'} type="date" value={footerData.preparedDate || ''} onChange={e => handleFooterChange('preparedDate', e.target.value)} className={`bg-transparent font-bold text-[11px] outline-none text-black leading-none font-sans text-black text-black text-black text-black ${userRole === 'viewer' ? 'cursor-default' : 'cursor-pointer'}`} />
-                                    </div>
-                                </div>
-                                <div className="space-y-1 text-left text-black text-black text-black text-black text-black text-black">
-                                    <h4 className="text-[12px] font-black text-black uppercase tracking-[0.2em] text-black text-black text-black text-black">DISAHKAN OLEH:</h4>
-                                    <div className="pt-10 pb-2 border-b border-black flex items-center gap-2 text-black text-black text-black text-black text-black text-black text-black text-black">
-                                        <span className="text-[11px] font-black text-black uppercase shrink-0 leading-none text-black text-black text-black text-black text-black">NAMA:</span>
-                                        <input disabled={userRole === 'viewer'} type="text" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} className={`w-full bg-transparent font-black text-sm outline-none text-black uppercase leading-none font-sans text-black text-black text-black text-black text-black text-black ${userRole === 'viewer' ? 'cursor-default' : ''}`} />
-                                    </div>
-                                    <p className="text-[11px] font-black text-black uppercase mt-1 leading-tight tracking-tight uppercase font-bold text-black text-black text-black text-black text-black text-black text-black text-black">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
-                                    <div className="flex items-center gap-2 pt-4 text-black text-black text-black text-black text-black text-black">
-                                        <span className="text-[11px] font-black text-black uppercase leading-none text-black text-black text-black text-black text-black">TARIKH:</span>
-                                        <input disabled={userRole === 'viewer'} type="date" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} className={`bg-transparent font-bold text-[11px] outline-none text-black leading-none font-sans text-black text-black text-black text-black text-black ${userRole === 'viewer' ? 'cursor-default' : 'cursor-pointer'}`} />
+                                    <p className="text-[11px] font-black text-slate-600 uppercase tracking-tight">PENGAJAR PENYELARAS</p>
+                                    <div className="flex items-center gap-2 pt-4">
+                                        <span className="text-[11px] font-black text-black uppercase leading-none">TARIKH:</span>
+                                        <input disabled={userRole === 'viewer'} type="date" value={footerData.preparedDate} onChange={e => handleFooterChange('preparedDate', e.target.value)} className={`bg-transparent font-bold text-[11px] outline-none text-black leading-none font-sans text-black ${userRole === 'viewer' ? 'cursor-default' : 'cursor-pointer'}`} />
                                     </div>
                                 </div>
-                                <div className="absolute bottom-4 right-8 text-[10px] text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black">
+                                <div className="space-y-1 text-left">
+                                    <h4 className="text-[12px] font-black text-black uppercase tracking-[0.2em]">DISAHKAN OLEH:</h4>
+                                    <div className="pt-10 pb-2 border-b border-black flex items-center gap-2 text-black">
+                                        <span className="text-[11px] font-black text-black uppercase shrink-0 leading-none text-black text-black">NAMA:</span>
+                                        <input disabled={userRole === 'viewer'} type="text" value={footerData.verifiedName} onChange={e => handleFooterChange('verifiedName', e.target.value)} className={`w-full bg-transparent font-black text-sm outline-none text-black uppercase leading-none font-sans text-black text-black ${userRole === 'viewer' ? 'cursor-default' : ''}`} />
+                                    </div>
+                                    <p className="text-[11px] font-black text-slate-600 uppercase tracking-tight">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
+                                    <div className="flex items-center gap-2 pt-4 text-black">
+                                        <span className="text-[11px] font-black text-black uppercase leading-none text-black">TARIKH:</span>
+                                        <input disabled={userRole === 'viewer'} type="date" value={footerData.verifiedDate} onChange={e => handleFooterChange('verifiedDate', e.target.value)} className={`bg-transparent font-bold text-[11px] outline-none text-black leading-none font-sans text-black ${userRole === 'viewer' ? 'cursor-default' : 'cursor-pointer'}`} />
+                                    </div>
+                                </div>
+                                <div className="absolute bottom-4 right-8 text-[10px] text-black">
                                     <span className="font-black italic text-black">**Harold Criso Anak Ajin**</span>
                                 </div>
                             </div>
                         </div>
                     </main>
 
-                    {/* MODAL ANALITIK DASHBOARD */}
+                    {/* MODAL DASHBOARD ANALITIK */}
                     {isDashboardOpen && (userRole === 'admin' || userRole === 'superuser') && (
-                        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in duration-300 font-sans text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black">
+                        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in duration-300 font-sans text-black text-black">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden border-4 border-green-600 flex flex-col font-sans">
-                                <div className="bg-green-50 px-10 py-6 border-b-2 border-green-100 flex justify-between items-center text-black text-black text-black text-black text-black text-black">
-                                    <div className="flex items-center gap-4 text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black">
-                                        <Icons.Chart className="text-green-600 text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black" />
+                                <div className="bg-green-50 px-10 py-6 border-b-2 border-green-100 flex justify-between items-center text-black text-black">
+                                    <div className="flex items-center gap-4 text-black text-black">
+                                        <Icons.Chart className="text-green-600 text-black text-black" />
                                         <div>
-                                            <h3 className="font-black text-lg uppercase text-green-800 text-black text-black text-black text-black text-black text-black text-black">Dashboard Analitik Jam Pengajaran</h3>
-                                            <p className="text-[9px] font-bold text-green-600 uppercase tracking-widest leading-none mt-1 text-black text-black text-black text-black text-black text-black text-black">Sesi: {academicSession}</p>
+                                            <h3 className="font-black text-lg uppercase text-green-800 text-black text-black">Dashboard Analitik Jam Pengajaran</h3>
+                                            <p className="text-[9px] font-bold text-green-600 uppercase tracking-widest leading-none mt-1 text-black text-black">Sesi: {academicSession}</p>
                                         </div>
                                     </div>
-                                    <button onClick={() => setIsDashboardOpen(false)} className="bg-white text-green-600 p-2 rounded-xl shadow-md hover:bg-green-600 hover:text-white transition-all text-black"><Icons.X /></button>
+                                    <button onClick={() => setIsDashboardOpen(false)} className="bg-white text-green-600 p-2 rounded-xl shadow-md hover:bg-green-600 hover:text-white transition-all text-black text-black"><Icons.X /></button>
                                 </div>
-                                <div className="p-8 overflow-y-auto flex-1 space-y-10 text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black">
+                                <div className="p-8 overflow-y-auto flex-1 space-y-10 text-black text-black">
                                     <section>
-                                        <h4 className="text-[12px] font-black text-slate-800 uppercase mb-4 flex items-center gap-2 text-black text-black text-black text-black text-black text-black">Rumusan Jam Mengikut Kod Kursus</h4>
-                                        <div className="overflow-x-auto rounded-3xl border border-slate-100 text-black text-black text-black text-black text-black">
-                                            <table className="w-full text-left border-collapse text-black text-black text-black text-black text-black text-black text-black text-black">
+                                        <h4 className="text-[12px] font-black text-slate-800 uppercase mb-4 flex items-center gap-2 text-black text-black">Rumusan Jam Mengikut Kod Kursus</h4>
+                                        <div className="overflow-x-auto rounded-3xl border border-slate-100 text-black text-black text-black">
+                                            <table className="w-full text-left border-collapse text-black text-black text-black">
                                                 <thead>
-                                                    <tr className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase text-black text-black text-black text-black text-black text-black text-black">
-                                                        <th className="p-4 border-b border-slate-100 text-black text-black text-black text-black text-black">Kod Kursus</th>
-                                                        <th className="p-4 border-b border-slate-100 text-black text-black text-black text-black text-black text-black text-black">Kuliah (L)</th>
-                                                        <th className="p-4 border-b border-slate-100 text-black text-black text-black text-black text-black text-black text-black text-black">Amali (P)</th>
-                                                        <th className="p-4 border-b border-slate-100 text-black text-black text-black text-black text-black text-black text-black text-black text-black">Tutorial (T)</th>
-                                                        <th className="p-4 border-b border-slate-100 text-blue-600 text-black text-black text-black text-black text-black text-black text-black text-black">JUMLAH JAM</th>
+                                                    <tr className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase text-black text-black text-black">
+                                                        <th className="p-4 border-b border-slate-100 text-black text-black text-black">Kod Kursus</th>
+                                                        <th className="p-4 border-b border-slate-100 text-black text-black text-black">Kuliah (L)</th>
+                                                        <th className="p-4 border-b border-slate-100 text-black text-black text-black">Amali (P)</th>
+                                                        <th className="p-4 border-b border-slate-100 text-black text-black text-black">Tutorial (T)</th>
+                                                        <th className="p-4 border-b border-slate-100 text-blue-600 text-black text-black text-black">JUMLAH JAM</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {Object.keys(dashboardData.courseSummary).sort().map(code => (
-                                                        <tr key={code} className="text-xs hover:bg-slate-50 transition-all font-bold text-black text-black text-black text-black text-black text-black text-black">
-                                                            <td className="p-4 border-b border-slate-50 font-black text-slate-800 text-black text-black text-black text-black text-black text-black">{code}</td>
-                                                            <td className="p-4 border-b border-slate-50 text-black text-black text-black text-black text-black text-black">{dashboardData.courseSummary[code].Kuliah} jam</td>
-                                                            <td className="p-4 border-b border-slate-50 text-black text-black text-black text-black text-black text-black text-black">{dashboardData.courseSummary[code].Amali} jam</td>
-                                                            <td className="p-4 border-b border-slate-50 text-black text-black text-black text-black text-black text-black text-black text-black">{dashboardData.courseSummary[code].Tutorial} jam</td>
-                                                            <td className="p-4 border-b border-slate-50 font-black text-blue-700 bg-blue-50/30 text-black text-black text-black text-black text-black text-black">{dashboardData.courseSummary[code].total} JAM</td>
+                                                        <tr key={code} className="text-xs hover:bg-slate-50 transition-all font-bold text-black text-black">
+                                                            <td className="p-4 border-b border-slate-50 font-black text-slate-800 text-black text-black text-black">{code}</td>
+                                                            <td className="p-4 border-b border-slate-50 text-black text-black text-black">{dashboardData.courseSummary[code].Kuliah} jam</td>
+                                                            <td className="p-4 border-b border-slate-50 text-black text-black text-black">{dashboardData.courseSummary[code].Amali} jam</td>
+                                                            <td className="p-4 border-b border-slate-50 text-black text-black text-black">{dashboardData.courseSummary[code].Tutorial} jam</td>
+                                                            <td className="p-4 border-b border-slate-50 font-black text-blue-700 bg-blue-50/30 text-black text-black">{dashboardData.courseSummary[code].total} JAM</td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
                                             </table>
                                         </div>
                                     </section>
-                                    
                                     <section>
-                                        <h4 className="text-[12px] font-black text-slate-800 uppercase mb-4 flex items-center gap-2 text-black text-black text-black text-black text-black text-black text-black text-black">Rumusan Jam Mengikut Pengajar</h4>
-                                        <div className="overflow-x-auto rounded-3xl border border-slate-100 text-black text-black text-black text-black text-black text-black text-black">
-                                            <table className="w-full text-left border-collapse text-black text-black text-black text-black text-black text-black text-black text-black text-black">
+                                        <h4 className="text-[12px] font-black text-slate-800 uppercase mb-4 flex items-center gap-2 text-black text-black">Rumusan Jam Mengikut Pengajar</h4>
+                                        <div className="overflow-x-auto rounded-3xl border border-slate-100 text-black text-black">
+                                            <table className="w-full text-left border-collapse text-black text-black text-black">
                                                 <thead>
-                                                    <tr className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase text-black text-black text-black text-black text-black text-black text-black text-black text-black">
-                                                        <th className="p-4 border-b border-slate-100 text-black text-black text-black text-black text-black text-black text-black text-black">Nama Pengajar</th>
-                                                        <th className="p-4 border-b border-slate-100 text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black">Kuliah (L)</th>
-                                                        <th className="p-4 border-b border-slate-100 text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black">Amali (P)</th>
-                                                        <th className="p-4 border-b border-slate-100 text-emerald-600 text-black text-black text-black text-black text-black text-black text-black text-black text-black">JUMLAH JAM</th>
+                                                    <tr className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase text-black text-black text-black">
+                                                        <th className="p-4 border-b border-slate-100 text-black text-black">Nama Pengajar</th>
+                                                        <th className="p-4 border-b border-slate-100 text-emerald-600 text-black text-black text-black text-black">JUMLAH JAM</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {Object.keys(dashboardData.instructorSummary).sort().map(name => (
-                                                        <tr key={name} className="text-xs hover:bg-slate-50 transition-all font-bold text-black text-black text-black text-black text-black text-black text-black text-black">
-                                                            <td className="p-4 border-b border-slate-50 font-black text-slate-800 text-black text-black text-black text-black text-black text-black">{name}</td>
-                                                            <td className="p-4 border-b border-slate-50 text-black text-black text-black text-black text-black text-black text-black text-black">{dashboardData.instructorSummary[name].Kuliah} jam</td>
-                                                            <td className="p-4 border-b border-slate-50 text-black text-black text-black text-black text-black text-black text-black text-black text-black">{dashboardData.instructorSummary[name].Amali} jam</td>
-                                                            <td className="p-4 border-b border-slate-50 font-black text-emerald-700 bg-emerald-50/30 text-black text-black text-black text-black text-black text-black text-black">{dashboardData.instructorSummary[name].total} JAM</td>
+                                                        <tr key={name} className="text-xs hover:bg-slate-50 transition-all font-bold text-black text-black">
+                                                            <td className="p-4 border-b border-slate-50 font-black text-slate-800 text-black text-black">{name}</td>
+                                                            <td className="p-4 border-b border-slate-50 font-black text-emerald-700 bg-emerald-50/30 text-black text-black">{dashboardData.instructorSummary[name].total} JAM</td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
@@ -646,89 +690,89 @@
 
                     {/* MODAL EDITOR */}
                     {isModalOpen && (userRole === 'admin' || userRole === 'superuser') && (
-                        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm no-print animate-in fade-in duration-300 font-sans text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black">
-                            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[95vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100 text-black text-black text-black text-black text-black text-black">
-                                <div className="bg-white px-10 py-6 border-b-2 border-slate-100 flex justify-between items-center shrink-0 text-black text-black text-black text-black text-black text-black">
-                                    <h3 className="font-black text-lg uppercase text-slate-800 tracking-tight leading-none font-sans text-black text-black text-black text-black text-black">KEMAS KINI SLOT</h3>
-                                    <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-3 rounded-2xl hover:rotate-90 transition-all shadow-md active:scale-75 text-black"><Icons.X /></button>
+                        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm no-print animate-in fade-in duration-300 font-sans text-black">
+                            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[95vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100 text-black text-black">
+                                <div className="bg-white px-10 py-6 border-b-2 border-slate-100 flex justify-between items-center shrink-0 text-black text-black">
+                                    <h3 className="font-black text-lg uppercase text-slate-800 tracking-tight leading-none font-sans text-black text-black">KEMAS KINI SLOT</h3>
+                                    <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-3 rounded-2xl hover:rotate-90 transition-all shadow-md active:scale-75 text-black text-black"><Icons.X /></button>
                                 </div>
-                                <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white text-black text-black text-black text-black text-black text-black">
+                                <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white text-black text-black">
                                     {userRole === 'admin' && isLocked(editingEvent) && (
-                                        <div className="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 text-amber-800 text-xs font-bold flex items-center gap-3 text-black text-black text-black text-black text-black text-black">
+                                        <div className="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 text-amber-800 text-xs font-bold flex items-center gap-3 text-black text-black">
                                             <Icons.Lock /> Slot ini telah dikunci (>24j). Sebarang simpanan/padam akan dihantar sebagai permohonan kepada Pentadbir.
                                         </div>
                                     )}
-                                    <div className="grid grid-cols-2 gap-6 text-black text-black text-black text-black text-black">
-                                        <div className="space-y-1 text-black text-black text-black text-black text-black text-black">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase leading-none text-black text-black text-black text-black text-black">Kod Kursus</label>
-                                            <select className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-sm outline-none cursor-pointer text-black text-black text-black text-black text-black" value={formData.courseCode} onChange={(e) => setFormData({...formData, courseCode: e.target.value})}>
+                                    <div className="grid grid-cols-2 gap-6 text-black text-black">
+                                        <div className="space-y-1 text-black text-black">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase leading-none text-black">Kod Kursus</label>
+                                            <select className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-sm outline-none cursor-pointer text-black text-black" value={formData.courseCode} onChange={(e) => setFormData({...formData, courseCode: e.target.value})}>
                                                 {courseCodes.map(c => <option key={c} value={c}>{c}</option>)}
                                             </select>
                                             {formData.courseCode !== 'Lain-lain' && (
                                                 <div className={`mt-2 flex items-center gap-2 px-3 py-1.5 rounded-xl border ${getCourseSemesterCount(formData.courseCode) >= (courseLimits[formData.courseCode] || 999) ? 'bg-red-50 border-red-200 text-red-600' : 'bg-indigo-50 border-indigo-200 text-indigo-700'}`}>
-                                                    <Icons.Info /> <span className="text-[9px] font-black uppercase tracking-tighter text-black text-black text-black text-black text-black">Agihan Semester: {getCourseSemesterCount(formData.courseCode)} / {courseLimits[formData.courseCode] || '∞'}</span>
+                                                    <Icons.Info /> <span className="text-[9px] font-black uppercase tracking-tighter text-black text-black">Agihan Semester: {getCourseSemesterCount(formData.courseCode)} / {courseLimits[formData.courseCode] || '∞'}</span>
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="space-y-1 text-black text-black text-black text-black text-black text-black">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase leading-none font-sans text-black text-black text-black text-black text-black">Bilangan Slot</label>
-                                            <select className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-sm outline-none cursor-pointer text-black text-black text-black text-black text-black" value={formData.duration} onChange={(e) => setFormData({...formData, duration: parseInt(e.target.value)})}>
-                                                <option value="1">1 Slot</option><option value="2">2 Slot</option><option value="3">3 Slot</option><option value="4">4 Slot</option>
+                                        <div className="space-y-1 text-black text-black">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase leading-none font-sans text-black text-black">Bilangan Slot</label>
+                                            <select className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-sm outline-none cursor-pointer text-black text-black" value={formData.duration} onChange={(e) => setFormData({...formData, duration: parseInt(e.target.value)})}>
+                                                {[1,2,3,4].map(n => <option key={n} value={n}>{n} Slot</option>)}
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="space-y-3 font-sans text-black text-black text-black text-black text-black text-black text-black">
-                                        <label className="text-[11px] font-black uppercase text-slate-400 leading-none tracking-widest text-black text-black text-black text-black text-black text-black">Jenis Sesi</label>
-                                        <div className="flex flex-wrap gap-2 text-black text-black text-black text-black text-black text-black text-black text-black">
+                                    <div className="space-y-3 font-sans text-black text-black">
+                                        <label className="text-[11px] font-black uppercase text-slate-400 leading-none tracking-widest text-black">Jenis Sesi</label>
+                                        <div className="flex flex-wrap gap-2 text-black">
                                             {sessionTypes.map(t => ( <button key={t.value} onClick={() => setFormData({...formData, type: t.value})} className={`px-5 py-2 rounded-2xl text-[10px] font-black border-2 transition-all ${formData.type === t.value ? t.color + ' border-blue-600 shadow-md scale-105' : 'bg-white border-slate-100 text-slate-400 hover:bg-slate-50'}`}> {t.label} </button> ))}
                                         </div>
                                     </div>
                                     {(formData.type === 'Kuliah' || formData.type === 'Amali') && (
-                                        <div className="space-y-1 animate-in slide-in-from-top-2 duration-300 text-black text-black text-black text-black text-black text-black text-black">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase leading-none text-black text-black text-black text-black text-black text-black">Bilangan {formData.type}</label>
-                                            <input type="number" min="1" className="w-full px-6 py-4 bg-blue-50/30 border border-blue-200 rounded-2xl font-black text-sm outline-none focus:border-blue-600 text-black font-bold text-black text-black text-black text-black text-black text-black" placeholder="Cth: 1" value={formData.sessionNumber || ''} onChange={(e) => setFormData({...formData, sessionNumber: e.target.value})} />
+                                        <div className="space-y-1 animate-in slide-in-from-top-2 duration-300 text-black text-black">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase leading-none text-black text-black">Bilangan {formData.type}</label>
+                                            <input type="number" min="1" className="w-full px-6 py-4 bg-blue-50/30 border border-blue-200 rounded-2xl font-black text-sm outline-none focus:border-blue-600 text-black font-bold" placeholder="Cth: 1" value={formData.sessionNumber} onChange={(e) => setFormData({...formData, sessionNumber: e.target.value})} />
                                         </div>
                                     )}
-                                    <div className="space-y-1 text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none font-sans text-black text-black text-black text-black text-black text-black text-black">Tajuk Pembelajaran</label>
-                                        <textarea rows="3" className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-sm shadow-sm text-black text-black text-black text-black text-black text-black text-black text-black" placeholder="Topik..." value={formData.topic} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
+                                    <div className="space-y-1 text-black text-black">
+                                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none font-sans text-black">Tajuk Pembelajaran</label>
+                                        <textarea rows="3" className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-sm shadow-sm text-black text-black" placeholder="Topik..." value={formData.topic} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
                                     </div>
-                                    <div className="space-y-1 text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black text-black">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none text-black text-black text-black text-black text-black text-black text-black text-black">Nama Pengajar</label>
-                                        <select className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-black text-sm shadow-sm cursor-pointer text-black font-bold text-black text-black text-black text-black text-black text-black text-black" value={formData.instructor} onChange={(e) => setFormData({...formData, instructor: e.target.value})}>
+                                    <div className="space-y-1 text-black text-black">
+                                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none text-black">Nama Pengajar</label>
+                                        <select className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-black text-sm shadow-sm cursor-pointer text-black font-bold" value={formData.instructor} onChange={(e) => setFormData({...formData, instructor: e.target.value})}>
                                             <option value="">Sila Pilih Pengajar</option>
                                             {instructorList.map(name => <option key={name} value={name}>{name}</option>)}
                                         </select>
                                     </div>
                                 </div>
-                                <div className="p-10 bg-slate-50 border-t-2 border-slate-100 flex gap-4 shrink-0 shadow-inner text-black text-black text-black text-black text-black text-black">
-                                    <button onClick={() => setFormData(prev => ({...prev, topic: '', instructor: '', sessionNumber: ''}))} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border border-slate-200 active:scale-90 shadow-sm uppercase text-black text-black text-black text-black text-black"><Icons.Undo /> Undo</button>
-                                    {editingEvent && ( <button onClick={handleDelete} className={`p-5 rounded-2xl border-2 flex items-center justify-center text-black text-black text-black text-black text-black text-black text-black text-black ${ (userRole === 'superuser' || !isLocked(editingEvent)) ? 'bg-white text-red-600 border-red-100 hover:bg-red-600 hover:text-white' : 'bg-orange-50 text-orange-600 border-orange-200' }`} title={(userRole === 'admin' && isLocked(editingEvent)) ? "Mohon Padam" : "Padam"}> {userRole === 'admin' && isLocked(editingEvent) ? <span className="text-[8px] font-black text-black text-black text-black text-black text-black text-black text-black">MOHON PADAM</span> : <Icons.Trash className="text-black text-black text-black text-black text-black text-black text-black" />} </button> )}
-                                    <button onClick={handleSave} disabled={isSaving} className={`flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 active:scale-95 transition-all shadow-xl leading-none uppercase tracking-widest font-sans text-black text-black text-black text-black text-black text-black text-black text-black`}>{isSaving ? 'Menyimpan...' : (userRole === 'admin' && isLocked(editingEvent) ? 'MOHON PINDAAN' : 'SIMPAN REKOD')}</button>
+                                <div className="p-10 bg-slate-50 border-t-2 border-slate-100 flex gap-4 shrink-0 shadow-inner text-black text-black">
+                                    <button onClick={() => setFormData(prev => ({...prev, topic: '', instructor: '', sessionNumber: ''}))} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border border-slate-200 active:scale-90 shadow-sm uppercase text-black text-black"><Icons.Undo /> Undo</button>
+                                    {editingEvent && ( <button onClick={handleDelete} className={`p-5 rounded-2xl border-2 flex items-center justify-center text-black ${ (userRole === 'superuser' || !isLocked(editingEvent)) ? 'bg-white text-red-600 border-red-100 hover:bg-red-600 hover:text-white' : 'bg-orange-50 text-orange-600 border-orange-200' }`} title={(userRole === 'admin' && isLocked(editingEvent)) ? "Mohon Padam" : "Padam"}> {userRole === 'admin' && isLocked(editingEvent) ? <span className="text-[8px] font-black text-black">MOHON PADAM</span> : <Icons.Trash />} </button> )}
+                                    <button onClick={handleSave} disabled={isSaving} className={`flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 active:scale-95 transition-all shadow-xl leading-none uppercase tracking-widest font-sans text-black text-black`}>{isSaving ? 'Menyimpan...' : (userRole === 'admin' && isLocked(editingEvent) ? 'MOHON PINDAAN' : 'SIMPAN REKOD')}</button>
                                 </div>
                             </div>
                         </div>
                     )}
                     
-                    {/* MODAL REQUEST KEKAL --- */}
+                    {/* MODAL REQUEST & LIMIT KEKAL SAMA --- */}
                     {isRequestModalOpen && userRole === 'superuser' && (
-                        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in duration-300">
-                            <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border-4 border-red-600 flex flex-col font-sans text-black text-black text-black text-black">
-                                <div className="bg-red-50 px-10 py-6 border-b-2 border-red-100 flex justify-between items-center text-black text-black text-black text-black">
-                                    <div className="flex items-center gap-4 text-black text-black text-black text-black text-black"> <Icons.Bell className="text-red-600 text-black" /> <h3 className="font-black text-lg uppercase text-red-800 text-black text-black">Senarai Permohonan</h3> </div>
+                        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in duration-300 font-sans text-black">
+                            <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border-4 border-red-600 flex flex-col font-sans">
+                                <div className="bg-red-50 px-10 py-6 border-b-2 border-red-100 flex justify-between items-center text-black">
+                                    <div className="flex items-center gap-4 text-black text-black"> <Icons.Bell className="text-red-600 text-black" /> <h3 className="font-black text-lg uppercase text-red-800 text-black text-black">Permohonan Pindaan Slot</h3> </div>
                                     <button onClick={() => setIsRequestModalOpen(false)} className="bg-white text-red-600 p-2 rounded-xl shadow-md hover:bg-red-600 hover:text-white transition-all text-black"><Icons.X /></button>
                                 </div>
-                                <div className="p-8 overflow-y-auto flex-1 space-y-4 text-black text-black text-black text-black text-black">
-                                    {Object.keys(changeRequests).length === 0 ? ( <p className="text-center font-bold text-slate-400 py-10 text-black text-black">Tiada permohonan baru.</p> ) : (
+                                <div className="p-8 overflow-y-auto flex-1 space-y-4 text-black text-black">
+                                    {Object.keys(changeRequests).length === 0 ? ( <p className="text-center font-bold text-slate-400 py-10">Tiada permohonan baru.</p> ) : (
                                         Object.entries(changeRequests).map(([key, data]) => (
-                                            <div key={key} className="bg-white border-2 border-slate-100 p-6 rounded-3xl shadow-sm flex items-center justify-between text-black text-black text-black text-black text-black">
+                                            <div key={key} className="bg-white border-2 border-slate-100 p-6 rounded-3xl shadow-sm flex items-center justify-between text-black text-black">
                                                 <div className="flex-1 text-black text-black text-black text-black">
-                                                    <p className="text-[11px] font-black text-slate-800 uppercase text-black text-black text-black text-black">{data.courseCode} • M{data.selectedWeek} • {data.day}</p>
-                                                    <p className="text-xs font-bold text-slate-500 italic text-black text-black text-black">"{data.topic}"</p>
+                                                    <p className="text-[11px] font-black text-slate-800 uppercase text-black text-black">{data.courseCode} • M{data.selectedWeek} • {data.day}</p>
+                                                    <p className="text-xs font-bold text-slate-500 italic text-black text-black">"{data.topic}"</p>
                                                     <p className="text-[10px] font-bold text-blue-600 text-black text-black text-black">Oleh: {data.instructor}</p>
                                                 </div>
-                                                <div className="flex gap-2 text-black text-black text-black text-black">
-                                                    <button onClick={() => approveRequest(key, data)} className="px-6 py-4 bg-green-600 text-white font-black text-xs rounded-2xl hover:bg-green-700 shadow-md flex items-center gap-2 text-black"><Icons.Check /> LULUSKAN</button>
+                                                <div className="flex gap-2">
+                                                    <button onClick={() => approveRequest(key, data)} className="px-6 py-4 bg-green-600 text-white font-black text-xs rounded-2xl hover:bg-green-700 shadow-md flex items-center gap-2 transition-all font-sans"><Icons.Check /> LULUSKAN</button>
                                                     <button onClick={() => rejectRequest(key)} className="p-4 bg-slate-100 text-slate-400 hover:bg-red-600 hover:text-white rounded-2xl transition-all text-black"><Icons.Trash /></button>
                                                 </div>
                                             </div>
@@ -739,25 +783,24 @@
                         </div>
                     )}
 
-                    {/* MODAL LIMIT KEKAL --- */}
                     {isLimitModalOpen && userRole === 'superuser' && (
-                        <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in duration-300 font-sans text-black text-black">
-                            <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden border-4 border-indigo-600 flex flex-col">
-                                <div className="bg-indigo-50 px-10 py-6 border-b-2 border-indigo-100 flex justify-between items-center text-black text-black text-black text-black">
-                                    <div className="flex items-center gap-4 text-black text-black text-black text-black text-black"> <Icons.Settings className="text-indigo-600 text-black text-black" /> <h3 className="font-black text-lg uppercase text-indigo-800 text-black text-black text-black">Had Agihan Semester</h3> </div>
+                        <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in duration-300 font-sans text-black">
+                            <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden border-4 border-indigo-600 flex flex-col text-black">
+                                <div className="bg-indigo-50 px-10 py-6 border-b-2 border-indigo-100 flex justify-between items-center text-black">
+                                    <div className="flex items-center gap-4 text-black text-black text-black"> <Icons.Settings className="text-indigo-600 text-black" /> <h3 className="font-black text-lg uppercase text-indigo-800 text-black text-black">Had Agihan Semester</h3> </div>
                                     <button onClick={() => setIsLimitModalOpen(false)} className="bg-white text-indigo-600 p-2 rounded-xl shadow-md hover:bg-indigo-600 hover:text-white transition-all text-black"><Icons.X /></button>
                                 </div>
-                                <div className="p-8 overflow-y-auto flex-1 space-y-3 text-black text-black">
-                                    <div className="grid grid-cols-2 gap-4 text-black text-black text-black text-black text-black">
+                                <div className="p-8 overflow-y-auto flex-1 space-y-3 text-black">
+                                    <div className="grid grid-cols-2 gap-4 text-black text-black text-black">
                                         {courseCodes.filter(c => c !== 'Lain-lain').map(code => (
-                                            <div key={code} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 text-black text-black text-black text-black">
-                                                <span className="text-[11px] font-black text-slate-700 text-black text-black">{code}</span>
-                                                <input type="number" min="0" className="w-16 px-3 py-2 rounded-xl border border-slate-200 font-black text-center text-sm text-black text-black text-black text-black" value={courseLimits[code] || 0} onChange={(e) => setCourseLimits({...courseLimits, [code]: parseInt(e.target.value) || 0})} />
+                                            <div key={code} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 text-black">
+                                                <span className="text-[11px] font-black text-slate-700 text-black">{code}</span>
+                                                <input type="number" min="0" className="w-16 px-3 py-2 rounded-xl border border-slate-200 font-black text-center text-sm text-black" value={courseLimits[code] || 0} onChange={(e) => setCourseLimits({...courseLimits, [code]: parseInt(e.target.value) || 0})} />
                                             </div>
                                         ))}
                                     </div>
                                 </div>
-                                <div className="p-8 bg-slate-50 border-t border-slate-100 text-black text-black text-black text-black">
+                                <div className="p-8 bg-slate-50 border-t border-slate-100 text-black text-black text-black">
                                     <button onClick={() => saveLimits(courseLimits)} className="w-full py-5 bg-indigo-600 text-white rounded-[2rem] font-black uppercase tracking-widest shadow-xl text-black">SIMPAN HAD SEMESTER</button>
                                 </div>
                             </div>
