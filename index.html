@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v13.2</title>
+    <title>Jadual Waktu Mingguan TMP Digital v13.3</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -666,13 +666,13 @@
                                                             const isHoliday = holidays[`${academicCycle}-${selectedWeek}-${day}`];
                                                             
                                                             if (weekStatus !== 'NORMAL') {
-                                                                if (semIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border-r border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">{weekStatus}</span> </td>);
+                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border-r border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">{weekStatus}</span> </td>);
                                                                 return null;
                                                             }
 
                                                             // JIKA HARI INI DI-SET SEBAGAI CUTI HKA/CT
                                                             if (isHoliday) {
-                                                                if (semIdx === 0) return (
+                                                                if (sIdx === 0) return (
                                                                     <td key={slotIdx} rowSpan={vSems.length} className="bg-rose-50/60 border-r border-rose-200 p-2 text-center align-middle">
                                                                         <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] text-rose-500 opacity-80">CUTI (HKA / CT)</span>
                                                                     </td>
@@ -681,7 +681,7 @@
                                                             }
 
                                                             if (isBreak) {
-                                                                if (semIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border-r border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">REHAT</span> </td>);
+                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border-r border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">REHAT</span> </td>);
                                                                 return null;
                                                             }
                                                             let colSpan = 1;
