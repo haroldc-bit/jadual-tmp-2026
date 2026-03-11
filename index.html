@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v12.6</title>
+    <title>Jadual Waktu Mingguan TMP Digital v12.7</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -509,6 +509,22 @@
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Icons.Search /></div>
                                 <input type="text" placeholder="Cari..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="bg-slate-50 border border-slate-200 rounded-xl py-2 pl-9 pr-4 text-xs font-black outline-none focus:border-blue-600 transition-all text-black w-40" />
                             </div>
+                            
+                            {/* --- PILIHAN HARI SABTU (DIKEMBALIKAN) --- */}
+                            {userRole !== 'viewer' && (
+                                <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 text-black h-[34px] no-print">
+                                    <span className="text-[9px] font-black uppercase text-slate-400 leading-none">Sabtu</span>
+                                    <button onClick={() => {
+                                        const satKey = `${academicCycle}-${selectedWeek}`;
+                                        const next = !currentWeekHasSaturday;
+                                        setSaturdayConfigs({...saturdayConfigs, [satKey]: next});
+                                        if(window.TMP_DB) window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), {...saturdayConfigs, [satKey]: next}).catch(e=>console.error(e));
+                                    }} className={`w-8 h-4 rounded-full relative transition-all ${currentWeekHasSaturday ? 'bg-green-500' : 'bg-slate-300'}`}>
+                                        <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${currentWeekHasSaturday ? 'left-4' : 'left-0.5'}`}></div>
+                                    </button>
+                                </div>
+                            )}
+
                             <div className="flex flex-col gap-1 border-r pr-3 border-slate-100 text-black">
                                 <label className="text-[9px] font-black uppercase text-slate-400 leading-none">Sesi</label>
                                 <select value={academicSession} onChange={e => setAcademicSession(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg border border-blue-100 outline-none cursor-pointer">
@@ -526,6 +542,9 @@
 
                     <main className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
+                            {/* --- TEKS BPL DIKEMBALIKAN --- */}
+                            <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
+                            
                             <div className="flex justify-center mb-1"><img src="JATA_NEGARA_MALAYSIA.jpg" alt="Jata Negara" className="h-16 w-auto" onError={e => e.target.src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png"} /></div>
                             <h1 className="text-lg font-black uppercase leading-tight">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-base font-bold uppercase underline underline-offset-4 tracking-wide">Jadual Waktu Mingguan</h2>
