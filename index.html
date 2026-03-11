@@ -213,7 +213,7 @@
                 ).length;
             };
 
-            // PEMBAIKAN FUNGSI SIMPANAN KEBAL PELURU (PANTAS)
+            // PEMBAIKAN FUNGSI SIMPANAN (OPTIMISTIC UPDATE - ZERO DELAY)
             const handleSave = async (e) => {
                 if (e) e.preventDefault();
                 if (isSaving || userRole === 'viewer') return;
@@ -261,15 +261,19 @@
                 try {
                     const { db, appId, doc, setDoc } = window.TMP_DB;
                     
-                    // Optimistic update: tutup form serta-merta tanpa tunggu Firebase membalas.
+                    // OPTIMISTIC UPDATE: Masukkan data terus ke paparan jadual (0 saat delay)
+                    setEvents(prev => ({ ...prev, [key]: dataToSave }));
+                    
+                    // Tutup modal serta-merta tanpa tunggu Firebase membalas.
                     setIsModalOpen(false);
                     setIsSaving(false);
 
+                    // Proses awan (Cloud process) berjalan di latar belakang
                     if (userRole === 'admin' && isLocked(editingEvent)) {
                         setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...dataToSave, requestType: 'EDIT'}).catch(err => {
                             console.error(err); alert("Gagal hantar permohonan. Semak internet anda.");
                         });
-                        alert("Slot telah terkunci (>24j). Permohonan pindaan telah dihantar.");
+                        setTimeout(() => alert("Slot telah terkunci (>24j). Permohonan pindaan telah dihantar."), 100);
                     } else {
                         setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave).catch(err => {
                             console.error(err); alert("Gagal menyimpan rekod. Semak internet anda.");
@@ -297,19 +301,21 @@
                     const { db, appId, doc, deleteDoc, setDoc } = window.TMP_DB;
                     if (userRole === 'superuser') {
                         if (confirm("Adakah anda pasti mahu memadam slot ini secara kekal?")) {
-                            setIsModalOpen(false); // Tutup serta merta
+                            setEvents(prev => { const next = {...prev}; delete next[key]; return next; }); // Padam paparan serta merta
+                            setIsModalOpen(false); 
                             deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key)).catch(err => console.error(err));
                         }
                     } else if (userRole === 'admin') {
                         if (isLocked(editingEvent)) {
                             if (confirm("Slot telah terkunci. Hantar permohonan padam?")) {
-                                setIsModalOpen(false); // Tutup serta merta
+                                setIsModalOpen(false); 
                                 setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...editingEvent, requestType: 'DELETE'}).catch(err => console.error(err));
-                                alert("Permohonan padam telah dihantar kepada Pentadbir.");
+                                setTimeout(() => alert("Permohonan padam telah dihantar kepada Pentadbir."), 100);
                             }
                         } else {
                             if (confirm("Padam slot ini?")) {
-                                setIsModalOpen(false); // Tutup serta merta
+                                setEvents(prev => { const next = {...prev}; delete next[key]; return next; }); // Padam paparan serta merta
+                                setIsModalOpen(false); 
                                 deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key)).catch(err => console.error(err));
                             }
                         }
