@@ -250,18 +250,21 @@
                 
                 try {
                     const { db, appId, doc, setDoc } = window.TMP_DB;
+                    
+                    // TUTUP MODAL SERTA MERTA (OPTIMISTIC UPDATE) UNTUK ELAK KELAMBATAN
+                    setIsModalOpen(false);
+                    setIsSaving(false);
+
                     if (userRole === 'admin' && isLocked(editingEvent)) {
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...data, requestType: 'EDIT'});
+                        setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...data, requestType: 'EDIT'}).catch(e => console.error(e));
                         alert("Slot terkunci (>24j). Permohonan pindaan dihantar.");
                     } else {
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), data);
+                        setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), data).catch(e => console.error(e));
                     }
-                    setIsModalOpen(false);
                 } catch (e) {
                     console.error("Save Error:", e);
                     alert("Ralat simpan. Sila semak sambungan internet anda."); 
-                } finally { 
-                    setIsSaving(false); 
+                    setIsSaving(false);
                 }
             };
 
@@ -272,20 +275,20 @@
                 try {
                     if (userRole === 'superuser') {
                         if (confirm("Padam slot secara kekal?")) {
-                            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key));
                             setIsModalOpen(false);
+                            deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key)).catch(e => console.error(e));
                         }
                     } else if (userRole === 'admin') {
                         if (isLocked(editingEvent)) {
                             if (confirm("Slot terkunci. Hantar mohon padam?")) {
-                                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...editingEvent, requestType: 'DELETE'});
-                                alert("Mohon padam dihantar.");
                                 setIsModalOpen(false);
+                                setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...editingEvent, requestType: 'DELETE'}).catch(e => console.error(e));
+                                alert("Mohon padam dihantar.");
                             }
                         } else {
                             if (confirm("Padam slot ini?")) {
-                                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key));
                                 setIsModalOpen(false);
+                                deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key)).catch(e => console.error(e));
                             }
                         }
                     }
