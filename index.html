@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v12.8</title>
+    <title>Jadual Waktu Mingguan TMP Digital v13.0</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -212,7 +212,7 @@
                 ).length;
             };
 
-            // PEMBAIKAN FUNGSI SIMPANAN (ZERO DELAY - NO BLOCKING ALERTS)
+            // PEMBAIKAN FUNGSI SIMPANAN (ZERO DELAY + SEMAKAN PERTINDIHAN PENGAJAR)
             const handleSave = async (e) => {
                 if (e) e.preventDefault();
                 if (userRole === 'viewer') return;
@@ -227,10 +227,41 @@
                     }
                     const limit = courseLimits[finalCode] || 999;
                     if (currentCount >= limit) {
-                        alert(`Ralat: Had agihan (${limit}) semester bagi ${finalCode} telah dicapai.`);
+                        alert(`Ralat: Had agihan (${limit}) semester bagi kursus ${finalCode} telah dicapai.`);
                         return;
                     }
                 }
+
+                // =========================================================================
+                // TAMBAHAN LOGIK PENAMBAHBAIKAN: SEMAKAN PERTINDIHAN JADUAL PENGAJAR
+                // =========================================================================
+                if (formData.instructor && formData.instructor.trim() !== "" && formData.instructor !== "Lain-lain") {
+                    const isConflict = Object.values(events).some(ev => {
+                        // Abaikan jika tiada maklumat atau pengajar berbeza
+                        if (!ev || ev.instructor !== formData.instructor) return false;
+                        
+                        // Abaikan jika sesi, kitaran, minggu, atau hari yang berbeza
+                        if (ev.session !== academicSession || ev.cycle !== academicCycle || ev.selectedWeek !== selectedWeek || ev.day !== formData.day) return false;
+                        
+                        // Abaikan semester yang sedang diedit (overwrite dibenarkan pada semester yang sama)
+                        if (ev.semester === formData.semester) return false;
+
+                        // Kira indeks mula dan indeks tamat berdasarkan durasi
+                        const exStart = parseInt(ev.timeSlotIndex);
+                        const exEnd = exStart + parseInt(ev.duration) - 1;
+                        const newStart = parseInt(formData.timeSlotIndex);
+                        const newEnd = newStart + parseInt(formData.duration) - 1;
+
+                        // Semak jika waktu bersilang (Overlap condition)
+                        return (newStart <= exEnd && newEnd >= exStart);
+                    });
+
+                    if (isConflict) {
+                        alert(`Peringatan: Pengajar ${formData.instructor} telah dijadualkan pada masa yang sama untuk semester lain pada hari ini. Sila pilih waktu atau pengajar lain.`);
+                        return; // Halang borang daripada disimpan jika bertindih
+                    }
+                }
+                // =========================================================================
                 
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 
@@ -279,7 +310,6 @@
                 
                 if (userRole === 'superuser') {
                     if (confirm("Adakah anda pasti mahu memadam slot ini secara kekal?")) {
-                        // Optimistic delete
                         setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
                         setIsModalOpen(false); 
                         if (window.TMP_DB) {
@@ -298,7 +328,6 @@
                         }
                     } else {
                         if (confirm("Padam slot ini?")) {
-                            // Optimistic delete
                             setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
                             setIsModalOpen(false); 
                             if (window.TMP_DB) {
