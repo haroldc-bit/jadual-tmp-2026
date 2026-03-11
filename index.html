@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v11.7</title>
+    <title>Jadual Waktu Mingguan TMP Digital v11.9</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -32,12 +32,12 @@
         .highlight-new { animation: high-visibility-flash 2.5s ease-out forwards; }
         
         @keyframes search-pulse {
-            0% { box-shadow: 0 0 0 0px rgba(59, 130, 246, 0.7); transform: scale(1); border-color: #3b82f6; }
-            50% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); transform: scale(1.03); border-color: #2563eb; }
-            100% { box-shadow: 0 0 0 0px rgba(59, 130, 246, 0); transform: scale(1); border-color: #3b82f6; }
+            0% { box-shadow: 0 0 0 0px rgba(59, 130, 246, 0.7); border-color: #3b82f6; }
+            50% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); border-color: #2563eb; }
+            100% { box-shadow: 0 0 0 0px rgba(59, 130, 246, 0); border-color: #3b82f6; }
         }
         .search-match { 
-            animation: search-pulse 2s infinite; 
+            animation: search-pulse 1.5s infinite; 
             border: 3px solid #3b82f6 !important;
             background-color: #eff6ff !important;
             z-index: 10;
@@ -60,10 +60,10 @@
         .sync-scroll-container::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
 
         .table-to-scroll thead th { position: sticky; top: 0; z-index: 50; background: #f8fafc !important; box-shadow: inset 0 -2px 0 #000; }
-        .freeze-container { max-height: calc(100vh - 280px); overflow: auto; border: 2px solid black; background: white; }
+        .freeze-container { max-height: calc(100vh - 300px); overflow: auto; border: 2px solid black; background: white; }
     </style>
 </head>
-<body class="bg-white min-h-screen text-black font-sans">
+<body class="bg-white min-h-screen text-black">
     <div id="root"></div>
 
     <!-- Firebase Modular SDK -->
@@ -103,11 +103,11 @@
             Info: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
             Chart: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>,
             Printer: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>,
-            Search: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            Search: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" cy1="21" x2="16.65" y2="16.65"></line></svg>
         };
 
         const App = () => {
-            // --- 1. STATES (SUSUNAN PALING ATAS) ---
+            // --- 1. STATES ---
             const [isAuthorized, setIsAuthorized] = useState(false);
             const [userRole, setUserRole] = useState(null);
             const [user, setUser] = useState(null);
@@ -138,13 +138,14 @@
             const tableContainerRef = useRef(null);
             const tableElementRef = useRef(null);
 
-            // --- 2. PEMBOLEHUBAH TETAP ---
+            // --- 2. CONSTANTS ---
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
             const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
-            const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTMM 2153", "MTBC 2032", "MTBC 2114", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTBT 2193", "MTPC 2203", "MTNF 2162", "MTHE 2182", "MTVS 2142", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "CCRM 2013", "GCSF 2013", "Lain-lain"];
             const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA’IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMIESHA BINTI ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL", "LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
+            const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTMM 2153", "MTBC 2032", "MTBC 2114", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTBT 2193", "MTPC 2203", "MTNF 2162", "MTHE 2182", "MTVS 2142", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "CCRM 2013", "GCSF 2013", "Lain-lain"];
             const sessionInitials = { 'Kuliah': '(L)', 'Amali': '(P)', 'IL': '(IL)', 'Tutorial': '(T)', 'CA': '(CA)', 'Ulangkaji': '(UK)', 'Lain-lain': '(LL)' };
             const semesterLabels = { 'T1SI': 'Tahun 1 Semester I', 'T1SII': 'Tahun 1 Semester II', 'T2SI': 'Tahun 2 Semester I', 'T2SII': 'Tahun 2 Semester II' };
+            const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
             const sessionTypes = [
                 { label: 'Kuliah (L)', value: 'Kuliah', color: 'bg-blue-50 border-blue-500 text-blue-700' },
                 { label: 'Amali (P)', value: 'Amali', color: 'bg-emerald-50 border-emerald-500 text-emerald-700' },
@@ -154,9 +155,8 @@
                 { label: 'Ulangkaji', value: 'Ulangkaji', color: 'bg-orange-50 border-orange-400 text-orange-700' },
                 { label: 'Lain-lain (LL)', value: 'Lain-lain', color: 'bg-slate-50 border-slate-400 text-slate-700' }
             ];
-            const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
 
-            // --- 3. FUNGSI TINDAKAN UTAMA ---
+            // --- 3. FUNCTIONS ---
 
             const handleLogin = (e) => {
                 if(e) e.preventDefault();
@@ -214,7 +214,6 @@
             const handleSave = async () => {
                 if (isSaving || userRole === 'viewer' || !window.TMP_DB || !user) return;
                 const finalCode = formData.courseCode === 'Lain-lain' ? formData.customCourseCode : formData.courseCode;
-                
                 if (userRole === 'admin') {
                     const currentCount = getCourseSemesterCount(finalCode);
                     const limit = courseLimits[finalCode] || 999;
@@ -223,21 +222,19 @@
                         return;
                     }
                 }
-                
                 setIsSaving(true);
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 const data = { ...formData, courseCode: finalCode, cycle: academicCycle, session: academicSession, lastUpdate: editingEvent?.lastUpdate || Date.now(), selectedWeek };
-                
                 try {
                     const { db, appId, doc, setDoc } = window.TMP_DB;
                     if (userRole === 'admin' && isLocked(editingEvent)) {
                         await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...data, requestType: 'EDIT'});
-                        alert("Slot terkunci (>24j). Permohonan pindaan dihantar.");
+                        alert("Slot terkunci. Permohonan pindaan dihantar.");
                     } else {
                         await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), data);
                     }
                     setIsModalOpen(false);
-                } catch (e) { alert("Ralat simpan: Masalah kebenaran pangkalan data."); } finally { setIsSaving(false); }
+                } catch (e) { alert("Ralat simpan."); } finally { setIsSaving(false); }
             };
 
             const handleDelete = async () => {
@@ -252,11 +249,9 @@
                         }
                     } else if (userRole === 'admin') {
                         if (isLocked(editingEvent)) {
-                            if (confirm("Slot terkunci. Hantar mohon padam?")) {
-                                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...editingEvent, requestType: 'DELETE'});
-                                alert("Mohon padam dihantar.");
-                                setIsModalOpen(false);
-                            }
+                            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...editingEvent, requestType: 'DELETE'});
+                            alert("Mohon padam dihantar.");
+                            setIsModalOpen(false);
                         } else {
                             if (confirm("Padam slot ini?")) {
                                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key));
@@ -267,7 +262,15 @@
                 } catch (e) { alert("Gagal padam."); }
             };
 
-            // --- 4. DATA MEMOIZED ---
+            const handleFooterChange = async (field, val) => {
+                if (userRole === 'viewer' || !window.TMP_DB || !user) return;
+                const next = { ...footerData, [field]: val };
+                setFooterData(next);
+                const { db, appId, doc, setDoc } = window.TMP_DB;
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), next);
+            };
+
+            // --- 4. MEMOIZED DATA ---
 
             const currentWeekHasSaturday = useMemo(() => saturdayConfigs[`${academicCycle}-${selectedWeek}`] === true, [saturdayConfigs, selectedWeek, academicCycle]);
             const visibleDays = useMemo(() => currentWeekHasSaturday ? days : days.slice(0, 5), [currentWeekHasSaturday]);
@@ -315,29 +318,26 @@
             // --- 5. EFFECTS ---
 
             useEffect(() => {
-                const savedAuth = sessionStorage.getItem('tmp_auth');
-                const savedRole = sessionStorage.getItem('tmp_role');
-                if (savedAuth === 'true' && savedRole) {
-                    setIsAuthorized(true);
-                    setUserRole(savedRole);
-                }
+                const sAuth = sessionStorage.getItem('tmp_auth');
+                const sRole = sessionStorage.getItem('tmp_role');
+                if (sAuth === 'true' && sRole) { setIsAuthorized(true); setUserRole(sRole); }
             }, []);
 
             useEffect(() => {
                 if (!window.TMP_DB) return;
-                const { db, auth, appId, collection, onSnapshot, onAuthStateChanged, signInAnonymously, doc } = window.TMP_DB;
+                const { auth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } = window.TMP_DB;
                 
                 const initAuth = async () => {
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await window.TMP_DB.signInWithCustomToken(auth, __initial_auth_token);
+                        await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
                         await signInAnonymously(auth);
                     }
                 };
                 initAuth();
 
-                const unsubscribeAuth = onAuthStateChanged(auth, setUser);
-                return () => unsubscribeAuth();
+                const unsubAuth = onAuthStateChanged(auth, setUser);
+                return () => unsubAuth();
             }, []);
 
             useEffect(() => {
@@ -360,19 +360,13 @@
                     if(d.exists()) setSaturdayConfigs(d.data());
                 });
 
-                const unsubReq = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'change_requests'), (s) => {
-                    const d = {}; s.forEach(doc => { d[doc.id] = doc.data(); }); setChangeRequests(d);
-                });
-
-                return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubReq(); };
+                return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); };
             }, [isAuthorized, user, academicCycle]);
 
             useEffect(() => {
                 if (!tableElementRef.current) return;
-                const updateWidth = () => setTableWidth(tableElementRef.current.scrollWidth);
-                const ro = new ResizeObserver(updateWidth);
-                ro.observe(tableElementRef.current);
-                updateWidth();
+                const updateW = () => setTableWidth(tableElementRef.current.scrollWidth);
+                const ro = new ResizeObserver(updateW); ro.observe(tableElementRef.current); updateW();
                 return () => ro.disconnect();
             }, [isAuthorized, filterSemester, saturdayConfigs]);
 
@@ -388,14 +382,6 @@
                 setIsModalOpen(true);
             };
 
-            const handleFooterChange = async (field, val) => {
-                if (userRole === 'viewer' || !window.TMP_DB) return;
-                const next = { ...footerData, [field]: val };
-                setFooterData(next);
-                const { db, appId, doc, setDoc } = window.TMP_DB;
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), next);
-            };
-
             const saveLimits = async (newLimits) => {
                 const { db, appId, doc, setDoc } = window.TMP_DB;
                 try {
@@ -404,16 +390,16 @@
                 } catch (e) { alert("Gagal simpan had."); }
             };
 
-            // --- 6. RENDER LOGIC ---
+            // --- 6. UI RENDER ---
 
             if (!isAuthorized) {
                 return (
                     <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6 text-black">
-                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full border-4 border-white">
+                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full border-4 border-white text-black">
                             <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl"><Icons.Lock /></div>
                             <h2 className="text-xl font-black mb-8 uppercase text-slate-800 text-center leading-tight">Akses Jadual TMP Digital</h2>
                             <form onSubmit={handleLogin}>
-                                <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 text-black" autoFocus />
+                                <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 text-black font-bold" autoFocus />
                                 <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase hover:bg-blue-700 transition-all shadow-md">Masuk</button>
                                 {loginError && <p className="mt-4 text-red-600 font-bold text-xs uppercase text-center">{loginError}</p>}
                             </form>
@@ -424,65 +410,65 @@
 
             return (
                 <div className="pb-20 bg-white min-h-screen text-black font-sans">
-                    <nav className="bg-white border-b border-slate-200 sticky top-0 z-[100] px-6 py-4 no-print shadow-sm flex flex-col gap-4 text-black">
-                        <div className="max-w-[98%] mx-auto w-full flex flex-wrap items-center justify-between gap-4 text-black">
-                            <div className="flex items-center gap-4">
-                                <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic shadow-lg">TMP</div>
-                                <div className="flex flex-col">
-                                    <h1 className="font-black text-slate-800 text-lg leading-none uppercase">JWM MASTER</h1>
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <button onClick={() => setAcademicCycle('A')} className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${academicCycle === 'A' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-400'}`}>Kitaran A</button>
-                                        <button onClick={() => setAcademicCycle('B')} className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${academicCycle === 'B' ? 'bg-orange-600 text-white shadow-md' : 'bg-slate-100 text-slate-400'}`}>Kitaran B</button>
-                                        <span className="ml-2 px-2 py-0.5 bg-slate-800 text-white rounded text-[8px] font-black uppercase"><Icons.User /> {userRole}</span>
-                                        {(userRole === 'admin' || userRole === 'superuser') && (
-                                            <button onClick={() => setIsDashboardOpen(true)} className="ml-2 px-2 py-0.5 bg-green-600 text-white rounded text-[8px] font-black uppercase flex items-center gap-1 shadow-sm hover:bg-green-700 transition-all text-white"><Icons.Chart /> Dashboard</button>
-                                        )}
-                                        {userRole === 'superuser' && (
-                                            <button onClick={() => setIsLimitModalOpen(true)} className="ml-2 px-2 py-0.5 bg-indigo-600 text-white rounded text-[8px] font-black uppercase flex items-center gap-1 shadow-sm hover:bg-indigo-700 transition-all text-white"><Icons.Settings /> Agihan</button>
-                                        )}
-                                    </div>
+                    <nav className="bg-white border-b border-slate-200 sticky top-0 z-[100] px-6 py-4 no-print shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4 text-black">
+                        <div className="flex items-center gap-4 text-black">
+                            <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic shadow-lg">TMP</div>
+                            <div>
+                                <h1 className="font-black text-slate-800 text-lg leading-none uppercase tracking-tight">JWM MASTER</h1>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <button onClick={() => setAcademicCycle('A')} className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${academicCycle === 'A' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-400'}`}>Kitaran A</button>
+                                    <button onClick={() => setAcademicCycle('B')} className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${academicCycle === 'B' ? 'bg-orange-600 text-white shadow-md' : 'bg-slate-100 text-slate-400'}`}>Kitaran B</button>
+                                    <span className="ml-2 px-2 py-0.5 bg-slate-800 text-white rounded text-[8px] font-black uppercase tracking-widest"><Icons.User /> {userRole}</span>
+                                    {(userRole === 'admin' || userRole === 'superuser') && (
+                                        <button onClick={() => setIsDashboardOpen(true)} className="ml-2 px-2 py-0.5 bg-green-600 text-white rounded text-[8px] font-black uppercase flex items-center gap-1 shadow-sm hover:bg-green-700 transition-all text-white"><Icons.Chart /> Dashboard</button>
+                                    )}
+                                    {userRole === 'superuser' && (
+                                        <button onClick={() => setIsLimitModalOpen(true)} className="ml-2 px-2 py-0.5 bg-indigo-600 text-white rounded text-[8px] font-black uppercase flex items-center gap-1 shadow-sm hover:bg-indigo-700 transition-all text-white"><Icons.Settings /> Agihan</button>
+                                    )}
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="flex-1 max-w-lg bg-slate-50 p-1.5 rounded-2xl border-2 border-slate-200 overflow-hidden no-print">
-                                <div className="week-scrollbar flex gap-2 overflow-x-auto pb-1 px-1">
-                                    {Array.from({length: 26}, (_, i) => i + 1).map(w => (
-                                        <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[42px] py-1.5 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-400 hover:bg-slate-100'}`}>M{w}</button>
-                                    ))}
-                                </div>
+                        <div className="flex-1 max-w-lg bg-slate-50 p-1.5 rounded-2xl border-2 border-slate-200 overflow-hidden no-print">
+                            <div className="week-scrollbar flex gap-2 overflow-x-auto pb-1 px-1">
+                                {Array.from({length: 26}, (_, i) => i + 1).map(w => (
+                                    <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[42px] py-1.5 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-400 hover:bg-slate-100'}`}>M{w}</button>
+                                ))}
                             </div>
+                        </div>
 
-                            <div className="flex items-center gap-3">
-                                <div className="relative group no-print">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Icons.Search /></div>
-                                    <input type="text" placeholder="Cari..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="bg-slate-50 border border-slate-200 rounded-xl py-2 pl-9 pr-4 text-xs font-black outline-none focus:border-blue-600 transition-all text-black w-40" />
-                                </div>
-                                <button onClick={() => window.print()} className="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-[10px] font-black flex items-center gap-2 uppercase shadow-md hover:bg-black transition-all"><Icons.Printer /> Cetak</button>
-                                <button onClick={handleLogout} className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.External /></button>
+                        <div className="flex items-center gap-3">
+                            <div className="relative group no-print">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Icons.Search /></div>
+                                <input type="text" placeholder="Cari..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="bg-slate-50 border border-slate-200 rounded-xl py-2 pl-9 pr-4 text-xs font-black outline-none focus:border-blue-600 transition-all text-black w-40" />
                             </div>
+                            <select value={academicSession} onChange={e => setAcademicSession(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-2 rounded-xl border border-blue-100 outline-none">
+                                {academicCycle === 'A' ? ['Januari - Jun', 'Julai - Disember'].map(o => <option key={o}>{o}</option>) : ['Oktober - Mac', 'April - September'].map(o => <option key={o}>{o}</option>)}
+                            </select>
+                            <button onClick={() => window.print()} className="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-[10px] font-black flex items-center gap-2 uppercase shadow-md hover:bg-black transition-all"><Icons.Printer /> Cetak</button>
+                            <button onClick={handleLogout} className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.External /></button>
                         </div>
                     </nav>
 
                     <main className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
-                        <div className="relative mb-6 text-center border-b-2 border-black pb-4">
+                        <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
                             <div className="flex justify-center mb-1"><img src="JATA_NEGARA_MALAYSIA.jpg" alt="Jata" className="h-16 w-auto" onError={e => e.target.src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png"} /></div>
                             <h1 className="text-lg font-black uppercase leading-tight">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-base font-bold uppercase underline underline-offset-4 tracking-wide">Jadual Waktu Mingguan</h2>
-                            <div className="mt-6 flex justify-between items-end text-left text-[11px] font-bold">
-                                <div className="space-y-0.5 text-black">
-                                    <p>INSTITUT LATIHAN KKM KUCHING, SARAWAK</p>
-                                    <p>TARIKH: {autoWeekRange}</p>
-                                    <div className="flex gap-2 items-center">
-                                        <span>SEMESTER:</span>
-                                        <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="no-print bg-slate-100 px-1 py-0.5 rounded outline-none">
-                                            <option value="SEMUA">Semua Semester</option>
-                                            {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
-                                        </select>
-                                        <span className="hidden print:inline">{filterSemester === 'SEMUA' ? 'Semua Semester' : semesterLabels[filterSemester]}</span>
-                                    </div>
-                                    <p>SESI: {currentSessionAcademic} ({academicCycle})</p>
+                            
+                            {/* --- HEADER ALIGNMENT (PEMBETULAN) --- */}
+                            <div className="mt-6 flex justify-start items-center text-left text-[11px] font-bold gap-10 text-black">
+                                <div>TARIKH: <span className="font-black text-blue-700">{autoWeekRange}</span></div>
+                                <div className="flex items-center gap-2">
+                                    <span>SEMESTER:</span>
+                                    <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="no-print bg-slate-100 px-1 py-0.5 rounded outline-none border border-slate-200">
+                                        <option value="SEMUA">Semua Semester</option>
+                                        {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
+                                    </select>
+                                    <span className="hidden print:inline">{filterSemester === 'SEMUA' ? 'Semua' : semesterLabels[filterSemester]}</span>
                                 </div>
-                                <div className="text-right text-black">
+                                <div>SESI AKADEMIK: <span className="font-black uppercase">{currentSessionAcademic} ({academicCycle})</span></div>
+                                <div className="ml-auto text-right">
                                     <h2 className="text-xl font-black uppercase leading-none">MINGGU {selectedWeek}</h2>
                                     {weekStatus !== "NORMAL" && <p className="text-[10px] text-red-600 uppercase font-black tracking-widest mt-1">{weekStatus}</p>}
                                 </div>
@@ -528,14 +514,17 @@
                                                             }
                                                             let colSpan = 1;
                                                             if (ev && ev.duration > 1) { for(let i=1; i<ev.duration; i++) { if(!isSlotBreak(day, slotIdx+i)) { colSpan++; skips.push(slotIdx+i); } else break; } }
-                                                            const isMatch = searchTerm && ev && (ev.courseCode?.toLowerCase().includes(searchTerm.toLowerCase()) || ev.instructor?.toLowerCase().includes(searchTerm.toLowerCase()));
+                                                            const isMatch = searchTerm && searchTerm.trim() !== "" && ev && ev.courseCode && (
+                                                                ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                                                (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase()))
+                                                            );
                                                             return (
-                                                                <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-28 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
+                                                                <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
                                                                     <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${ev && ev.courseCode ? (sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4') : 'border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200'} ${isMatch ? 'search-match' : ''} ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : ''}`}>
                                                                         {ev && ev.courseCode ? (
                                                                             <React.Fragment>
                                                                                 <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight">
-                                                                                    {ev.courseCode} {sessionInitials[ev.type] || '(L)'}
+                                                                                    {ev.courseCode} {ev.sessionNumber ? (sessionInitials[ev.type] || '').replace(')', ev.sessionNumber + ')') : sessionInitials[ev.type] || '(L)'}
                                                                                     {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
                                                                                 </div>
                                                                                 <div className="font-bold line-clamp-3 leading-tight mb-1">{ev.topic}</div>
@@ -571,21 +560,29 @@
                         </div>
                     </main>
 
-                    {/* MODAL EDITOR */}
+                    {/* MODAL EDITOR (PEMBETULAN BILANGAN KULIAH/AMALI) */}
                     {isModalOpen && (
                         <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm no-print animate-in fade-in duration-300 text-black">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[95vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
-                                <div className="bg-slate-50 px-10 py-6 border-b-2 flex justify-between items-center">
+                                <div className="bg-slate-50 px-10 py-6 border-b-2 flex justify-between items-center text-black">
                                     <h3 className="font-black text-lg uppercase">Kemas Kini Slot</h3>
                                     <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-2 rounded-xl shadow-lg hover:rotate-90 transition-all"><Icons.X /></button>
                                 </div>
                                 <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white text-black">
+                                    {userRole === 'admin' && isLocked(editingEvent) && (
+                                        <div className="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 text-amber-800 text-xs font-bold flex items-center gap-3">
+                                            <Icons.Lock /> Slot Terkunci (>24j).
+                                        </div>
+                                    )}
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-1">
                                             <label className="text-[11px] font-black text-slate-400 uppercase">Kod Kursus</label>
                                             <select className="w-full p-4 bg-slate-50 border-2 rounded-2xl font-black text-sm text-black" value={formData.courseCode} onChange={(e) => setFormData({...formData, courseCode: e.target.value})}>
                                                 {courseCodes.map(c => <option key={c} value={c}>{c}</option>)}
                                             </select>
+                                            {formData.courseCode !== 'Lain-lain' && (
+                                                <div className="mt-2 text-[10px] font-black text-blue-600 uppercase">Sem: {getCourseSemesterCount(formData.courseCode)} / {courseLimits[formData.courseCode] || '∞'}</div>
+                                            )}
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-[11px] font-black text-slate-400 uppercase">Bilangan Slot</label>
@@ -602,12 +599,18 @@
                                             ))}
                                         </div>
                                     </div>
-                                    <div className="space-y-1 text-black">
+                                    {(formData.type === 'Kuliah' || formData.type === 'Amali') && (
+                                        <div className="space-y-1 animate-in slide-in-from-top-2">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase">Bilangan {formData.type}</label>
+                                            <input type="number" min="1" className="w-full p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl font-black text-sm text-black focus:border-blue-600" placeholder="Cth: 1" value={formData.sessionNumber || ''} onChange={(e) => setFormData({...formData, sessionNumber: e.target.value})} />
+                                        </div>
+                                    )}
+                                    <div className="space-y-1">
                                         <label className="text-[11px] font-black text-slate-400 uppercase">Tajuk Pembelajaran</label>
                                         <textarea rows="3" className="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none font-bold text-sm text-black shadow-sm" placeholder="Topik..." value={formData.topic} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
                                     </div>
-                                    <div className="space-y-1 text-black">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase">Nama Pengajar</label>
+                                    <div className="space-y-1">
+                                        <label className="text-[11px] font-black text-slate-400 uppercase text-black">Nama Pengajar</label>
                                         <select className="w-full p-4 bg-slate-50 border-2 rounded-2xl font-black text-sm text-black shadow-sm" value={formData.instructor} onChange={(e) => setFormData({...formData, instructor: e.target.value})}>
                                             <option value="">Pilih Pengajar</option>
                                             {instructorList.map(name => <option key={name} value={name}>{name}</option>)}
@@ -615,22 +618,24 @@
                                     </div>
                                 </div>
                                 <div className="p-10 bg-slate-50 border-t-2 flex gap-4">
-                                    <button onClick={handleSave} disabled={isSaving} className={`flex-1 py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 shadow-xl uppercase tracking-widest transition-all ${isSaving ? 'opacity-50' : ''}`}> {isSaving ? 'Menyimpan...' : 'Simpan Rekod'} </button>
+                                    <button onClick={() => setFormData(p => ({...p, topic: '', instructor: '', sessionNumber: ''}))} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border-2 active:scale-90 transition-all uppercase tracking-widest"><Icons.Undo /> Undo</button>
+                                    {editingEvent && ( <button onClick={handleDelete} className="p-5 bg-white text-red-600 border-2 border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all"><Icons.Trash /></button> )}
+                                    <button onClick={handleSave} disabled={isSaving} className={`flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 shadow-xl uppercase tracking-widest transition-all ${isSaving ? 'opacity-50' : ''}`}> {isSaving ? 'Menyimpan...' : 'Simpan Rekod'} </button>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* MODAL DASHBOARD ANALITIK */}
+                    {/* DASHBOARD ANALITIK MODAL */}
                     {isDashboardOpen && (
                         <div className="fixed inset-0 z-[700] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in text-black">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden border-4 border-green-600 flex flex-col">
                                 <div className="bg-green-50 px-10 py-6 flex justify-between items-center border-b-2 border-green-100 text-black">
                                     <h3 className="font-black text-lg uppercase flex items-center gap-2 text-green-800"><Icons.Chart /> Analitik Jam: {academicSession}</h3>
-                                    <button onClick={() => setIsDashboardOpen(false)} className="bg-white text-green-600 p-2 rounded-xl shadow-md"><Icons.X /></button>
+                                    <button onClick={() => setIsDashboardOpen(false)} className="bg-white text-green-600 p-2 rounded-xl shadow-md text-black"><Icons.X /></button>
                                 </div>
                                 <div className="p-10 overflow-y-auto flex-1 space-y-10 text-black">
-                                    <div className="overflow-x-auto rounded-3xl border border-slate-100">
+                                    <div className="overflow-x-auto rounded-3xl border border-slate-100 text-black">
                                         <table className="w-full text-left text-black">
                                             <thead>
                                                 <tr className="bg-slate-50 text-[10px] font-black uppercase text-slate-400">
@@ -654,11 +659,11 @@
                                     </div>
                                     <div>
                                         <h4 className="text-[12px] font-black uppercase mb-4 flex items-center gap-2 text-slate-400 tracking-widest"><div className="w-2 h-2 bg-emerald-600 rounded-full"></div> Jam Pengajar</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-black">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-black text-black">
                                             {Object.entries(dashboardData.instructorSum).sort().map(([name, data]) => (
-                                                <div key={name} className="p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 flex flex-col justify-center">
-                                                    <p className="text-[10px] font-black uppercase text-slate-400 mb-1 leading-tight">{name}</p>
-                                                    <p className="text-2xl font-black text-emerald-700 leading-none">{data.total} <span className="text-[10px] uppercase opacity-50 font-black text-black">JAM</span></p>
+                                                <div key={name} className="p-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
+                                                    <p className="text-[10px] font-black uppercase text-slate-400 mb-1">{name}</p>
+                                                    <p className="text-2xl font-black text-emerald-700">{data.total} <span className="text-[10px] uppercase opacity-50 font-black text-black">JAM</span></p>
                                                 </div>
                                             ))}
                                         </div>
@@ -672,7 +677,7 @@
                     {isLimitModalOpen && (
                         <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm no-print animate-in fade-in">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-indigo-600 flex flex-col text-black">
-                                <div className="bg-indigo-50 px-10 py-6 border-b-2 border-indigo-100 flex justify-between items-center">
+                                <div className="bg-indigo-50 px-10 py-6 border-b-2 border-indigo-100 flex justify-between items-center text-black">
                                     <h3 className="font-black text-lg uppercase flex items-center gap-2 text-indigo-800"><Icons.Settings /> Had Agihan Semester</h3>
                                     <button onClick={() => setIsLimitModalOpen(false)} className="bg-white text-indigo-600 p-2 rounded-xl shadow-md"><Icons.X /></button>
                                 </div>
@@ -680,11 +685,11 @@
                                     {courseCodes.filter(c => c !== 'Lain-lain').map(code => (
                                         <div key={code} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border-2 border-slate-100">
                                             <span className="text-[10px] font-black uppercase">{code}</span>
-                                            <input type="number" min="0" className="w-16 p-2 rounded-lg border-2 border-slate-200 text-center font-black text-sm text-black" value={courseLimits[code] || 0} onChange={(e) => setCourseLimits({...courseLimits, [code]: e.target.value})} />
+                                            <input type="number" min="0" className="w-16 p-2 rounded-lg border-2 border-slate-200 text-center font-black text-sm text-black font-bold" value={courseLimits[code] || 0} onChange={(e) => setCourseLimits({...courseLimits, [code]: e.target.value})} />
                                         </div>
                                     ))}
                                 </div>
-                                <div className="p-8 bg-slate-50 border-t-2">
+                                <div className="p-8 bg-slate-50 border-t-2 text-black text-black">
                                     <button onClick={() => saveLimits(courseLimits)} className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase shadow-xl hover:bg-indigo-700 tracking-widest transition-all">Simpan Had Agihan</button>
                                 </div>
                             </div>
