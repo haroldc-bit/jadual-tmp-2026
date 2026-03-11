@@ -217,7 +217,7 @@
             };
 
             const handleSave = async () => {
-                if (isSaving || userRole === 'viewer' || !window.TMP_DB || !user) return;
+                if (isSaving || userRole === 'viewer' || !window.TMP_DB) return;
                 const finalCode = formData.courseCode === 'Lain-lain' ? formData.customCourseCode : formData.courseCode;
                 if (userRole === 'admin') {
                     let currentCount = getCourseSemesterCount(finalCode);
@@ -225,7 +225,7 @@
                         currentCount -= 1; // Elak kiraan berulang untuk slot sama
                     }
                     const limit = courseLimits[finalCode] || 999;
-                    if (currentCount >= limit) {
+                    if (currentCount >= limit && !editingEvent) {
                         alert(`Ralat: Had agihan (${limit}) semester bagi ${finalCode} telah dicapai.`);
                         return;
                     }
@@ -236,14 +236,14 @@
                 try {
                     const { db, appId, doc, setDoc } = window.TMP_DB;
                     
-                    // OPTIMISTIC UPDATE: Tutup form dan reset state serta-merta tanpa tunggu server
+                    // TUTUP MODAL SERTA-MERTA (OPTIMISTIC UPDATE)
                     setIsModalOpen(false);
                     setIsSaving(false);
 
-                    // Buang 'await' supaya proses berlaku secara latar belakang (background)
+                    // Proses di latar belakang tanpa 'await'
                     if (userRole === 'admin' && isLocked(editingEvent)) {
                         setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...data, requestType: 'EDIT'}).catch(e => console.error(e));
-                        alert("Slot terkunci. Permohonan pindaan dihantar.");
+                        alert("Slot terkunci (>24j). Permohonan pindaan dihantar.");
                     } else {
                         setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), data).catch(e => console.error(e));
                     }
@@ -260,19 +260,19 @@
                 try {
                     if (userRole === 'superuser') {
                         if (confirm("Padam slot secara kekal?")) {
-                            setIsModalOpen(false); // Tutup serta merta
+                            setIsModalOpen(false);
                             deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key)).catch(e => console.error(e));
                         }
                     } else if (userRole === 'admin') {
                         if (isLocked(editingEvent)) {
                             if (confirm("Slot terkunci. Hantar mohon padam?")) {
-                                setIsModalOpen(false); // Tutup serta merta
+                                setIsModalOpen(false);
                                 setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...editingEvent, requestType: 'DELETE'}).catch(e => console.error(e));
                                 alert("Mohon padam dihantar.");
                             }
                         } else {
                             if (confirm("Padam slot ini?")) {
-                                setIsModalOpen(false); // Tutup serta merta
+                                setIsModalOpen(false);
                                 deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key)).catch(e => console.error(e));
                             }
                         }
@@ -293,7 +293,7 @@
             };
 
             const handleFooterChange = async (field, val) => {
-                if (userRole === 'viewer' || !window.TMP_DB || !user) return;
+                if (userRole === 'viewer' || !window.TMP_DB) return;
                 const next = { ...footerData, [field]: val };
                 setFooterData(next);
                 const { db, appId, doc, setDoc } = window.TMP_DB;
