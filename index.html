@@ -694,15 +694,15 @@
 
                                                             return (
                                                                 <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
-                                                                    <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${ev && ev.courseCode ? (sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4') : 'border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200'} ${isMatch ? 'search-match' : ''} ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : ''}`}>
+                                                                    <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${ev && ev.courseCode ? `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4'}` : 'border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200'} ${isMatch ? 'search-match' : ''} ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : ''}`}>
                                                                         {ev && ev.courseCode ? (
                                                                             <React.Fragment>
-                                                                                <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight">
+                                                                                <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0">
                                                                                     {ev.courseCode} {ev.sessionNumber ? `${sessionInitials[ev.type].replace(')', ev.sessionNumber + ')')}` : sessionInitials[ev.type] || '(L)'}
                                                                                     {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
                                                                                 </div>
-                                                                                <div className="font-bold line-clamp-3 leading-tight mb-1">{ev.topic}</div>
-                                                                                <div className="mt-auto font-black opacity-60 text-[8px] truncate uppercase">{ev.instructor}</div>
+                                                                                <div className="font-bold leading-tight mb-1 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>{ev.topic}</div>
+                                                                                <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">{ev.instructor}</div>
                                                                             </React.Fragment>
                                                                         ) : (userRole !== 'viewer' && <Icons.Plus />)}
                                                                     </div>
