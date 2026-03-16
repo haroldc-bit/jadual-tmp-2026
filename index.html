@@ -320,14 +320,53 @@
 
             const handleExportPDF = () => {
                 const element = printAreaRef.current;
+                const container = tableContainerRef.current;
+                
+                // Backup gaya asal
+                const originalOverflow = container.style.overflow;
+                const originalMaxHeight = container.style.maxHeight;
+                const originalBorder = container.style.border;
+                
+                // Sembunyikan elemen .no-print sementara
+                const noPrintElements = element.querySelectorAll('.no-print');
+                const originalDisplays = [];
+                noPrintElements.forEach(el => {
+                    originalDisplays.push(el.style.display);
+                    el.style.display = 'none';
+                });
+
+                // Ubah gaya kontena untuk paparan penuh tanpa potongan jadual
+                container.style.overflow = 'visible';
+                container.style.maxHeight = 'none';
+                container.style.border = 'none';
+
+                const fullWidth = container.scrollWidth;
+
                 const opt = {
-                    margin: 0.5,
+                    margin: [0.3, 0.3, 0.3, 0.3], // Margin secukup rasa
                     filename: `JWM_TMP_Minggu_${selectedWeek}_Versi_${academicCycle}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, logging: false },
-                    jsPDF: { unit: 'cm', format: 'a3', orientation: 'landscape' }
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { 
+                        scale: 2, // Resolusi tinggi
+                        useCORS: true, 
+                        logging: false,
+                        windowWidth: fullWidth + 50,
+                        width: fullWidth,
+                        scrollY: 0
+                    },
+                    jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } // A3 Landskap menampung format jadual lebar
                 };
-                html2pdf().set(opt).from(element).save();
+
+                html2pdf().set(opt).from(element).save().then(() => {
+                    // Kembalikan gaya kepada keadaan asal selepas eksport siap
+                    container.style.overflow = originalOverflow;
+                    container.style.maxHeight = originalMaxHeight;
+                    container.style.border = originalBorder;
+                    
+                    noPrintElements.forEach((el, index) => {
+                        el.style.display = originalDisplays[index];
+                    });
+                });
             };
 
             const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
