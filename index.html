@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v13.3</title>
-    <!-- Tailwind CSS -->
+    <title>Jadual Waktu Mingguan TMP Digital v13.8</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
         @media print {
@@ -66,7 +64,6 @@
 <body class="bg-white min-h-screen text-black">
     <div id="root"></div>
 
-    <!-- Firebase Modular SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -100,7 +97,8 @@
             Chart: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>,
             Printer: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>,
             Search: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
-            Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
+            FileText: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         };
 
         const App = () => {
@@ -121,12 +119,11 @@
             const [footerData, setFooterData] = useState({ preparedName: '', preparedDate: '', verifiedName: '', verifiedDate: '' });
             const [filterSemester, setFilterSemester] = useState('SEMUA');
             const [saturdayConfigs, setSaturdayConfigs] = useState({});
-            const [holidays, setHolidays] = useState({}); // STATE BARU UNTUK HARI CUTI
+            const [holidays, setHolidays] = useState({}); 
             const [searchTerm, setSearchTerm] = useState("");
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [isDashboardOpen, setIsDashboardOpen] = useState(false);
             const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
-            const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
             const [editingEvent, setEditingEvent] = useState(null);
             const [lastUpdatedKey, setLastUpdatedKey] = useState(null);
             const [formData, setFormData] = useState({ id: '', day: '', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', semester: '', duration: 1, sessionNumber: '' });
@@ -135,6 +132,7 @@
             const topScrollRef = useRef(null);
             const tableContainerRef = useRef(null);
             const tableElementRef = useRef(null);
+            const printAreaRef = useRef(null); // Reference for PDF export
 
             // --- 2. CONSTANTS ---
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
@@ -217,10 +215,8 @@
                 if (e) e.preventDefault();
                 if (userRole === 'viewer') return;
 
-                // PEMBETULAN: Jika jenis adalah Lain-lain, tetapkan kod kursus secara automatik kepada 'Lain-Lain'
                 const finalCode = formData.type === 'Lain-lain' ? 'Lain-Lain' : formData.courseCode;
                 
-                // Semakan had agihan (Hanya terpakai untuk Kursus, BUKAN Lain-lain)
                 if (userRole === 'admin' && formData.type !== 'Lain-lain') {
                     let currentCount = getCourseSemesterCount(finalCode);
                     if (editingEvent && editingEvent.courseCode === finalCode) {
@@ -254,8 +250,6 @@
                 }
                 
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
-                
-                // Pembersihan data untuk Firestore (Bebas ralat undefined)
                 const dataToSave = {
                     id: formData.id || Math.random().toString(36).substr(2, 9),
                     day: formData.day,
@@ -284,16 +278,13 @@
                         } else {
                             setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave).catch(err => console.error(err));
                         }
-                    } catch (error) { 
-                        console.error("Firestore Error:", error);
-                    }
+                    } catch (error) { console.error("Firestore Error:", error); }
                 }
             };
 
             const handleDelete = async (e) => {
                 if (e) e.preventDefault();
                 if (userRole === 'viewer') return;
-                
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 
                 if (userRole === 'superuser') {
@@ -327,6 +318,18 @@
                 }
             };
 
+            const handleExportPDF = () => {
+                const element = printAreaRef.current;
+                const opt = {
+                    margin: 0.5,
+                    filename: `JWM_TMP_Minggu_${selectedWeek}_Versi_${academicCycle}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false },
+                    jsPDF: { unit: 'cm', format: 'a3', orientation: 'landscape' }
+                };
+                html2pdf().set(opt).from(element).save();
+            };
+
             const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
                 if (isSlotBreak(day, slotIdx) || userRole === 'viewer') return;
                 if (event) {
@@ -358,7 +361,6 @@
             };
 
             // --- 4. MEMOIZED DATA ---
-
             const currentWeekHasSaturday = useMemo(() => saturdayConfigs[`${academicCycle}-${selectedWeek}`] === true, [saturdayConfigs, selectedWeek, academicCycle]);
             const visibleDays = useMemo(() => currentWeekHasSaturday ? days : days.slice(0, 5), [currentWeekHasSaturday]);
 
@@ -385,10 +387,8 @@
             const dashboardData = useMemo(() => {
                 const courseSum = {}, instructorSum = {};
                 Object.values(events).filter(ev => 
-                    ev && ev.session === academicSession && 
-                    ev.cycle === academicCycle && 
-                    ev.courseCode && typeof ev.courseCode === 'string' && ev.courseCode.trim() !== "" && 
-                    ev.courseCode !== "Lain-lain"
+                    ev && ev.session === academicSession && ev.cycle === academicCycle && 
+                    ev.courseCode && typeof ev.courseCode === 'string' && ev.courseCode.trim() !== "" && ev.courseCode !== "Lain-lain"
                 ).forEach(ev => {
                     const hours = parseInt(ev.duration || 1);
                     const course = ev.courseCode;
@@ -403,41 +403,27 @@
             }, [events, academicSession, academicCycle]);
 
             // --- 5. EFFECTS ---
-
             useEffect(() => {
-                const interval = setInterval(() => {
-                    if (window.TMP_DB) {
-                        setDbReady(true);
-                        clearInterval(interval);
-                    }
-                }, 50);
+                const interval = setInterval(() => { if (window.TMP_DB) { setDbReady(true); clearInterval(interval); } }, 50);
                 return () => clearInterval(interval);
             }, []);
 
             useEffect(() => {
                 const savedAuth = sessionStorage.getItem('tmp_auth');
                 const savedRole = sessionStorage.getItem('tmp_role');
-                if (savedAuth === 'true' && savedRole) {
-                    setIsAuthorized(true);
-                    setUserRole(savedRole);
-                }
+                if (savedAuth === 'true' && savedRole) { setIsAuthorized(true); setUserRole(savedRole); }
             }, []);
 
             useEffect(() => {
                 if (!dbReady || !window.TMP_DB) return;
                 const { auth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } = window.TMP_DB;
-                
                 const initAuth = async () => {
                     try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } 
+                        else { await signInAnonymously(auth); }
                     } catch (e) { console.error("Auth init err:", e); }
                 };
                 initAuth();
-
                 const unsubAuth = onAuthStateChanged(auth, setUser);
                 return () => unsubAuth();
             }, [dbReady]);
@@ -445,27 +431,13 @@
             useEffect(() => {
                 if (!dbReady || !isAuthorized || !window.TMP_DB || !user) return;
                 const { db, appId, collection, onSnapshot, doc } = window.TMP_DB;
-
                 const unsubEv = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`), (s) => {
                     const d = {}; s.forEach(doc => { d[doc.id] = doc.data(); }); setEvents(d);
                 });
-
-                const unsubLim = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), (d) => {
-                    if(d.exists()) setCourseLimits(d.data());
-                });
-
-                const unsubSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), (d) => {
-                    if(d.exists()) setFooterData(d.data());
-                });
-
-                const unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), (d) => {
-                    if(d.exists()) setSaturdayConfigs(d.data());
-                });
-
-                const unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), (d) => {
-                    if(d.exists()) setHolidays(d.data());
-                });
-
+                const unsubLim = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), (d) => { if(d.exists()) setCourseLimits(d.data()); });
+                const unsubSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), (d) => { if(d.exists()) setFooterData(d.data()); });
+                const unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), (d) => { if(d.exists()) setSaturdayConfigs(d.data()); });
+                const unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), (d) => { if(d.exists()) setHolidays(d.data()); });
                 return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); };
             }, [dbReady, isAuthorized, user, academicCycle]);
 
@@ -479,17 +451,16 @@
             }, [isAuthorized, filterSemester, saturdayConfigs]);
 
             // --- 6. UI RENDER ---
-
             if (!isAuthorized) {
                 return (
                     <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6 text-black">
-                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full border-4 border-white text-black">
+                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full border-4 border-white text-black text-center">
                             <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl"><Icons.Lock /></div>
-                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 text-center leading-tight">Akses Jadual TMP Digital</h2>
+                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 leading-tight">Akses Jadual TMP Digital</h2>
                             <form onSubmit={handleLogin}>
                                 <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 text-black font-bold" autoFocus />
                                 <button type="submit" className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase hover:bg-blue-700 transition-all shadow-md">Masuk</button>
-                                {loginError && <p className="mt-4 text-red-600 font-bold text-xs uppercase text-center">Kod Akses Salah</p>}
+                                {loginError && <p className="mt-4 text-red-600 font-bold text-xs uppercase">Kod Akses Salah</p>}
                             </form>
                         </div>
                     </div>
@@ -498,14 +469,12 @@
 
             return (
                 <div className="pb-20 bg-white min-h-screen text-black font-sans">
-                    <nav className="bg-white border-b border-slate-200 sticky top-0 z-[100] px-6 py-4 no-print shadow-sm flex flex-col gap-4 text-black">
-                        <div className="max-w-[98%] mx-auto w-full flex flex-col gap-4 text-black">
-                            
-                            {/* --- BARIS 1: LOGO & KAWALAN --- */}
+                    <nav className="bg-white border-b border-slate-200 sticky top-0 z-[100] px-6 py-4 no-print shadow-sm flex flex-col gap-4">
+                        <div className="max-w-[98%] mx-auto w-full flex flex-col gap-4">
                             <div className="flex flex-wrap items-center justify-between gap-4">
-                                <div className="flex items-center gap-4 text-black">
+                                <div className="flex items-center gap-4">
                                     <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic shadow-lg">TMP</div>
-                                    <div>
+                                    <div className="flex flex-col">
                                         <h1 className="font-black text-slate-800 text-lg leading-none uppercase tracking-tight">JWM MASTER</h1>
                                         <div className="flex items-center gap-2 mt-1">
                                             <button onClick={() => setAcademicCycle('A')} className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${academicCycle === 'A' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-400'}`}>Versi A</button>
@@ -527,24 +496,18 @@
                                         <input type="text" placeholder="Cari..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="bg-slate-50 border border-slate-200 rounded-xl py-2 pl-9 pr-4 text-xs font-black outline-none focus:border-blue-600 transition-all text-black w-40" />
                                     </div>
                                     
-                                    {/* --- BUTANG CUTI HKA/CT DITAMBAH DI PANEL NAVIGASI --- */}
                                     {userRole !== 'viewer' && (
-                                        <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-xl border border-slate-200 text-black h-[34px] no-print">
-                                            <span className="text-[9px] font-black uppercase text-rose-500 leading-none mr-1">Cuti HKA/CT:</span>
+                                        <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-xl border border-slate-200 h-[34px]">
+                                            <span className="text-[9px] font-black uppercase text-rose-500 mr-1">Cuti HKA/CT:</span>
                                             {visibleDays.map(d => {
                                                 const holKey = `${academicCycle}-${selectedWeek}-${d}`;
                                                 const isHol = holidays[holKey];
                                                 return (
-                                                    <button 
-                                                        key={d}
-                                                        onClick={() => {
-                                                            const next = !isHol;
-                                                            setHolidays({...holidays, [holKey]: next});
-                                                            if(window.TMP_DB) window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), {...holidays, [holKey]: next}).catch(e=>console.error(e));
-                                                        }}
-                                                        className={`w-6 h-6 rounded-md text-[10px] font-black transition-all flex items-center justify-center ${isHol ? 'bg-rose-500 text-white shadow-sm' : 'bg-white text-slate-400 border border-slate-200 hover:bg-slate-100'}`}
-                                                        title={`Set Cuti untuk ${d}`}
-                                                    >
+                                                    <button key={d} onClick={() => {
+                                                        const next = !isHol;
+                                                        setHolidays({...holidays, [holKey]: next});
+                                                        if(window.TMP_DB) window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), {...holidays, [holKey]: next}).catch(e=>console.error(e));
+                                                    }} className={`w-6 h-6 rounded-md text-[10px] font-black transition-all flex items-center justify-center ${isHol ? 'bg-rose-500 text-white shadow-sm' : 'bg-white text-slate-400 border border-slate-200 hover:bg-slate-100'}`}>
                                                         {d.substring(0, 1)}
                                                     </button>
                                                 );
@@ -553,8 +516,8 @@
                                     )}
 
                                     {userRole !== 'viewer' && (
-                                        <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 text-black h-[34px] no-print">
-                                            <span className="text-[9px] font-black uppercase text-slate-400 leading-none">Sabtu</span>
+                                        <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 h-[34px]">
+                                            <span className="text-[9px] font-black uppercase text-slate-400">Sabtu</span>
                                             <button onClick={() => {
                                                 const satKey = `${academicCycle}-${selectedWeek}`;
                                                 const next = !currentWeekHasSaturday;
@@ -566,22 +529,24 @@
                                         </div>
                                     )}
 
-                                    <div className="flex flex-col gap-1 border-r pr-3 border-slate-100 text-black">
+                                    <div className="flex flex-col gap-1 border-r pr-3 border-slate-100">
                                         <label className="text-[9px] font-black uppercase text-slate-400 leading-none">Sesi</label>
                                         <select value={academicSession} onChange={e => setAcademicSession(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg border border-blue-100 outline-none cursor-pointer">
                                             {academicCycle === 'A' ? ['Januari - Jun', 'Julai - Disember'].map(o => <option key={o}>{o}</option>) : ['Oktober - Mac', 'April - September'].map(o => <option key={o}>{o}</option>)}
                                         </select>
                                     </div>
-                                    <div className="flex flex-col gap-1 pr-3 border-slate-100 text-black">
+                                    <div className="flex flex-col gap-1 pr-3 border-slate-100">
                                         <label className="text-[9px] font-black uppercase text-slate-400 leading-none">Mula M1</label>
-                                        <input type="date" value={sessionStartDate} onChange={e => setSessionStartDate(e.target.value)} className="bg-slate-100 text-slate-800 text-[10px] font-black p-1 rounded outline-none cursor-pointer border border-slate-200" />
+                                        <input type="date" value={sessionStartDate} onChange={e => setSessionStartDate(e.target.value)} className="bg-slate-100 text-slate-800 text-[10px] font-black p-1 rounded outline-none border border-slate-200" />
                                     </div>
-                                    <button onClick={() => window.print()} className="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-[10px] font-black flex items-center gap-2 uppercase shadow-md hover:bg-black transition-all"><Icons.Printer /> Cetak</button>
+                                    <div className="flex items-center gap-1">
+                                        <button onClick={() => window.print()} className="bg-slate-800 text-white px-3 py-2.5 rounded-xl text-[10px] font-black flex items-center gap-2 uppercase shadow-md hover:bg-black transition-all"><Icons.Printer /> Cetak</button>
+                                        <button onClick={handleExportPDF} className="bg-blue-600 text-white px-3 py-2.5 rounded-xl text-[10px] font-black flex items-center gap-2 uppercase shadow-md hover:bg-blue-800 transition-all"><Icons.FileText /> PDF</button>
+                                    </div>
                                     <button onClick={handleLogout} className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Icons.External /></button>
                                 </div>
                             </div>
 
-                            {/* --- BARIS 2: SLIDER MINGGU (LEBAR PENUH) --- */}
                             <div className="w-full bg-slate-50 p-1.5 rounded-2xl border-2 border-slate-200 overflow-hidden no-print">
                                 <div className="week-scrollbar flex gap-2 overflow-x-auto pb-1 px-1">
                                     {Array.from({length: 26}, (_, i) => i + 1).map(w => (
@@ -589,40 +554,38 @@
                                     ))}
                                 </div>
                             </div>
-
                         </div>
                     </nav>
 
-                    <main className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
-                        <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
+                    <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
+                        <div className="relative mb-6 text-center border-b-2 border-black pb-4">
                             <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
-                            
                             <div className="flex justify-center mb-1"><img src="JATA_NEGARA_MALAYSIA.jpg" alt="Jata Negara" className="h-16 w-auto" onError={e => e.target.src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png"} /></div>
                             <h1 className="text-lg font-black uppercase leading-tight">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-base font-bold uppercase underline underline-offset-4 tracking-wide">Jadual Waktu Mingguan</h2>
                             
-                            <div className="mt-6 flex flex-col text-left gap-2 font-sans text-black">
+                            <div className="mt-6 flex flex-col text-left gap-2 font-sans">
                                 <div className="flex items-center gap-2">
-                                    <span className="font-black text-[12px] uppercase shrink-0 text-black">NAMA INSTITUSI:</span>
-                                    <span className="font-bold text-[12px] uppercase text-black">INSTITUT LATIHAN KEMENTERIAN KESIHATAN MALAYSIA KUCHING, SARAWAK</span>
+                                    <span className="font-black text-[12px] uppercase shrink-0">NAMA INSTITUSI:</span>
+                                    <span className="font-bold text-[12px] uppercase">INSTITUT LATIHAN KEMENTERIAN KESIHATAN MALAYSIA KUCHING, SARAWAK</span>
                                 </div>
                                 <div className="flex justify-between items-end">
                                     <div className="flex items-center gap-8">
                                         <div className="flex items-center gap-2">
-                                            <span className="font-black text-[12px] uppercase text-black">TARIKH:</span>
+                                            <span className="font-black text-[12px] uppercase">TARIKH:</span>
                                             <span className="font-bold text-[12px] text-blue-700 uppercase tracking-tight">{autoWeekRange}</span>
                                         </div>
                                         <div className="flex items-center gap-2 text-black">
-                                            <span className="font-black text-[12px] uppercase text-black">SEMESTER:</span>
+                                            <span className="font-black text-[12px] uppercase">SEMESTER:</span>
                                             <select value={filterSemester} onChange={e => setFilterSemester(e.target.value)} className="font-bold text-[12px] uppercase text-black bg-slate-100 px-2 py-0.5 rounded no-print outline-none cursor-pointer border border-slate-200">
                                                 <option value="SEMUA">Semua Semester</option>
                                                 {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
                                             </select>
-                                            <span className="hidden print:inline">{filterSemester === 'SEMUA' ? 'Semua' : semesterLabels[filterSemester]}</span>
+                                            <span className="hidden print:inline font-bold text-[12px] uppercase">{filterSemester === 'SEMUA' ? 'Semua' : semesterLabels[filterSemester]}</span>
                                         </div>
-                                        <div className="flex items-center gap-2 text-black">
-                                            <span className="font-black text-[12px] uppercase text-black">SESI AKADEMIK:</span>
-                                            <span className="font-bold text-[12px] uppercase text-black">{currentSessionAcademic}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-black text-[12px] uppercase">SESI AKADEMIK:</span>
+                                            <span className="font-bold text-[12px] uppercase">{currentSessionAcademic}</span>
                                         </div>
                                     </div>
                                     <div className="text-right pr-8">
@@ -668,31 +631,20 @@
                                                             const isBreak = isSlotBreak(day, slotIdx);
                                                             const isHoliday = holidays[`${academicCycle}-${selectedWeek}-${day}`];
                                                             
-                                                            if (weekStatus !== 'NORMAL') {
-                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border-r border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">{weekStatus}</span> </td>);
-                                                                return null;
-                                                            }
-
-                                                            // JIKA HARI INI DI-SET SEBAGAI CUTI HKA/CT
                                                             if (isHoliday) {
-                                                                if (sIdx === 0) return (
-                                                                    <td key={slotIdx} rowSpan={vSems.length} className="bg-rose-50/60 border-r border-rose-200 p-2 text-center align-middle">
-                                                                        <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] text-rose-500 opacity-80">CUTI (HKA / CT)</span>
-                                                                    </td>
-                                                                );
+                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-rose-50/60 border-r border-black p-2 text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] text-rose-500 opacity-80">CUTI (HKA / CT)</span> </td>);
                                                                 return null;
                                                             }
-
                                                             if (isBreak) {
                                                                 if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border-r border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">REHAT</span> </td>);
                                                                 return null;
                                                             }
+
                                                             let colSpan = 1;
                                                             if (ev && ev.duration > 1) { for(let i=1; i<ev.duration; i++) { if(!isSlotBreak(day, slotIdx+i)) { colSpan++; skips.push(slotIdx+i); } else break; } }
                                                             
                                                             const isMatch = searchTerm && searchTerm.trim() !== "" && ev && ev.courseCode && (
-                                                                ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                                                (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase()))
+                                                                ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase()))
                                                             );
 
                                                             return (
@@ -719,7 +671,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px] text-black">
+                            <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
                                 <div>
                                     <p>DISEDIAKAN OLEH:</p>
                                     <div className="mt-8 border-b border-black flex gap-2">NAMA: <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.preparedName || ''} onChange={e => handleFooterChange('preparedName', e.target.value)} /></div>
@@ -747,9 +699,7 @@
                                 </div>
                                 <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white text-black">
                                     {userRole === 'admin' && isLocked(editingEvent) && (
-                                        <div className="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 text-amber-800 text-xs font-bold flex items-center gap-3">
-                                            <Icons.Lock /> Slot Terkunci (>24j). Mohon pindaan jika perlu.
-                                        </div>
+                                        <div className="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 text-amber-800 text-xs font-bold flex items-center gap-3"><Icons.Lock /> Slot Terkunci (>24j). Mohon pindaan jika perlu.</div>
                                     )}
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-1">
@@ -775,16 +725,9 @@
                                         </div>
                                     </div>
 
-                                    {/* BUTANG LAIN-LAIN (LL) KHAS DI BAWAH KOD KURSUS & BILANGAN SLOT */}
                                     <div className="pt-1">
                                         <button 
-                                            onClick={(e) => { 
-                                                e.preventDefault(); 
-                                                setFormData(prev => ({
-                                                    ...prev, 
-                                                    type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain'
-                                                })); 
-                                            }} 
+                                            onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain' })); }} 
                                             className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Lain-lain' ? 'bg-slate-800 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>
                                             {formData.type === 'Lain-lain' ? 'AKTIVITI LAIN-LAIN (LL) AKTIF' : 'KLIK UNTUK PENGISIAN LAIN-LAIN (LL)'}
                                         </button>
@@ -801,7 +744,6 @@
                                         </div>
                                     )}
                                     
-                                    {/* RUANGAN BILANGAN KULIAH / AMALI (L1, P1 dsb.) */}
                                     {(formData.type === 'Kuliah' || formData.type === 'Amali') && (
                                         <div className="space-y-1 animate-in slide-in-from-top-2">
                                             <label className="text-[11px] font-black text-slate-400 uppercase">Bilangan {formData.type}</label>
@@ -810,9 +752,7 @@
                                     )}
 
                                     <div className="space-y-1 text-black">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase">
-                                            {formData.type === 'Lain-lain' ? 'Nama Aktiviti / Perkara' : 'Tajuk Pembelajaran'}
-                                        </label>
+                                        <label className="text-[11px] font-black text-slate-400 uppercase">{formData.type === 'Lain-lain' ? 'Nama Aktiviti / Perkara' : 'Tajuk Pembelajaran'}</label>
                                         <textarea rows="3" className="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none font-bold text-sm text-black shadow-sm" placeholder={formData.type === 'Lain-lain' ? "Sila catat maklumat aktiviti..." : "Topik..."} value={formData.topic || ''} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
                                     </div>
                                     <div className="space-y-1 text-black">
@@ -835,14 +775,14 @@
                     {/* DASHBOARD ANALITIK MODAL */}
                     {isDashboardOpen && (
                         <div className="fixed inset-0 z-[700] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in text-black">
-                            <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden border-4 border-green-600 flex flex-col">
-                                <div className="bg-green-50 px-10 py-6 flex justify-between items-center border-b-2 border-green-100 text-black">
+                            <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden border-4 border-green-600 flex flex-col text-black">
+                                <div className="bg-green-50 px-10 py-6 flex justify-between items-center border-b-2 border-green-100">
                                     <h3 className="font-black text-lg uppercase flex items-center gap-2 text-green-800"><Icons.Chart /> Analitik Jam: {academicSession}</h3>
-                                    <button onClick={() => setIsDashboardOpen(false)} className="bg-white text-green-600 p-2 rounded-xl shadow-md text-black"><Icons.X /></button>
+                                    <button onClick={() => setIsDashboardOpen(false)} className="bg-white text-green-600 p-2 rounded-xl shadow-md"><Icons.X /></button>
                                 </div>
-                                <div className="p-10 overflow-y-auto flex-1 space-y-10 text-black">
-                                    <div className="overflow-x-auto rounded-3xl border border-slate-100 text-black">
-                                        <table className="w-full text-left text-black">
+                                <div className="p-10 overflow-y-auto flex-1 space-y-10">
+                                    <div className="overflow-x-auto rounded-3xl border border-slate-100">
+                                        <table className="w-full text-left">
                                             <thead>
                                                 <tr className="bg-slate-50 text-[10px] font-black uppercase text-slate-400">
                                                     <th className="p-4">Kod Kursus</th>
@@ -853,7 +793,7 @@
                                             </thead>
                                             <tbody>
                                                 {Object.entries(dashboardData.courseSum).sort().map(([code, data]) => (
-                                                    <tr key={code} className="text-xs border-t font-bold hover:bg-slate-50 text-black">
+                                                    <tr key={code} className="text-xs border-t font-bold hover:bg-slate-50">
                                                         <td className="p-4 font-black text-slate-800">{code}</td>
                                                         <td className="p-4 text-slate-600">{data.Kuliah} j</td>
                                                         <td className="p-4 text-slate-600">{data.Amali} j</td>
@@ -865,7 +805,7 @@
                                     </div>
                                     <div>
                                         <h4 className="text-[12px] font-black uppercase mb-4 flex items-center gap-2 text-slate-400 tracking-widest"><div className="w-2 h-2 bg-emerald-600 rounded-full"></div> Jam Pengajar</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-black text-black">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                             {Object.entries(dashboardData.instructorSum).sort().map(([name, data]) => (
                                                 <div key={name} className="p-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
                                                     <p className="text-[10px] font-black uppercase text-slate-400 mb-1">{name}</p>
@@ -883,7 +823,7 @@
                     {isLimitModalOpen && (
                         <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm no-print animate-in fade-in">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-indigo-600 flex flex-col text-black">
-                                <div className="bg-indigo-50 px-10 py-6 border-b-2 border-indigo-100 flex justify-between items-center text-black">
+                                <div className="bg-indigo-50 px-10 py-6 border-b-2 border-indigo-100 flex justify-between items-center">
                                     <h3 className="font-black text-lg uppercase flex items-center gap-2 text-indigo-800"><Icons.Settings /> Had Agihan Semester</h3>
                                     <button onClick={() => setIsLimitModalOpen(false)} className="bg-white text-indigo-600 p-2 rounded-xl shadow-md"><Icons.X /></button>
                                 </div>
@@ -891,11 +831,11 @@
                                     {courseCodes.filter(c => c !== 'Lain-lain').map(code => (
                                         <div key={code} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border-2 border-slate-100">
                                             <span className="text-[10px] font-black uppercase">{code}</span>
-                                            <input type="number" min="0" className="w-16 p-2 rounded-lg border-2 border-slate-200 text-center font-black text-sm text-black font-bold" value={courseLimits[code] || 0} onChange={(e) => setCourseLimits({...courseLimits, [code]: e.target.value})} />
+                                            <input type="number" min="0" className="w-16 p-2 rounded-lg border-2 border-slate-200 text-center font-black text-sm text-black" value={courseLimits[code] || 0} onChange={(e) => setCourseLimits({...courseLimits, [code]: e.target.value})} />
                                         </div>
                                     ))}
                                 </div>
-                                <div className="p-8 bg-slate-50 border-t-2 text-black text-black">
+                                <div className="p-8 bg-slate-50 border-t-2">
                                     <button onClick={() => saveLimits(courseLimits)} className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase shadow-xl hover:bg-indigo-700 tracking-widest transition-all">Simpan Had Agihan</button>
                                 </div>
                             </div>
