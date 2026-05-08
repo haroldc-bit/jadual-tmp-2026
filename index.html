@@ -599,7 +599,17 @@
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
                             <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
-                            <div className="flex justify-center mb-1"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png" alt="Jata Negara" className="h-16 w-auto" /></div>
+                            <div className="flex justify-center mb-1">
+                                <img 
+                                    src="https://www.parlimen.gov.my/images/webdev/logo/jata-negara.png" 
+                                    alt="Jata Negara" 
+                                    className="h-16 w-auto object-contain" 
+                                    onError={(e) => { 
+                                        e.target.onerror = null; 
+                                        e.target.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png"; 
+                                    }} 
+                                />
+                            </div>
                             <h1 className="text-lg font-black uppercase leading-tight">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-base font-bold uppercase underline underline-offset-4 tracking-wide">Jadual Waktu Mingguan</h2>
                             
@@ -889,7 +899,3 @@
     </script>
 </body>
 </html>
-                                                           
-                 
-                                    
-                                 
