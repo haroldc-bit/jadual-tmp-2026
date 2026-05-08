@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v13.8</title>
+    <title>Jadual Waktu Mingguan TMP Digital v15.4</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- HTML2PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
@@ -64,6 +68,7 @@
 <body class="bg-white min-h-screen text-black">
     <div id="root"></div>
 
+    <!-- Firebase Modular SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -132,7 +137,7 @@
             const topScrollRef = useRef(null);
             const tableContainerRef = useRef(null);
             const tableElementRef = useRef(null);
-            const printAreaRef = useRef(null); // Reference for PDF export
+            const printAreaRef = useRef(null);
 
             // --- 2. CONSTANTS ---
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
@@ -153,12 +158,13 @@
             ];
 
             // --- 3. FUNGSI LOGIK KRITIKAL ---
-
             const handleLogin = (e) => {
                 if(e) e.preventDefault();
                 setLoginError("");
+                
                 const code = accessCode.trim().toUpperCase();
-                if(code === "ADMIN2026"){ 
+                
+                if(code === "ADMIN2026" || code === "TMP2026"){ 
                     setIsAuthorized(true); setUserRole('superuser'); 
                     sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'superuser');
                 } else if (code === "DTMP2026") {
@@ -322,12 +328,10 @@
                 const element = printAreaRef.current;
                 const container = tableContainerRef.current;
                 
-                // Backup gaya asal
                 const originalOverflow = container.style.overflow;
                 const originalMaxHeight = container.style.maxHeight;
                 const originalBorder = container.style.border;
                 
-                // Sembunyikan elemen .no-print sementara
                 const noPrintElements = element.querySelectorAll('.no-print');
                 const originalDisplays = [];
                 noPrintElements.forEach(el => {
@@ -335,7 +339,6 @@
                     el.style.display = 'none';
                 });
 
-                // Ubah gaya kontena untuk paparan penuh tanpa potongan jadual
                 container.style.overflow = 'visible';
                 container.style.maxHeight = 'none';
                 container.style.border = 'none';
@@ -343,22 +346,24 @@
                 const fullWidth = container.scrollWidth;
 
                 const opt = {
-                    margin: [0.3, 0.3, 0.3, 0.3], // Margin secukup rasa
+                    margin: [0.3, 0.3, 0.3, 0.3], 
                     filename: `JWM_TMP_Minggu_${selectedWeek}_Versi_${academicCycle}.pdf`,
                     image: { type: 'jpeg', quality: 1 },
                     html2canvas: { 
-                        scale: 2, // Resolusi tinggi
+                        scale: 3, 
                         useCORS: true, 
+                        allowTaint: true,
                         logging: false,
-                        windowWidth: fullWidth + 50,
+                        backgroundColor: "#ffffff",
+                        imageTimeout: 15000,
+                        windowWidth: fullWidth + 100,
                         width: fullWidth,
                         scrollY: 0
                     },
-                    jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } // A3 Landskap menampung format jadual lebar
+                    jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } 
                 };
 
                 html2pdf().set(opt).from(element).save().then(() => {
-                    // Kembalikan gaya kepada keadaan asal selepas eksport siap
                     container.style.overflow = originalOverflow;
                     container.style.maxHeight = originalMaxHeight;
                     container.style.border = originalBorder;
@@ -482,10 +487,22 @@
 
             useEffect(() => {
                 if (!tableElementRef.current) return;
-                const updateWidth = () => setTableWidth(tableElementRef.current.scrollWidth);
+                
+                const updateWidth = (entries) => {
+                    for (let entry of entries) {
+                        const newWidth = entry.target.scrollWidth;
+                        setTableWidth(prev => {
+                            if (Math.abs(prev - newWidth) > 10) {
+                                return newWidth;
+                            }
+                            return prev;
+                        });
+                    }
+                };
+                
                 const ro = new ResizeObserver(updateWidth);
                 ro.observe(tableElementRef.current);
-                updateWidth();
+                
                 return () => ro.disconnect();
             }, [isAuthorized, filterSemester, saturdayConfigs]);
 
@@ -597,19 +614,35 @@
                     </nav>
 
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
-                        <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
+                        <div className="relative mb-8 text-center border-b-2 border-black pb-6 mt-4">
                             <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
-                            <div className="flex justify-center mb-1">
-                                <img 
-                                    src="https://www.parlimen.gov.my/images/webdev/logo/jata-negara.png" 
-                                    alt="Jata Negara" 
-                                    className="h-16 w-auto object-contain" 
-                                    onError={(e) => { 
-                                        e.target.onerror = null; 
-                                        e.target.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png"; 
-                                    }} 
+                            
+                            <div 
+                                className="flex justify-center mb-3 mt-2"
+                                style={{
+                                    minHeight: '90px',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <img
+                                    src="https://drive.google.com/uc?export=view&id=1zO6-g73JwvV7T92kXKGiSl2vVNV1C3eB"
+                                    alt="Jata Negara Malaysia"
+                                    style={{
+                                        width: '90px',
+                                        height: '90px',
+                                        objectFit: 'contain',
+                                        display: 'block'
+                                    }}
+                                    crossOrigin="anonymous"
+                                    referrerPolicy="no-referrer"
+                                    onError={(e) => {
+                                        console.log("Logo gagal dimuatkan");
+                                        e.target.style.display = 'none';
+                                    }}
                                 />
                             </div>
+
                             <h1 className="text-lg font-black uppercase leading-tight">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-base font-bold uppercase underline underline-offset-4 tracking-wide">Jadual Waktu Mingguan</h2>
                             
