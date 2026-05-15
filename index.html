@@ -133,6 +133,7 @@
             const [lastUpdatedKey, setLastUpdatedKey] = useState(null);
             const [formData, setFormData] = useState({ id: '', day: '', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', semester: '', duration: 1, sessionNumber: '' });
             const [tableWidth, setTableWidth] = useState(0);
+            const [modalError, setModalError] = useState(""); // TAMBAHAN: Untuk ralat kemas kini tanpa menggunakan popup 'alert()'
 
             const topScrollRef = useRef(null);
             const tableContainerRef = useRef(null);
@@ -358,10 +359,11 @@
             const handleSave = async (e) => {
                 if (e) e.preventDefault();
                 if (userRole === 'viewer') return;
+                setModalError(""); // Reset ralat
 
                 // PENAMBAHBAIKAN: Halang admin daripada mengubah slot yang telah disimpan
                 if (userRole === 'admin' && editingEvent) {
-                    alert("Ralat: Slot yang telah disimpan tidak boleh diubah. Sila hubungi Supervisor.");
+                    setModalError("Ralat: Slot yang telah disimpan tidak boleh diubah. Sila hubungi Supervisor.");
                     return;
                 }
 
@@ -374,7 +376,7 @@
                     }
                     const limit = courseLimits[finalCode] || 999;
                     if (currentCount >= limit) {
-                        alert(`Ralat: Had agihan (${limit}) semester bagi kursus ${finalCode} telah dicapai.`);
+                        setModalError(`Ralat: Had agihan (${limit}) semester bagi kursus ${finalCode} telah dicapai.`);
                         return;
                     }
                 }
@@ -394,7 +396,7 @@
                     });
 
                     if (isConflict) {
-                        alert(`Peringatan: Pengajar ${formData.instructor} telah dijadualkan pada masa yang sama untuk semester lain pada hari ini. Sila pilih waktu atau pengajar lain.`);
+                        setModalError(`Peringatan: Pengajar ${formData.instructor} telah dijadualkan pada masa yang sama untuk semester lain pada hari ini. Sila pilih waktu atau pengajar lain.`);
                         return;
                     }
                 }
@@ -428,7 +430,7 @@
                     setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave)
                         .catch(error => {
                             console.error("Firestore Error:", error); 
-                            alert("Ralat Latar Belakang: Gagal menyegerak ke awan. Sila pastikan talian internet anda stabil.");
+                            // alert tidak lagi digunakan di sini untuk elak iframe crash
                         });
                 }
             };
@@ -508,6 +510,7 @@
 
             const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
                 if (isSlotBreak(day, slotIdx) || userRole === 'viewer') return;
+                setModalError(""); // Reset ralat apabila borang baru dibuka
                 if (event) {
                     setFormData({ ...event, customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode });
                     setEditingEvent(event);
@@ -533,7 +536,7 @@
                     Object.keys(newLimits).forEach(k => { cleanLimits[k] = parseInt(newLimits[k]) || 0; });
                     await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), cleanLimits); 
                     setIsLimitModalOpen(false); 
-                } catch (e) { alert("Gagal menyimpan agihan."); }
+                } catch (e) { console.error("Gagal menyimpan agihan."); }
             };
 
             // --- 4. MEMOIZED DATA ---
@@ -926,6 +929,11 @@
                                     <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-2 rounded-xl shadow-lg hover:rotate-90 transition-all"><Icons.X /></button>
                                 </div>
                                 <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white text-black">
+                                    {modalError && (
+                                        <div className="bg-red-100 p-4 rounded-2xl border-2 border-red-300 text-red-800 text-xs font-bold flex items-center gap-3">
+                                            ⚠️ {modalError}
+                                        </div>
+                                    )}
                                     {userRole === 'admin' && editingEvent && (
                                         <div className="bg-red-50 p-4 rounded-2xl border-2 border-red-200 text-red-800 text-xs font-bold flex items-center gap-3"><Icons.Lock /> Slot Terkunci. Hanya Supervisor boleh mengubah atau memadam slot yang telah disimpan.</div>
                                     )}
