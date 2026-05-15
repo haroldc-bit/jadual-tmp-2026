@@ -359,6 +359,12 @@
                 if (e) e.preventDefault();
                 if (userRole === 'viewer') return;
 
+                // PENAMBAHBAIKAN: Halang admin daripada mengubah slot yang telah disimpan
+                if (userRole === 'admin' && editingEvent) {
+                    alert("Ralat: Slot yang telah disimpan tidak boleh diubah. Sila hubungi Supervisor.");
+                    return;
+                }
+
                 const finalCode = formData.type === 'Lain-lain' ? 'Lain-Lain' : formData.courseCode;
                 
                 if (userRole === 'admin' && formData.type !== 'Lain-lain') {
@@ -417,47 +423,24 @@
                 if (window.TMP_DB) {
                     try {
                         const { db, appId, doc, setDoc } = window.TMP_DB;
-                        if (userRole === 'admin' && isLocked(editingEvent)) {
-                            setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...dataToSave, requestType: 'EDIT'}).catch(err => console.error(err));
-                        } else {
-                            setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave).catch(err => console.error(err));
-                        }
+                        setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave).catch(err => console.error(err));
                     } catch (error) { console.error("Firestore Error:", error); }
                 }
             };
 
             const handleDelete = async (e) => {
                 if (e) e.preventDefault();
-                if (userRole === 'viewer') return;
+                // PENAMBAHBAIKAN: Hanya superuser (Supervisor) sahaja boleh memadam slot
+                if (userRole === 'viewer' || userRole === 'admin') return;
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 
                 if (userRole === 'superuser') {
-                    if (confirm("Adakah anda pasti mahu memadam slot ini secara kekal?")) {
-                        setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
-                        setIsModalOpen(false); 
-                        if (window.TMP_DB) {
-                            const { db, appId, doc, deleteDoc } = window.TMP_DB;
-                            deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key)).catch(err => console.error(err));
-                        }
-                    }
-                } else if (userRole === 'admin') {
-                    if (isLocked(editingEvent)) {
-                        if (confirm("Slot telah terkunci. Hantar permohonan padam?")) {
-                            setIsModalOpen(false); 
-                            if (window.TMP_DB) {
-                                const { db, appId, doc, setDoc } = window.TMP_DB;
-                                setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'change_requests', key), {...editingEvent, requestType: 'DELETE'}).catch(err => console.error(err));
-                            }
-                        }
-                    } else {
-                        if (confirm("Padam slot ini?")) {
-                            setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
-                            setIsModalOpen(false); 
-                            if (window.TMP_DB) {
-                                const { db, appId, doc, deleteDoc } = window.TMP_DB;
-                                deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key)).catch(err => console.error(err));
-                            }
-                        }
+                    // PEMBETULAN: Dialog confirm() dihalang oleh sekatan keselamatan pelayar (iframe). Padam terus.
+                    setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
+                    setIsModalOpen(false); 
+                    if (window.TMP_DB) {
+                        const { db, appId, doc, deleteDoc } = window.TMP_DB;
+                        deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key)).catch(err => console.error(err));
                     }
                 }
             };
@@ -920,8 +903,8 @@
                                     <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-2 rounded-xl shadow-lg hover:rotate-90 transition-all"><Icons.X /></button>
                                 </div>
                                 <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white text-black">
-                                    {userRole === 'admin' && isLocked(editingEvent) && (
-                                        <div className="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 text-amber-800 text-xs font-bold flex items-center gap-3"><Icons.Lock /> Slot Terkunci (>24j). Mohon pindaan jika perlu.</div>
+                                    {userRole === 'admin' && editingEvent && (
+                                        <div className="bg-red-50 p-4 rounded-2xl border-2 border-red-200 text-red-800 text-xs font-bold flex items-center gap-3"><Icons.Lock /> Slot Terkunci. Hanya Supervisor boleh mengubah atau memadam slot yang telah disimpan.</div>
                                     )}
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-1">
@@ -1006,9 +989,13 @@
                                     </div>
                                 </div>
                                 <div className="p-10 bg-slate-50 border-t-2 flex gap-4">
-                                    <button onClick={(e) => { e.preventDefault(); setFormData(p => ({...p, topic: '', instructor: '', sessionNumber: ''}))}} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border-2 active:scale-90 transition-all uppercase tracking-widest"><Icons.Undo /> Undo</button>
-                                    {editingEvent && ( <button onClick={handleDelete} className="p-5 bg-white text-red-600 border-2 border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all"><Icons.Trash /></button> )}
-                                    <button onClick={handleSave} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 shadow-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2"> <Icons.Save /> Simpan Rekod </button>
+                                    {!(userRole === 'admin' && editingEvent) && (
+                                        <button onClick={(e) => { e.preventDefault(); setFormData(p => ({...p, topic: '', instructor: '', sessionNumber: ''}))}} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border-2 active:scale-90 transition-all uppercase tracking-widest"><Icons.Undo /> Undo</button>
+                                    )}
+                                    {editingEvent && userRole === 'superuser' && ( <button onClick={handleDelete} className="p-5 bg-white text-red-600 border-2 border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all"><Icons.Trash /></button> )}
+                                    {!(userRole === 'admin' && editingEvent) && (
+                                        <button onClick={handleSave} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 shadow-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2"> <Icons.Save /> Simpan Rekod </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
