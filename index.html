@@ -75,13 +75,14 @@
         import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Konfigurasi Pangkalan Data
-        let firebaseConfig = {
-            apiKey: "AIzaSyDoMacsYw5OF7F8kDpTsAB79jwJ3RsqG0s",
-            authDomain: "jadual-tmp-2026.firebaseapp.com",
-            projectId: "jadual-tmp-2026",
-            storageBucket: "jadual-tmp-2026.firebasestorage.app",
-            messagingSenderId: "352749857072",
-            appId: "1:352749857072:web:5759b14c81a0f9771080f5"
+        const firebaseConfig = {
+         apiKey: "AIzaSyDoMacsYw5OF7F8kDpTsAB79jwJ3RsqG0s",
+         authDomain: "jadual-tmp-2026.firebaseapp.com",
+         projectId: "jadual-tmp-2026",
+         storageBucket: "jadual-tmp-2026.firebasestorage.app",
+         messagingSenderId: "352749857072",
+         appId: "1:352749857072:web:5759b14c81a0f9771080f5",
+
         };
 
         const isFirebaseConfigured = firebaseConfig.apiKey && firebaseConfig.apiKey !== "SILA_ISI_API_KEY_FIREBASE_ANDA";
