@@ -417,19 +417,19 @@
                     selectedWeek: selectedWeek
                 };
 
-                // PEMBETULAN: Wajib tunggu (await) pengesahan awan sebelum papar di skrin untuk elak 'silent fail'
+                // PEMBETULAN MUTLAK: Kemas kini UI serta-merta tanpa menunggu awan (Optimistic Update)
+                // Ini menjadikan butang klik berfungsi super pantas dan panel ditutup terus.
+                setEvents(prev => ({ ...prev, [key]: dataToSave }));
+                setIsModalOpen(false);
+
+                // Proses penghantaran ke awan dibuat di latar belakang
                 if (window.TMP_DB) {
-                    try {
-                        const { db, appId, doc, setDoc } = window.TMP_DB;
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave);
-                        
-                        // Jika awan berjaya terima, baru papar & tutup modal
-                        setEvents(prev => ({ ...prev, [key]: dataToSave }));
-                        setIsModalOpen(false);
-                    } catch (error) { 
-                        console.error("Firestore Error:", error); 
-                        alert("Ralat: Gagal menyimpan data ke awan. Sila pastikan talian internet anda stabil.");
-                    }
+                    const { db, appId, doc, setDoc } = window.TMP_DB;
+                    setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave)
+                        .catch(error => {
+                            console.error("Firestore Error:", error); 
+                            alert("Ralat Latar Belakang: Gagal menyegerak ke awan. Sila pastikan talian internet anda stabil.");
+                        });
                 }
             };
 
@@ -440,18 +440,17 @@
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 
                 if (userRole === 'superuser') {
-                    // PEMBETULAN: Pastikan padam di awan (await) sebelum hilangkan dari paparan (tanpa dialog confirm yg disekat pelayar)
+                    // PEMBETULAN MUTLAK: Padam dari UI serta-merta
+                    setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
+                    setIsModalOpen(false); 
+                    
                     if (window.TMP_DB) {
-                        try {
-                            const { db, appId, doc, deleteDoc } = window.TMP_DB;
-                            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key));
-                            
-                            setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
-                            setIsModalOpen(false); 
-                        } catch (error) {
-                            console.error("Firestore Error:", error); 
-                            alert("Ralat memadam slot di pangkalan data awan.");
-                        }
+                        const { db, appId, doc, deleteDoc } = window.TMP_DB;
+                        deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key))
+                            .catch(error => {
+                                console.error("Firestore Error:", error); 
+                                alert("Ralat Latar Belakang: Gagal memadam data di awan.");
+                            });
                     }
                 }
             };
