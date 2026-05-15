@@ -417,14 +417,19 @@
                     selectedWeek: selectedWeek
                 };
 
-                setEvents(prev => ({ ...prev, [key]: dataToSave }));
-                setIsModalOpen(false);
-
+                // PEMBETULAN: Wajib tunggu (await) pengesahan awan sebelum papar di skrin admin untuk elak 'silent fail'
                 if (window.TMP_DB) {
                     try {
                         const { db, appId, doc, setDoc } = window.TMP_DB;
-                        setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave).catch(err => console.error(err));
-                    } catch (error) { console.error("Firestore Error:", error); }
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave);
+                        
+                        // Jika awan berjaya terima, baru papar & tutup modal
+                        setEvents(prev => ({ ...prev, [key]: dataToSave }));
+                        setIsModalOpen(false);
+                    } catch (error) { 
+                        console.error("Firestore Error:", error); 
+                        alert("Ralat: Gagal menyimpan data ke pangkalan data awan. Sila pastikan talian internet anda stabil.");
+                    }
                 }
             };
 
@@ -435,12 +440,18 @@
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 
                 if (userRole === 'superuser') {
-                    // PEMBETULAN: Dialog confirm() dihalang oleh sekatan keselamatan pelayar (iframe). Padam terus.
-                    setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
-                    setIsModalOpen(false); 
+                    // PEMBETULAN: Pastikan padam di awan (await) sebelum hilangkan dari paparan
                     if (window.TMP_DB) {
-                        const { db, appId, doc, deleteDoc } = window.TMP_DB;
-                        deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key)).catch(err => console.error(err));
+                        try {
+                            const { db, appId, doc, deleteDoc } = window.TMP_DB;
+                            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key));
+                            
+                            setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
+                            setIsModalOpen(false); 
+                        } catch (error) {
+                            console.error("Firestore Error:", error); 
+                            alert("Ralat memadam slot di pangkalan data awan.");
+                        }
                     }
                 }
             };
