@@ -417,7 +417,7 @@
                     selectedWeek: selectedWeek
                 };
 
-                // PEMBETULAN: Wajib tunggu (await) pengesahan awan sebelum papar di skrin admin untuk elak 'silent fail'
+                // PEMBETULAN: Wajib tunggu (await) pengesahan awan sebelum papar di skrin untuk elak 'silent fail'
                 if (window.TMP_DB) {
                     try {
                         const { db, appId, doc, setDoc } = window.TMP_DB;
@@ -428,7 +428,7 @@
                         setIsModalOpen(false);
                     } catch (error) { 
                         console.error("Firestore Error:", error); 
-                        alert("Ralat: Gagal menyimpan data ke pangkalan data awan. Sila pastikan talian internet anda stabil.");
+                        alert("Ralat: Gagal menyimpan data ke awan. Sila pastikan talian internet anda stabil.");
                     }
                 }
             };
@@ -440,7 +440,7 @@
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 
                 if (userRole === 'superuser') {
-                    // PEMBETULAN: Pastikan padam di awan (await) sebelum hilangkan dari paparan
+                    // PEMBETULAN: Pastikan padam di awan (await) sebelum hilangkan dari paparan (tanpa dialog confirm yg disekat pelayar)
                     if (window.TMP_DB) {
                         try {
                             const { db, appId, doc, deleteDoc } = window.TMP_DB;
@@ -608,13 +608,26 @@
             useEffect(() => {
                 if (!dbReady || !isAuthorized || !window.TMP_DB || !user) return;
                 const { db, appId, collection, onSnapshot, doc } = window.TMP_DB;
-                const unsubEv = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`), (s) => {
-                    const d = {}; s.forEach(doc => { d[doc.id] = doc.data(); }); setEvents(d);
-                });
-                const unsubLim = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), (d) => { if(d.exists()) setCourseLimits(d.data()); });
-                const unsubSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), (d) => { if(d.exists()) setFooterData(d.data()); });
-                const unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), (d) => { if(d.exists()) setSaturdayConfigs(d.data()); });
-                const unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), (d) => { if(d.exists()) setHolidays(d.data()); });
+                const unsubEv = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`), 
+                    (s) => { const d = {}; s.forEach(doc => { d[doc.id] = doc.data(); }); setEvents(d); },
+                    (err) => console.error("Error events:", err)
+                );
+                const unsubLim = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), 
+                    (d) => { if(d.exists()) setCourseLimits(d.data()); },
+                    (err) => console.error("Error limits:", err)
+                );
+                const unsubSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), 
+                    (d) => { if(d.exists()) setFooterData(d.data()); },
+                    (err) => console.error("Error sigs:", err)
+                );
+                const unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), 
+                    (d) => { if(d.exists()) setSaturdayConfigs(d.data()); },
+                    (err) => console.error("Error sat:", err)
+                );
+                const unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), 
+                    (d) => { if(d.exists()) setHolidays(d.data()); },
+                    (err) => console.error("Error hol:", err)
+                );
                 return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); };
             }, [dbReady, isAuthorized, user, academicCycle]);
 
