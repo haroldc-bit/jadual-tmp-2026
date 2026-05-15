@@ -68,23 +68,86 @@
 <body class="bg-white min-h-screen text-black">
     <div id="root"></div>
 
-    <!-- Firebase Modular SDK -->
+    <!-- Firebase Modular SDK & Alternatif Storan Offline -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tmp-jadual-v26-master';
-
-        window.TMP_DB = { 
-            db, auth, appId, setDoc, doc, collection, onSnapshot, 
-            onAuthStateChanged, signInAnonymously, signOut, query, 
-            deleteDoc, getDoc, signInWithCustomToken 
+        // Konfigurasi Pangkalan Data
+        let firebaseConfig = {
+            apiKey: "SILA_ISI_API_KEY_FIREBASE_ANDA",
+            authDomain: "SILA_ISI_AUTH_DOMAIN_ANDA",
+            projectId: "SILA_ISI_PROJECT_ID_ANDA",
+            storageBucket: "SILA_ISI_STORAGE_BUCKET_ANDA",
+            messagingSenderId: "SILA_ISI_MESSAGING_SENDER_ID_ANDA",
+            appId: "SILA_ISI_APP_ID_ANDA"
         };
+
+        const isFirebaseConfigured = firebaseConfig.apiKey && firebaseConfig.apiKey !== "SILA_ISI_API_KEY_FIREBASE_ANDA";
+
+        if (isFirebaseConfigured || typeof __firebase_config !== 'undefined') {
+            // --- MOD 1: GUNA PANGKALAN DATA AWAN FIREBASE (Jika Kunci Diisi) ---
+            if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
+            try {
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'jadual-tmp-master-projek';
+
+                window.TMP_DB = { 
+                    db, auth, appId, setDoc, doc, collection, onSnapshot, 
+                    onAuthStateChanged, signInAnonymously, signOut, query, 
+                    deleteDoc, getDoc, signInWithCustomToken 
+                };
+            } catch (error) {
+                console.error("Firebase Ralat:", error);
+            }
+        } else {
+            // --- MOD 2: ALTERNATIF PERCUMA (STORAN TEMPATAN / OFFLINE) ---
+            // Mod ini akan aktif secara automatik di GitHub jika Firebase tidak dikonfigurasi.
+            console.warn("AWAS: Firebase tidak diisi. Sistem bertukar kepada Storan Tempatan (Offline). Data anda kekal selepas refresh, tetapi komputer lain tidak akan dapat melihatnya.");
+            
+            window.TMP_DB = {
+                db: "localdb", auth: {}, appId: "local-app",
+                doc: (_, ...paths) => paths.join('/'),
+                collection: (_, ...paths) => paths.join('/'),
+                setDoc: async (path, data) => {
+                    localStorage.setItem(path, JSON.stringify(data));
+                    window.dispatchEvent(new CustomEvent('localDBChange')); // Maklumkan sistem ada perubahan
+                },
+                deleteDoc: async (path) => {
+                    localStorage.removeItem(path);
+                    window.dispatchEvent(new CustomEvent('localDBChange'));
+                },
+                onSnapshot: (path, callback) => {
+                    const isCollection = path.includes('jadual_cycle');
+                    const trigger = () => {
+                        if (isCollection) {
+                            let results = [];
+                            for (let i = 0; i < localStorage.length; i++) {
+                                let k = localStorage.key(i);
+                                if (k.startsWith(path + '/')) {
+                                    results.push({ id: k.replace(path + '/', ''), data: () => JSON.parse(localStorage.getItem(k)) });
+                                }
+                            }
+                            callback({ forEach: (fn) => results.forEach(fn) });
+                        } else {
+                            let item = localStorage.getItem(path);
+                            callback({ exists: () => !!item, data: () => item ? JSON.parse(item) : {} });
+                        }
+                    };
+                    trigger(); // Panggil sekali semasa buka
+                    const listener = () => trigger(); // Panggil setiap kali ada data baru disimpan
+                    window.addEventListener('localDBChange', listener);
+                    return () => window.removeEventListener('localDBChange', listener);
+                },
+                signInAnonymously: async () => {},
+                onAuthStateChanged: (auth, cb) => cb({ uid: 'local-user' }),
+                signOut: async () => {},
+                signInWithCustomToken: async () => {}
+            };
+        }
     </script>
 
     <script type="text/babel">
