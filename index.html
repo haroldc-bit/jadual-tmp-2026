@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v16.8</title>
+    <title>Jadual Waktu Mingguan TMP Digital v16.9</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -510,7 +510,27 @@
                 });
             };
 
+            // --- 4. MEMOIZED DATA ---
+            const currentWeekHasSaturday = useMemo(() => saturdayConfigs[`${academicCycle}-${selectedWeek}`] === true, [saturdayConfigs, selectedWeek, academicCycle]);
+            const visibleDays = useMemo(() => currentWeekHasSaturday ? days : days.slice(0, 5), [currentWeekHasSaturday]);
+
+            // Status Minggu (TERMASUK PEPERIKSAAN AKHIR SEMESTER)
+            const weekStatus = useMemo(() => {
+                let customStatus = weekStatuses[`${academicCycle}-${selectedWeek}`];
+                if (customStatus === "PEPERIKSAAN") customStatus = "PEPERIKSAAN AKHIR SEMESTER"; // Kemas kini status lama
+                if (customStatus && customStatus !== "NORMAL") return customStatus;
+                if (customStatus === "NORMAL") return "NORMAL";
+
+                if (selectedWeek === 10) return "CUTI PERTENGAHAN SEMESTER";
+                if ([21, 22, 23].includes(selectedWeek)) return "PEPERIKSAAN AKHIR SEMESTER";
+                if ([24, 25, 26].includes(selectedWeek)) return "CUTI AKHIR SEMESTER";
+                return "NORMAL";
+            }, [selectedWeek, weekStatuses, academicCycle]);
+
             const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
+                // BLOK PENGISIAN PADA MINGGU CUTI/PEPERIKSAAN
+                if (weekStatus !== "NORMAL") return;
+                
                 if (isSlotBreak(day, slotIdx) || userRole === 'viewer') return;
                 setModalError(""); 
                 if (event) {
@@ -540,21 +560,6 @@
                     setIsLimitModalOpen(false); 
                 } catch (e) { console.error("Gagal menyimpan agihan."); }
             };
-
-            // --- 4. MEMOIZED DATA ---
-            const currentWeekHasSaturday = useMemo(() => saturdayConfigs[`${academicCycle}-${selectedWeek}`] === true, [saturdayConfigs, selectedWeek, academicCycle]);
-            const visibleDays = useMemo(() => currentWeekHasSaturday ? days : days.slice(0, 5), [currentWeekHasSaturday]);
-
-            const weekStatus = useMemo(() => {
-                const customStatus = weekStatuses[`${academicCycle}-${selectedWeek}`];
-                if (customStatus && customStatus !== "NORMAL") return customStatus;
-                if (customStatus === "NORMAL") return "NORMAL";
-
-                if (selectedWeek === 10) return "CUTI PERTENGAHAN SEMESTER";
-                if ([21, 22, 23].includes(selectedWeek)) return "PEPERIKSAAN";
-                if ([24, 25, 26].includes(selectedWeek)) return "CUTI AKHIR SEMESTER";
-                return "NORMAL";
-            }, [selectedWeek, weekStatuses, academicCycle]);
 
             const autoWeekRange = useMemo(() => {
                 const start = new Date(sessionStartDate);
@@ -757,7 +762,7 @@
                                                 <option value="NORMAL">Biasa (Normal)</option>
                                                 <option value="CUTI PERTENGAHAN SEMESTER">Cuti Pertengahan Sem</option>
                                                 <option value="CUTI AKHIR SEMESTER">Cuti Akhir Sem</option>
-                                                <option value="PEPERIKSAAN">Peperiksaan</option>
+                                                <option value="PEPERIKSAAN AKHIR SEMESTER">Peperiksaan Akhir Sem</option>
                                             </select>
                                         </div>
                                     )}
@@ -866,46 +871,58 @@
                                                             </td>
                                                         )}
                                                         <td className="p-2 bg-white text-center font-black text-[11px] border-r border-black">{sem}</td>
-                                                        {timeSlots.map((slot, slotIdx) => {
-                                                            if (skips.includes(slotIdx)) return null;
-                                                            const key = `${academicSession}-${selectedWeek}-${day}-${sem}-${slotIdx}`;
-                                                            const ev = events[key];
-                                                            const isBreak = isSlotBreak(day, slotIdx);
-                                                            const isHoliday = holidays[`${academicCycle}-${selectedWeek}-${day}`];
-                                                            
-                                                            if (isHoliday) {
-                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-rose-50/60 border-r border-black p-2 text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] text-rose-500 opacity-80">CUTI (HKA / CT)</span> </td>);
-                                                                return null;
-                                                            }
-                                                            if (isBreak) {
-                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border-r border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">REHAT</span> </td>);
-                                                                return null;
-                                                            }
-
-                                                            let colSpan = 1;
-                                                            if (ev && ev.duration > 1) { for(let i=1; i<ev.duration; i++) { if(!isSlotBreak(day, slotIdx+i)) { colSpan++; skips.push(slotIdx+i); } else break; } }
-                                                            
-                                                            const isMatch = searchTerm && searchTerm.trim() !== "" && ev && ev.courseCode && (
-                                                                ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase()))
-                                                            );
-
-                                                            return (
-                                                                <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
-                                                                    <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${ev && ev.courseCode ? `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4'}` : 'border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200'} ${isMatch ? 'search-match' : ''} ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : ''}`}>
-                                                                        {ev && ev.courseCode ? (
-                                                                            <React.Fragment>
-                                                                                <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0">
-                                                                                    {ev.courseCode} {ev.sessionNumber ? `${sessionInitials[ev.type].replace(')', ev.sessionNumber + ')')}` : sessionInitials[ev.type] || '(L)'}
-                                                                                    {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
-                                                                                </div>
-                                                                                <div className="font-bold leading-tight mb-1 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>{ev.topic}</div>
-                                                                                <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">{ev.instructor}</div>
-                                                                            </React.Fragment>
-                                                                        ) : (userRole !== 'viewer' && <Icons.Plus />)}
-                                                                    </div>
+                                                        
+                                                        {weekStatus !== "NORMAL" ? (
+                                                            sIdx === 0 ? (
+                                                                <td colSpan={timeSlots.length} rowSpan={vSems.length} className="bg-slate-200 border-r border-black p-4 text-center align-middle relative overflow-hidden">
+                                                                    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 8px)' }}></div>
+                                                                    <span className="relative z-10 text-xl md:text-2xl font-black uppercase tracking-[0.3em] text-slate-600 opacity-90">
+                                                                        {weekStatus}
+                                                                    </span>
                                                                 </td>
-                                                            );
-                                                        })}
+                                                            ) : null
+                                                        ) : (
+                                                            timeSlots.map((slot, slotIdx) => {
+                                                                if (skips.includes(slotIdx)) return null;
+                                                                const key = `${academicSession}-${selectedWeek}-${day}-${sem}-${slotIdx}`;
+                                                                const ev = events[key];
+                                                                const isBreak = isSlotBreak(day, slotIdx);
+                                                                const isHoliday = holidays[`${academicCycle}-${selectedWeek}-${day}`];
+                                                                
+                                                                if (isHoliday) {
+                                                                    if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-rose-50/60 border-r border-black p-2 text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] text-rose-500 opacity-80">CUTI (HKA / CT)</span> </td>);
+                                                                    return null;
+                                                                }
+                                                                if (isBreak) {
+                                                                    if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border-r border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">REHAT</span> </td>);
+                                                                    return null;
+                                                                }
+
+                                                                let colSpan = 1;
+                                                                if (ev && ev.duration > 1) { for(let i=1; i<ev.duration; i++) { if(!isSlotBreak(day, slotIdx+i)) { colSpan++; skips.push(slotIdx+i); } else break; } }
+                                                                
+                                                                const isMatch = searchTerm && searchTerm.trim() !== "" && ev && ev.courseCode && (
+                                                                    ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase()))
+                                                                );
+
+                                                                return (
+                                                                    <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
+                                                                        <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${ev && ev.courseCode ? `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4'}` : 'border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200'} ${isMatch ? 'search-match' : ''} ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : ''}`}>
+                                                                            {ev && ev.courseCode ? (
+                                                                                <React.Fragment>
+                                                                                    <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0">
+                                                                                        {ev.courseCode} {ev.sessionNumber ? `${sessionInitials[ev.type].replace(')', ev.sessionNumber + ')')}` : sessionInitials[ev.type] || '(L)'}
+                                                                                        {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
+                                                                                    </div>
+                                                                                    <div className="font-bold leading-tight mb-1 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>{ev.topic}</div>
+                                                                                    <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">{ev.instructor}</div>
+                                                                                </React.Fragment>
+                                                                            ) : (userRole !== 'viewer' && <Icons.Plus />)}
+                                                                        </div>
+                                                                    </td>
+                                                                );
+                                                            })
+                                                        )}
                                                     </tr>
                                                 );
                                             });
