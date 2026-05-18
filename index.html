@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v15.7</title>
+    <title>Jadual Waktu Mingguan TMP Digital v16.8</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -68,86 +68,36 @@
 <body class="bg-white min-h-screen text-black">
     <div id="root"></div>
 
-    <!-- Firebase Modular SDK & Alternatif Storan Offline -->
+    <!-- Firebase Modular SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Konfigurasi Pangkalan Data
-        const firebaseConfig = {
-         apiKey: "AIzaSyDoMacsYw5OF7F8kDpTsAB79jwJ3RsqG0s",
-         authDomain: "jadual-tmp-2026.firebaseapp.com",
-         projectId: "jadual-tmp-2026",
-         storageBucket: "jadual-tmp-2026.firebasestorage.app",
-         messagingSenderId: "352749857072",
-         appId: "1:352749857072:web:5759b14c81a0f9771080f5",
-
+        // Konfigurasi Pangkalan Data Firebase Anda (Spark Plan)
+        let firebaseConfig = {
+            apiKey: "AIzaSyDoMacsYw5OF7F8kDpTsAB79jwJ3RsqG0s",
+            authDomain: "jadual-tmp-2026.firebaseapp.com",
+            projectId: "jadual-tmp-2026",
+            storageBucket: "jadual-tmp-2026.firebasestorage.app",
+            messagingSenderId: "352749857072",
+            appId: "1:352749857072:web:5759b14c81a0f9771080f5"
         };
 
-        const isFirebaseConfigured = firebaseConfig.apiKey && firebaseConfig.apiKey !== "SILA_ISI_API_KEY_FIREBASE_ANDA";
+        try {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'jadual-tmp-master-projek';
 
-        if (isFirebaseConfigured || typeof __firebase_config !== 'undefined') {
-            // --- MOD 1: GUNA PANGKALAN DATA AWAN FIREBASE (Jika Kunci Diisi) ---
-            if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
-            try {
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                const db = getFirestore(app);
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'jadual-tmp-master-projek';
-
-                window.TMP_DB = { 
-                    db, auth, appId, setDoc, doc, collection, onSnapshot, 
-                    onAuthStateChanged, signInAnonymously, signOut, query, 
-                    deleteDoc, getDoc, signInWithCustomToken 
-                };
-            } catch (error) {
-                console.error("Firebase Ralat:", error);
-            }
-        } else {
-            // --- MOD 2: ALTERNATIF PERCUMA (STORAN TEMPATAN / OFFLINE) ---
-            // Mod ini akan aktif secara automatik di GitHub jika Firebase tidak dikonfigurasi.
-            console.warn("AWAS: Firebase tidak diisi. Sistem bertukar kepada Storan Tempatan (Offline). Data anda kekal selepas refresh, tetapi komputer lain tidak akan dapat melihatnya.");
-            
-            window.TMP_DB = {
-                db: "localdb", auth: {}, appId: "local-app",
-                doc: (_, ...paths) => paths.join('/'),
-                collection: (_, ...paths) => paths.join('/'),
-                setDoc: async (path, data) => {
-                    localStorage.setItem(path, JSON.stringify(data));
-                    window.dispatchEvent(new CustomEvent('localDBChange')); // Maklumkan sistem ada perubahan
-                },
-                deleteDoc: async (path) => {
-                    localStorage.removeItem(path);
-                    window.dispatchEvent(new CustomEvent('localDBChange'));
-                },
-                onSnapshot: (path, callback) => {
-                    const isCollection = path.includes('jadual_cycle');
-                    const trigger = () => {
-                        if (isCollection) {
-                            let results = [];
-                            for (let i = 0; i < localStorage.length; i++) {
-                                let k = localStorage.key(i);
-                                if (k.startsWith(path + '/')) {
-                                    results.push({ id: k.replace(path + '/', ''), data: () => JSON.parse(localStorage.getItem(k)) });
-                                }
-                            }
-                            callback({ forEach: (fn) => results.forEach(fn) });
-                        } else {
-                            let item = localStorage.getItem(path);
-                            callback({ exists: () => !!item, data: () => item ? JSON.parse(item) : {} });
-                        }
-                    };
-                    trigger(); // Panggil sekali semasa buka
-                    const listener = () => trigger(); // Panggil setiap kali ada data baru disimpan
-                    window.addEventListener('localDBChange', listener);
-                    return () => window.removeEventListener('localDBChange', listener);
-                },
-                signInAnonymously: async () => {},
-                onAuthStateChanged: (auth, cb) => cb({ uid: 'local-user' }),
-                signOut: async () => {},
-                signInWithCustomToken: async () => {}
+            window.TMP_DB = { 
+                db, auth, appId, setDoc, doc, collection, onSnapshot, 
+                onAuthStateChanged, signInAnonymously, signOut, query, 
+                deleteDoc, getDoc, signInWithCustomToken 
             };
+        } catch (error) {
+            console.error("Firebase Ralat:", error);
+            window.TMP_DB = null;
         }
     </script>
 
@@ -184,11 +134,11 @@
             const [academicSession, setAcademicSession] = useState('Januari - Jun');
             const [events, setEvents] = useState({});
             const [courseLimits, setCourseLimits] = useState({}); 
-            const [changeRequests, setChangeRequests] = useState({});
             const [footerData, setFooterData] = useState({ preparedName: '', preparedDate: '', verifiedName: '', verifiedDate: '' });
             const [filterSemester, setFilterSemester] = useState('SEMUA');
             const [saturdayConfigs, setSaturdayConfigs] = useState({});
             const [holidays, setHolidays] = useState({}); 
+            const [weekStatuses, setWeekStatuses] = useState({});
             const [searchTerm, setSearchTerm] = useState("");
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [isDashboardOpen, setIsDashboardOpen] = useState(false);
@@ -197,14 +147,14 @@
             const [lastUpdatedKey, setLastUpdatedKey] = useState(null);
             const [formData, setFormData] = useState({ id: '', day: '', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', semester: '', duration: 1, sessionNumber: '' });
             const [tableWidth, setTableWidth] = useState(0);
-            const [modalError, setModalError] = useState(""); // TAMBAHAN: Untuk ralat kemas kini tanpa menggunakan popup 'alert()'
+            const [modalError, setModalError] = useState("");
 
             const topScrollRef = useRef(null);
             const tableContainerRef = useRef(null);
             const tableElementRef = useRef(null);
             const printAreaRef = useRef(null);
 
-            // --- 2. CONSTANTS ---
+            // --- 2. CONSTANTS & TAJUK SILIBUS ---
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
             const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
             const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA’IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMIESHA BINTI ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
@@ -222,7 +172,6 @@
                 { label: 'Others (O)', value: 'Others', color: 'bg-teal-50 border-teal-500 text-teal-700' }
             ];
 
-            // --- PEMBOLEHUBAH BARU: SENARAI TAJUK SILIBUS PENGISIAN PANTAS ---
             const courseTopics = {
                 "MTIM 2013": [
                     "KULIAH: Laboratory Hazards and Personnel Protective Equipment", "KULIAH: Glassware and Pipettes", "KULIAH: Balances", "KULIAH: Distiller & Deionizer", "KULIAH: Oven, Water Bath and Incubator", "KULIAH: Autoclave", "KULIAH: Centrifuge", "KULIAH: pH Meter", "KULIAH: Chromatography and Electrophoresis System", "KULIAH: Microscope: Components and Application", "KULIAH: The Concept and Application of Photometry", "KULIAH: Atom Structures and Periodic Tables", "KULIAH: Concept of Ion, Electrolyte, Oxidation and Reduction Reaction", "KULIAH: Acid, Base and Buffer", "KULIAH: Composition in Chemical Reagent", "KULIAH: Application of Conversion Measurement Unit", "KULIAH: Preparation of Reagent and Solution",
@@ -361,13 +310,13 @@
             };
 
             // --- 3. FUNGSI LOGIK KRITIKAL ---
+
             const handleLogin = (e) => {
                 if(e) e.preventDefault();
                 setLoginError("");
-                
                 const code = accessCode.trim().toUpperCase();
                 
-                if(code === "ADMIN2026" || code === "TMP2026"){ 
+                if(code === "ADMIN2026"){ 
                     setIsAuthorized(true); setUserRole('superuser'); 
                     sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'superuser');
                 } else if (code === "DTMP2026") {
@@ -423,9 +372,9 @@
             const handleSave = async (e) => {
                 if (e) e.preventDefault();
                 if (userRole === 'viewer') return;
-                setModalError(""); // Reset ralat
+                setModalError(""); 
 
-                // PENAMBAHBAIKAN: Halang admin daripada mengubah slot yang telah disimpan
+                // Halang admin daripada mengubah slot yang telah disimpan
                 if (userRole === 'admin' && editingEvent) {
                     setModalError("Ralat: Slot yang telah disimpan tidak boleh diubah. Sila hubungi Supervisor.");
                     return;
@@ -483,8 +432,7 @@
                     selectedWeek: selectedWeek
                 };
 
-                // PEMBETULAN MUTLAK: Kemas kini UI serta-merta tanpa menunggu awan (Optimistic Update)
-                // Ini menjadikan butang klik berfungsi super pantas dan panel ditutup terus.
+                // Kemas kini UI serta-merta tanpa menunggu awan (Optimistic Update)
                 setEvents(prev => ({ ...prev, [key]: dataToSave }));
                 setIsModalOpen(false);
 
@@ -492,31 +440,25 @@
                 if (window.TMP_DB) {
                     const { db, appId, doc, setDoc } = window.TMP_DB;
                     setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave)
-                        .catch(error => {
-                            console.error("Firestore Error:", error); 
-                            // alert tidak lagi digunakan di sini untuk elak iframe crash
-                        });
+                        .catch(error => console.error("Firestore Error:", error));
                 }
             };
 
             const handleDelete = async (e) => {
                 if (e) e.preventDefault();
-                // PENAMBAHBAIKAN: Hanya superuser (Supervisor) sahaja boleh memadam slot
+                // Hanya superuser (Supervisor) sahaja boleh memadam slot
                 if (userRole === 'viewer' || userRole === 'admin') return;
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 
                 if (userRole === 'superuser') {
-                    // PEMBETULAN MUTLAK: Padam dari UI serta-merta
+                    // Padam dari UI serta-merta
                     setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
                     setIsModalOpen(false); 
                     
                     if (window.TMP_DB) {
                         const { db, appId, doc, deleteDoc } = window.TMP_DB;
                         deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key))
-                            .catch(error => {
-                                console.error("Firestore Error:", error); 
-                                alert("Ralat Latar Belakang: Gagal memadam data di awan.");
-                            });
+                            .catch(error => console.error("Firestore Error:", error));
                     }
                 }
             };
@@ -542,19 +484,15 @@
 
                 const fullWidth = container.scrollWidth;
 
-                // TETAPAN PDF PDF SEPERTI YANG DIRUJUK OLEH ANDA (html2canvas.docx)
                 const opt = {
                     margin: [0.3, 0.3, 0.3, 0.3], 
                     filename: `JWM_TMP_Minggu_${selectedWeek}_Versi_${academicCycle}.pdf`,
                     image: { type: 'jpeg', quality: 1 },
                     html2canvas: { 
-                        scale: 3, 
+                        scale: 2, 
                         useCORS: true, 
-                        allowTaint: true,
                         logging: false,
-                        backgroundColor: "#ffffff",
-                        imageTimeout: 15000,
-                        windowWidth: fullWidth + 100,
+                        windowWidth: fullWidth + 50,
                         width: fullWidth,
                         scrollY: 0
                     },
@@ -574,7 +512,7 @@
 
             const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
                 if (isSlotBreak(day, slotIdx) || userRole === 'viewer') return;
-                setModalError(""); // Reset ralat apabila borang baru dibuka
+                setModalError(""); 
                 if (event) {
                     setFormData({ ...event, customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode });
                     setEditingEvent(event);
@@ -608,11 +546,15 @@
             const visibleDays = useMemo(() => currentWeekHasSaturday ? days : days.slice(0, 5), [currentWeekHasSaturday]);
 
             const weekStatus = useMemo(() => {
+                const customStatus = weekStatuses[`${academicCycle}-${selectedWeek}`];
+                if (customStatus && customStatus !== "NORMAL") return customStatus;
+                if (customStatus === "NORMAL") return "NORMAL";
+
                 if (selectedWeek === 10) return "CUTI PERTENGAHAN SEMESTER";
                 if ([21, 22, 23].includes(selectedWeek)) return "PEPERIKSAAN";
                 if ([24, 25, 26].includes(selectedWeek)) return "CUTI AKHIR SEMESTER";
                 return "NORMAL";
-            }, [selectedWeek]);
+            }, [selectedWeek, weekStatuses, academicCycle]);
 
             const autoWeekRange = useMemo(() => {
                 const start = new Date(sessionStartDate);
@@ -660,12 +602,22 @@
             useEffect(() => {
                 if (!dbReady || !window.TMP_DB) return;
                 const { auth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } = window.TMP_DB;
+                
                 const initAuth = async () => {
                     try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } 
-                        else { await signInAnonymously(auth); }
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { 
+                            try {
+                                await signInWithCustomToken(auth, __initial_auth_token); 
+                            } catch (err) {
+                                console.warn("Fallback ke anonymous auth kerana token tidak sepadan:", err);
+                                await signInAnonymously(auth);
+                            }
+                        } else { 
+                            await signInAnonymously(auth); 
+                        }
                     } catch (e) { console.error("Auth init err:", e); }
                 };
+                
                 initAuth();
                 const unsubAuth = onAuthStateChanged(auth, setUser);
                 return () => unsubAuth();
@@ -694,27 +646,19 @@
                     (d) => { if(d.exists()) setHolidays(d.data()); },
                     (err) => console.error("Error hol:", err)
                 );
-                return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); };
+                const unsubWeekStat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'week_statuses'), 
+                    (d) => { if(d.exists()) setWeekStatuses(d.data()); },
+                    (err) => console.error("Error week_stat:", err)
+                );
+                return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); unsubWeekStat(); };
             }, [dbReady, isAuthorized, user, academicCycle]);
 
             useEffect(() => {
                 if (!tableElementRef.current) return;
-                
-                const updateWidth = (entries) => {
-                    for (let entry of entries) {
-                        const newWidth = entry.target.scrollWidth;
-                        setTableWidth(prev => {
-                            if (Math.abs(prev - newWidth) > 10) {
-                                return newWidth;
-                            }
-                            return prev;
-                        });
-                    }
-                };
-                
+                const updateWidth = () => setTableWidth(tableElementRef.current.scrollWidth);
                 const ro = new ResizeObserver(updateWidth);
                 ro.observe(tableElementRef.current);
-                
+                updateWidth();
                 return () => ro.disconnect();
             }, [isAuthorized, filterSemester, saturdayConfigs]);
 
@@ -797,6 +741,27 @@
                                         </div>
                                     )}
 
+                                    {userRole === 'superuser' && (
+                                        <div className="flex items-center gap-1 bg-purple-50 px-2 py-1.5 rounded-xl border border-purple-200 h-[34px] no-print">
+                                            <span className="text-[9px] font-black uppercase text-purple-600 mr-1">Status M{selectedWeek}:</span>
+                                            <select 
+                                                value={weekStatuses[`${academicCycle}-${selectedWeek}`] || (weekStatus === "NORMAL" ? "NORMAL" : weekStatus)}
+                                                onChange={(e) => {
+                                                    const statKey = `${academicCycle}-${selectedWeek}`;
+                                                    const nextStat = e.target.value;
+                                                    setWeekStatuses({...weekStatuses, [statKey]: nextStat});
+                                                    if(window.TMP_DB) window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'week_statuses'), {...weekStatuses, [statKey]: nextStat}).catch(err=>console.error(err));
+                                                }}
+                                                className="bg-transparent text-purple-800 text-[10px] font-black outline-none cursor-pointer uppercase"
+                                            >
+                                                <option value="NORMAL">Biasa (Normal)</option>
+                                                <option value="CUTI PERTENGAHAN SEMESTER">Cuti Pertengahan Sem</option>
+                                                <option value="CUTI AKHIR SEMESTER">Cuti Akhir Sem</option>
+                                                <option value="PEPERIKSAAN">Peperiksaan</option>
+                                            </select>
+                                        </div>
+                                    )}
+
                                     <div className="flex flex-col gap-1 border-r pr-3 border-slate-100">
                                         <label className="text-[9px] font-black uppercase text-slate-400 leading-none">Sesi</label>
                                         <select value={academicSession} onChange={e => setAcademicSession(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg border border-blue-100 outline-none cursor-pointer">
@@ -826,37 +791,19 @@
                     </nav>
 
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
-                        <div className="relative mb-8 text-center border-b-2 border-black pb-6 mt-4">
+                        <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
                             <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
-                            
-                            {/* PEMBETULAN MUTLAK JATA NEGARA SEPERTI RUJUKAN PENGGUNA (html 1.docx) */}
-                            <div 
-                                className="flex justify-center mb-3 mt-2"
-                                style={{
-                                    minHeight: '90px',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}
-                            >
-                                <img
-                                    src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg"
-                                    alt="Jata Negara Malaysia"
-                                    style={{
-                                        width: '90px',
-                                        height: '90px',
-                                        objectFit: 'contain',
-                                        display: 'block'
-                                    }}
+                            <div className="flex justify-center mb-1 mt-4" style={{ minHeight: '90px', alignItems: 'center', justifyContent: 'center' }}>
+                                <img 
+                                    src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" 
+                                    alt="Jata Negara" 
+                                    style={{ width: '90px', height: '90px', objectFit: 'contain', display: 'block' }}
                                     crossOrigin="anonymous"
                                     referrerPolicy="no-referrer"
-                                    onError={(e) => {
-                                        console.log("Logo gagal dimuatkan");
-                                        e.target.style.display = 'none';
-                                    }}
+                                    onError={(e) => { e.target.style.display = 'none'; }} 
                                 />
                             </div>
-
-                            <h1 className="text-lg font-black uppercase leading-tight">KEMENTERIAN KESIHATAN MALAYSIA</h1>
+                            <h1 className="text-lg font-black uppercase leading-tight mt-3">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-base font-bold uppercase underline underline-offset-4 tracking-wide">Jadual Waktu Mingguan</h2>
                             
                             <div className="mt-6 flex flex-col text-left gap-2 font-sans">
@@ -1054,13 +1001,13 @@
                                     <div className="space-y-1 text-black">
                                         <label className="text-[11px] font-black text-slate-400 uppercase">{formData.type === 'Lain-lain' ? 'Nama Aktiviti / Perkara' : 'Tajuk Pembelajaran'}</label>
                                         
-                                        {/* TAMBAHAN PENAMBAHBAIKAN: Dropdown Isi Pantas Tajuk (Sentiasa Kelihatan) */}
+                                        {/* Dropdown Isi Pantas Tajuk (Sentiasa Kelihatan) */}
                                         {formData.type !== 'Lain-lain' && (
                                             <select 
                                                 className="w-full p-3 mb-2 bg-emerald-50 border-2 border-emerald-400 rounded-xl font-black text-[11px] text-emerald-900 shadow-sm outline-none cursor-pointer"
                                                 onChange={(e) => {
                                                     if(e.target.value) setFormData({...formData, topic: e.target.value});
-                                                    e.target.value = ""; // Kembalikan ke asal
+                                                    e.target.value = ""; 
                                                 }}
                                             >
                                                 <option value="">⬇️ KLIK SINI UNTUK SENARAI TAJUK SILIBUS ⬇️</option>
