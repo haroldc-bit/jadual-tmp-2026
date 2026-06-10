@@ -140,6 +140,11 @@
             const [holidays, setHolidays] = useState({}); 
             const [weekStatuses, setWeekStatuses] = useState({});
             const [searchTerm, setSearchTerm] = useState("");
+            
+            const [activeSigSemester, setActiveSigSemester] = useState('T1SI');
+            const [semSignatures, setSemSignatures] = useState({});
+            const [sigSaveStatus, setSigSaveStatus] = useState('');
+
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [isDashboardOpen, setIsDashboardOpen] = useState(false);
             const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
@@ -655,7 +660,11 @@
                     (d) => { if(d.exists()) setWeekStatuses(d.data()); },
                     (err) => console.error("Error week_stat:", err)
                 );
-                return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); unsubWeekStat(); };
+                const unsubSemSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures_by_sem'), 
+                    (d) => { if(d.exists()) setSemSignatures(d.data()); },
+                    (err) => console.error("Error sem sigs:", err)
+                );
+                return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); unsubWeekStat(); unsubSemSig(); };
             }, [dbReady, isAuthorized, user, academicCycle]);
 
             useEffect(() => {
@@ -666,6 +675,36 @@
                 updateWidth();
                 return () => ro.disconnect();
             }, [isAuthorized, filterSemester, saturdayConfigs]);
+
+            useEffect(() => {
+                if (filterSemester && filterSemester !== 'SEMUA') {
+                    setActiveSigSemester(filterSemester);
+                }
+            }, [filterSemester]);
+
+            const handleLocalSigChange = (field, value) => {
+                setSemSignatures(prev => ({
+                    ...prev,
+                    [activeSigSemester]: {
+                        ...(prev[activeSigSemester] || { preparedName: '', preparedDate: '' }),
+                        [field]: value
+                    }
+                }));
+                setSigSaveStatus('');
+            };
+
+            const handleSaveSemSignature = async () => {
+                if (userRole === 'viewer' || !window.TMP_DB) return;
+                const { db, appId, doc, setDoc } = window.TMP_DB;
+                try {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures_by_sem'), semSignatures);
+                    setSigSaveStatus('Berjaya Disimpan!');
+                    setTimeout(() => setSigSaveStatus(''), 3000);
+                } catch (e) {
+                    console.error("Gagal menyimpan penyelaras:", e);
+                    setSigSaveStatus('Ralat Menyimpan');
+                }
+            };
 
             // --- 6. UI RENDER ---
             if (!isAuthorized) {
@@ -930,12 +969,77 @@
                                     </tbody>
                                 </table>
                             </div>
+                            
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
                                 <div>
-                                    <p>DISEDIAKAN OLEH:</p>
-                                    <div className="mt-8 border-b border-black flex gap-2">NAMA: <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.preparedName || ''} onChange={e => handleFooterChange('preparedName', e.target.value)} /></div>
-                                    <p className="mt-1 font-bold">PENGAJAR PENYELARAS</p>
-                                    <div className="mt-4 flex gap-2">TARIKH: <input type="date" className="bg-transparent outline-none font-bold" value={footerData.preparedDate || ''} onChange={e => handleFooterChange('preparedDate', e.target.value)} /></div>
+                                    <p className="uppercase text-slate-800 tracking-wider">DISEDIAKAN OLEH:</p>
+                                    
+                                    {/* Pemilihan Semester Penyelaras (no-print) */}
+                                    <div className="mt-4 flex flex-wrap items-center gap-2 no-print">
+                                        <span className="text-[10px] text-slate-400 font-black uppercase">Untuk Semester:</span>
+                                        <select 
+                                            value={activeSigSemester} 
+                                            onChange={e => { setActiveSigSemester(e.target.value); setSigSaveStatus(''); }}
+                                            className="bg-slate-50 border border-slate-200 rounded-lg p-1 text-[10px] font-black cursor-pointer text-black"
+                                        >
+                                            {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
+                                        </select>
+                                    </div>
+
+                                    {/* Dropdown Senarai Pengajar (no-print) */}
+                                    <div className="mt-3 flex flex-wrap items-center gap-2 no-print">
+                                        <span className="text-[10px] text-slate-400 font-black uppercase">Pilih Penyelaras:</span>
+                                        <select 
+                                            value={semSignatures[activeSigSemester]?.preparedName || ''} 
+                                            onChange={e => handleLocalSigChange('preparedName', e.target.value)}
+                                            className="bg-emerald-50 border border-emerald-200 rounded-lg p-1 text-[10px] font-black cursor-pointer text-emerald-900 w-56"
+                                            disabled={userRole === 'viewer'}
+                                        >
+                                            <option value="">-- Pilih Pengajar --</option>
+                                            {instructorList.map(name => <option key={name} value={name}>{name}</option>)}
+                                        </select>
+                                    </div>
+
+                                    <div className="mt-8 border-b border-black flex gap-2">
+                                        NAMA: 
+                                        <input 
+                                            type="text" 
+                                            className="bg-transparent outline-none w-full font-black uppercase" 
+                                            value={semSignatures[activeSigSemester]?.preparedName || ''} 
+                                            onChange={e => handleLocalSigChange('preparedName', e.target.value)}
+                                            placeholder="NAMA PENYELARAS AMBILAN"
+                                            disabled={userRole === 'viewer'}
+                                        />
+                                    </div>
+                                    <p className="mt-1 font-bold uppercase text-slate-500">PENGAJAR PENYELARAS ({semesterLabels[activeSigSemester]})</p>
+                                    
+                                    <div className="mt-4 flex gap-2">
+                                        TARIKH: 
+                                        <input 
+                                            type="date" 
+                                            className="bg-transparent outline-none font-bold" 
+                                            value={semSignatures[activeSigSemester]?.preparedDate || ''} 
+                                            onChange={e => handleLocalSigChange('preparedDate', e.target.value)}
+                                            disabled={userRole === 'viewer'}
+                                        />
+                                    </div>
+
+                                    {/* Butang Simpan Penyelaras */}
+                                    {userRole !== 'viewer' && (
+                                        <div className="mt-4 flex items-center gap-2 no-print">
+                                            <button 
+                                                onClick={handleSaveSemSignature}
+                                                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-md transition-all active:scale-95"
+                                            >
+                                                <Icons.Save /> Simpan Penyelaras
+                                            </button>
+                                            {sigSaveStatus && (
+                                                <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${sigSaveStatus.includes('Ralat') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                                    {sigSaveStatus}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                                 <div>
                                     <p>DISAHKAN OLEH:</p>
