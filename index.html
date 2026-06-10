@@ -1000,8 +1000,8 @@
                                         </select>
                                     </div>
 
-                                    <div className="mt-8 border-b border-black flex gap-2">
-                                        NAMA: 
+                                    <div className="mt-8 border-b border-black flex items-center gap-2">
+                                        <span className="shrink-0">NAMA:</span>
                                         <input 
                                             type="text" 
                                             className="bg-transparent outline-none w-full font-black uppercase" 
@@ -1010,11 +1010,23 @@
                                             placeholder="NAMA PENYELARAS AMBILAN"
                                             disabled={userRole === 'viewer'}
                                         />
+                                        {semSignatures[activeSigSemester]?.preparedName && userRole !== 'viewer' && (
+                                            <button 
+                                                onClick={() => handleLocalSigChange('preparedName', '')}
+                                                className="no-print p-1 text-slate-400 hover:text-red-600 transition-all"
+                                                title="Padam Nama"
+                                            >
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                </svg>
+                                            </button>
+                                        )}
                                     </div>
                                     <p className="mt-1 font-bold uppercase text-slate-500">PENGAJAR PENYELARAS ({semesterLabels[activeSigSemester]})</p>
                                     
-                                    <div className="mt-4 flex gap-2">
-                                        TARIKH: 
+                                    <div className="mt-4 flex items-center gap-2">
+                                        <span className="shrink-0">TARIKH:</span> 
                                         <input 
                                             type="date" 
                                             className="bg-transparent outline-none font-bold" 
@@ -1022,6 +1034,18 @@
                                             onChange={e => handleLocalSigChange('preparedDate', e.target.value)}
                                             disabled={userRole === 'viewer'}
                                         />
+                                        {semSignatures[activeSigSemester]?.preparedDate && userRole !== 'viewer' && (
+                                            <button 
+                                                onClick={() => handleLocalSigChange('preparedDate', '')}
+                                                className="no-print p-1 text-slate-400 hover:text-red-600 transition-all"
+                                                title="Padam Tarikh"
+                                            >
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                </svg>
+                                            </button>
+                                        )}
                                     </div>
 
                                     {/* Butang Simpan Penyelaras */}
@@ -1033,6 +1057,21 @@
                                             >
                                                 <Icons.Save /> Simpan Penyelaras
                                             </button>
+                                            {(semSignatures[activeSigSemester]?.preparedName || semSignatures[activeSigSemester]?.preparedDate) && (
+                                                <button 
+                                                    onClick={() => {
+                                                        handleLocalSigChange('preparedName', '');
+                                                        handleLocalSigChange('preparedDate', '');
+                                                    }}
+                                                    className="px-3 py-1.5 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1 transition-all active:scale-95"
+                                                    title="Padam Semua Info Penyelaras"
+                                                >
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="mr-0.5">
+                                                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                                                    </svg>
+                                                    Kosongkan
+                                                </button>
+                                            )}
                                             {sigSaveStatus && (
                                                 <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${sigSaveStatus.includes('Ralat') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
                                                     {sigSaveStatus}
