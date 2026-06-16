@@ -140,11 +140,6 @@
             const [holidays, setHolidays] = useState({}); 
             const [weekStatuses, setWeekStatuses] = useState({});
             const [searchTerm, setSearchTerm] = useState("");
-            
-            const [activeSigSemester, setActiveSigSemester] = useState('T1SI');
-            const [semSignatures, setSemSignatures] = useState({});
-            const [sigSaveStatus, setSigSaveStatus] = useState('');
-
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [isDashboardOpen, setIsDashboardOpen] = useState(false);
             const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
@@ -179,7 +174,7 @@
 
             const courseTopics = {
                 "MTIM 2013": [
-                    "KULIAH: Laboratory Hazards and Personnel Protective Equipment", "KULIAH: Glassware and Pipettes", "KULIAH: Balances", "KULIAH: Distiller & Deionizer", "KULIAH: Oven, Water Bath and Incubator", "KULIAH: Autoclave", "KULIAH: Centrifuge", "KULIAH: pH Meter", "KULIAH: Chromatography and Electrophoresis System", "KULIAH: Microscope: Components and Application", "KULIAH: The Concept and Application of Photometry", "KULIAH: Atom Structures and Periodic Tables", "KULIAH: Concept of Ion, Electrolyte, Oxidation and Reduction Reaction", "KULIAH: Acid, Base and Buffer", "KULIAH: Composition in Chemical Reagent", "KULIAH: Application of Conversion Measurement Unit", "KULIAH: Preparation of Reagent and Solution",
+                    "KULIAH: Laboratory Hazards and Personnel Protective Equipment", "KULIAH: Glassware and Pipettes", "KULIAH: Balances", "KULIAH: Distiller & Deionizer", "KULIAH: Oven, Water Bath and Incubator", "KULIAH: Autoclave", "KULIAH: Centrifuge", "KULIAH: pH Meter", "KULIAH: Chromatography and Electrophoresis System", "KULIAH: Microscope: Components and Application", "KULIAH: The Concept and Application of Photometry", "KULIAH: Atom Structures and Periodic Tables", "KULIAH: Concept of Ion, Electrolyte, Oxidation and Reduction Reaction", "KULIAH: Acid, Base and Buffer", "KULIAH: Composition in Chemical Reagent", "KULIAH: Preparation of Reagent and Solution",
                     "TUTORIAL: Laboratory Hazards and Personnel Protective Equipment", "TUTORIAL: Centrifuge", "TUTORIAL: Microscope: Components and Application", "TUTORIAL: The Concept and Application of Photometry",
                     "AMALI: Laboratory Hazards and Personnel Protective Equipment", "AMALI: Glassware and Pipettes", "AMALI: Balances", "AMALI: Distiller & Deionizer", "AMALI: Oven, Water Bath and Incubator", "AMALI: Autoclave", "AMALI: Centrifuge", "AMALI: pH Meter", "AMALI: Chromatography and Electrophoresis System", "AMALI: Microscope: Components and Application", "AMALI: The Concept and Application of Photometry", "AMALI: Composition in Chemical Reagent", "AMALI: Preparation of Reagent and Solution"
                 ],
@@ -664,11 +659,7 @@
                     (d) => { if(d.exists()) setWeekStatuses(d.data()); },
                     (err) => console.error("Error week_stat:", err)
                 );
-                const unsubSemSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures_by_sem'), 
-                    (d) => { if(d.exists()) setSemSignatures(d.data()); },
-                    (err) => console.error("Error sem sigs:", err)
-                );
-                return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); unsubWeekStat(); unsubSemSig(); };
+                return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); unsubWeekStat(); };
             }, [dbReady, isAuthorized, user, academicCycle]);
 
             useEffect(() => {
@@ -680,43 +671,26 @@
                 return () => ro.disconnect();
             }, [isAuthorized, filterSemester, saturdayConfigs]);
 
-            useEffect(() => {
-                if (filterSemester && filterSemester !== 'SEMUA') {
-                    setActiveSigSemester(filterSemester);
-                }
-            }, [filterSemester]);
-
-            const handleLocalSigChange = (field, value) => {
-                setSemSignatures(prev => ({
-                    ...prev,
-                    [activeSigSemester]: {
-                        ...(prev[activeSigSemester] || { preparedName: '', preparedDate: '' }),
-                        [field]: value
-                    }
-                }));
-                setSigSaveStatus('');
-            };
-
-            const handleSaveSemSignature = async () => {
-                if (userRole === 'viewer' || !window.TMP_DB) return;
-                const { db, appId, doc, setDoc } = window.TMP_DB;
-                try {
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures_by_sem'), semSignatures);
-                    setSigSaveStatus('Berjaya Disimpan!');
-                    setTimeout(() => setSigSaveStatus(''), 3000);
-                } catch (e) {
-                    console.error("Gagal menyimpan penyelaras:", e);
-                    setSigSaveStatus('Ralat Menyimpan');
-                }
-            };
-
             // --- 6. UI RENDER ---
             if (!isAuthorized) {
                 return (
                     <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6 text-black">
                         <div className="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full border-4 border-white text-black text-center">
-                            <div className="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl"><Icons.Lock /></div>
-                            <h2 className="text-xl font-black mb-8 uppercase text-slate-800 leading-tight">Akses Jadual TMP Digital</h2>
+                            {/* PENAMBAHBAIKAN: Logo Jata Negara diletakkan di tengah-tengah atas */}
+                            <div className="flex justify-center mb-6">
+                                <img 
+                                    src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" 
+                                    alt="Jata Negara" 
+                                    style={{ width: '90px', height: '90px', objectFit: 'contain', display: 'block' }}
+                                    crossOrigin="anonymous"
+                                    referrerPolicy="no-referrer"
+                                    onError={(e) => { e.target.style.display = 'none'; }} 
+                                />
+                            </div>
+                            {/* PENAMBAHBAIKAN: Menukar tajuk login mengikut arahan */}
+                            <h2 className="text-base font-black mb-8 uppercase text-slate-800 leading-tight tracking-tight">
+                                JADUAL WAKTU MINGGUAN PROGRAM TEKNOLOGI MAKMAL PERUBATAN ILKKM KUCHING
+                            </h2>
                             <form onSubmit={handleLogin}>
                                 <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kod Akses" className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-center mb-4 outline-none focus:border-blue-600 text-black font-bold" autoFocus />
                                 <button type="submit" className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase hover:bg-blue-700 transition-all shadow-md">Masuk</button>
@@ -977,112 +951,9 @@
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
                                 <div>
                                     <p className="uppercase text-slate-800 tracking-wider">DISEDIAKAN OLEH:</p>
-                                    
-                                    {/* Pemilihan Semester Penyelaras (no-print) */}
-                                    <div className="mt-4 flex flex-wrap items-center gap-2 no-print">
-                                        <span className="text-[10px] text-slate-400 font-black uppercase">Untuk Semester:</span>
-                                        <select 
-                                            value={activeSigSemester} 
-                                            onChange={e => { setActiveSigSemester(e.target.value); setSigSaveStatus(''); }}
-                                            className="bg-slate-50 border border-slate-200 rounded-lg p-1 text-[10px] font-black cursor-pointer text-black"
-                                        >
-                                            {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
-                                        </select>
-                                    </div>
-
-                                    {/* Dropdown Senarai Pengajar (no-print) */}
-                                    <div className="mt-3 flex flex-wrap items-center gap-2 no-print">
-                                        <span className="text-[10px] text-slate-400 font-black uppercase">Pilih Penyelaras:</span>
-                                        <select 
-                                            value={semSignatures[activeSigSemester]?.preparedName || ''} 
-                                            onChange={e => handleLocalSigChange('preparedName', e.target.value)}
-                                            className="bg-emerald-50 border border-emerald-200 rounded-lg p-1 text-[10px] font-black cursor-pointer text-emerald-900 w-56"
-                                            disabled={userRole === 'viewer'}
-                                        >
-                                            <option value="">-- Pilih Pengajar --</option>
-                                            {instructorList.map(name => <option key={name} value={name}>{name}</option>)}
-                                        </select>
-                                    </div>
-
-                                    <div className="mt-8 border-b border-black flex items-center gap-2">
-                                        <span className="shrink-0">NAMA:</span>
-                                        <input 
-                                            type="text" 
-                                            className="bg-transparent outline-none w-full font-black uppercase" 
-                                            value={semSignatures[activeSigSemester]?.preparedName || ''} 
-                                            onChange={e => handleLocalSigChange('preparedName', e.target.value)}
-                                            placeholder="NAMA PENYELARAS AMBILAN"
-                                            disabled={userRole === 'viewer'}
-                                        />
-                                        {semSignatures[activeSigSemester]?.preparedName && userRole !== 'viewer' && (
-                                            <button 
-                                                onClick={() => handleLocalSigChange('preparedName', '')}
-                                                className="no-print p-1 text-slate-400 hover:text-red-600 transition-all"
-                                                title="Padam Nama"
-                                            >
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                                </svg>
-                                            </button>
-                                        )}
-                                    </div>
-                                    <p className="mt-1 font-bold uppercase text-slate-500">PENGAJAR PENYELARAS ({semesterLabels[activeSigSemester]})</p>
-                                    
-                                    <div className="mt-4 flex items-center gap-2">
-                                        <span className="shrink-0">TARIKH:</span> 
-                                        <input 
-                                            type="date" 
-                                            className="bg-transparent outline-none font-bold" 
-                                            value={semSignatures[activeSigSemester]?.preparedDate || ''} 
-                                            onChange={e => handleLocalSigChange('preparedDate', e.target.value)}
-                                            disabled={userRole === 'viewer'}
-                                        />
-                                        {semSignatures[activeSigSemester]?.preparedDate && userRole !== 'viewer' && (
-                                            <button 
-                                                onClick={() => handleLocalSigChange('preparedDate', '')}
-                                                className="no-print p-1 text-slate-400 hover:text-red-600 transition-all"
-                                                title="Padam Tarikh"
-                                            >
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                                </svg>
-                                            </button>
-                                        )}
-                                    </div>
-
-                                    {/* Butang Simpan Penyelaras */}
-                                    {userRole !== 'viewer' && (
-                                        <div className="mt-4 flex items-center gap-2 no-print">
-                                            <button 
-                                                onClick={handleSaveSemSignature}
-                                                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-md transition-all active:scale-95"
-                                            >
-                                                <Icons.Save /> Simpan Penyelaras
-                                            </button>
-                                            {(semSignatures[activeSigSemester]?.preparedName || semSignatures[activeSigSemester]?.preparedDate) && (
-                                                <button 
-                                                    onClick={() => {
-                                                        handleLocalSigChange('preparedName', '');
-                                                        handleLocalSigChange('preparedDate', '');
-                                                    }}
-                                                    className="px-3 py-1.5 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1 transition-all active:scale-95"
-                                                    title="Padam Semua Info Penyelaras"
-                                                >
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="mr-0.5">
-                                                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
-                                                    </svg>
-                                                    Kosongkan
-                                                </button>
-                                            )}
-                                            {sigSaveStatus && (
-                                                <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${sigSaveStatus.includes('Ralat') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                                                    {sigSaveStatus}
-                                                </span>
-                                            )}
-                                        </div>
-                                    )}
+                                    <div className="mt-8 border-b border-black flex gap-2">NAMA: <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.preparedName || ''} onChange={e => handleFooterChange('preparedName', e.target.value)} /></div>
+                                    <p className="mt-1 font-bold uppercase text-slate-500">PENGAJAR PENYELARAS</p>
+                                    <div className="mt-4 flex gap-2">TARIKH: <input type="date" className="bg-transparent outline-none font-bold" value={footerData.preparedDate || ''} onChange={e => handleFooterChange('preparedDate', e.target.value)} /></div>
                                 </div>
                                 <div>
                                     <p>DISAHKAN OLEH:</p>
@@ -1124,7 +995,6 @@
                                                 {formData.type === 'Lain-lain' && <option value="">- Aktiviti Berasingan -</option>}
                                                 {courseCodes.filter(c => c !== 'Lain-lain').map(c => <option key={c} value={c}>{c}</option>)}
                                             </select>
-                                            {}
                                             {/* PEMBETULAN: Menukar paparan dari Sem/Slot kepada Jumlah Jam (j) */}
                                             {formData.type !== 'Lain-lain' && (
                                                 <div className="mt-2 text-[10px] font-black text-blue-600 uppercase">Jumlah Jam: {getCourseSemesterCount(formData.courseCode)} j / {courseLimits[formData.courseCode] || '∞'} j</div>
@@ -1261,7 +1131,6 @@
                         <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm no-print animate-in fade-in">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-indigo-600 flex flex-col text-black">
                                 <div className="bg-indigo-50 px-10 py-6 border-b-2 border-indigo-100 flex justify-between items-center">
-                                    {}
                                     {/* PEMBETULAN: Menjelaskan tetapan had agihan adalah dalam unit Jam */}
                                     <h3 className="font-black text-lg uppercase flex items-center gap-2 text-indigo-800"><Icons.Settings /> Had Agihan Semester (Jam)</h3>
                                     <button onClick={() => setIsLimitModalOpen(false)} className="bg-white text-indigo-600 p-2 rounded-xl shadow-md"><Icons.X /></button>
@@ -1291,4 +1160,4 @@
         root.render(<App />);
     </script>
 </body>
-</html>                                        
+</html>
