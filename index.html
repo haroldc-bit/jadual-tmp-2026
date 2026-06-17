@@ -514,15 +514,22 @@
                     selectedWeek: selectedWeek
                 };
 
-                // Kemas kini UI serta-merta tanpa menunggu awan (Optimistic Update)
-                setEvents(prev => ({ ...prev, [key]: dataToSave }));
-                setIsModalOpen(false);
-
-                // Proses penghantaran ke awan dibuat di latar belakang
+                // PEMBETULAN MUTLAK: Sistem akan paksa pengesahan pangkalan data terlebih dahulu.
                 if (window.TMP_DB) {
-                    const { db, appId, doc, setDoc } = window.TMP_DB;
-                    setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave)
-                        .catch(error => console.error("Firestore Error:", error));
+                    try {
+                        const { db, appId, doc, setDoc } = window.TMP_DB;
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave);
+                        
+                        // Kemas kini paparan hanya setelah awan menerima data
+                        setEvents(prev => ({ ...prev, [key]: dataToSave }));
+                        setIsModalOpen(false);
+                    } catch (error) {
+                        console.error("Firestore Error:", error);
+                        setModalError("RALAT AWAN: Gagal menyimpan jadual. Sila semak tetapan Firebase anda (Pastikan 'Rules Firestore' anda adalah allow read, write: if true;).");
+                    }
+                } else {
+                    setEvents(prev => ({ ...prev, [key]: dataToSave }));
+                    setIsModalOpen(false);
                 }
             };
 
@@ -533,14 +540,20 @@
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 
                 if (userRole === 'superuser') {
-                    // Padam dari UI serta-merta
-                    setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
-                    setIsModalOpen(false); 
-                    
                     if (window.TMP_DB) {
-                        const { db, appId, doc, deleteDoc } = window.TMP_DB;
-                        deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key))
-                            .catch(error => console.error("Firestore Error:", error));
+                        try {
+                            const { db, appId, doc, deleteDoc } = window.TMP_DB;
+                            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key));
+                            
+                            setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
+                            setIsModalOpen(false); 
+                        } catch (error) {
+                            console.error("Firestore Error:", error);
+                            setModalError("RALAT AWAN: Gagal memadam jadual. Sila semak tetapan 'Rules Firestore' anda.");
+                        }
+                    } else {
+                        setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
+                        setIsModalOpen(false); 
                     }
                 }
             };
@@ -686,7 +699,32 @@
             }, []);
 
             useEffect(() => {
-                if (!dbReady || !window.TMP_DB || !user) return;
+                if (!dbReady || !window.TMP_DB) return;
+                const { auth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } = window.TMP_DB;
+                
+                const initAuth = async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { 
+                            try {
+                                await signInWithCustomToken(auth, __initial_auth_token); 
+                            } catch (err) {
+                                console.warn("Fallback ke anonymous auth kerana token tidak sepadan:", err);
+                                await signInAnonymously(auth);
+                            }
+                        } else { 
+                            await signInAnonymously(auth); 
+                        }
+                    } catch (e) { console.error("Auth init err:", e); }
+                };
+                
+                initAuth();
+                const unsubAuth = onAuthStateChanged(auth, setUser);
+                return () => unsubAuth();
+            }, [dbReady]);
+
+            useEffect(() => {
+                // PENYELESAIAN MUTLAK: Dibuang '!user' untuk memintas halangan sandaran data jika tetapan awan tidak sepadan
+                if (!dbReady || !window.TMP_DB) return;
                 const { db, appId, collection, onSnapshot, doc } = window.TMP_DB;
                 const unsubEv = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`), 
                     (s) => { const d = {}; s.forEach(doc => { d[doc.id] = doc.data(); }); setEvents(d); },
@@ -713,7 +751,7 @@
                     (err) => console.error("Error week_stat:", err)
                 );
                 return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); unsubWeekStat(); };
-            }, [dbReady, isAuthorized, user, academicCycle]);
+            }, [dbReady, isAuthorized, academicCycle]);
 
             useEffect(() => {
                 if (!tableElementRef.current) return;
