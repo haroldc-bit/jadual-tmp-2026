@@ -181,7 +181,6 @@
     </script>
 
     <!-- React Application Code -->
-    <!-- PEMBETULAN KHUSUS: Menggunakan preset yang didaftarkan untuk mengelakkan sebarang ralat import module dan jsx -->
     <script type="text/babel" data-presets="react-classic,env">
         const { useState, useEffect, useMemo, useRef } = React;
 
@@ -301,9 +300,9 @@
                     "TUTORIAL: Biochemical Test for Gram Positive Bacteria", "TUTORIAL: Biochemical Test for Gram Negative Bacteria", "TUTORIAL: Staphylococcus spp", "TUTORIAL: Escherichia coli", "TUTORIAL: Tribe Protea (Proteus spp, Providencia spp, Morganella spp)", "TUTORIAL: Mycobacterium tuberculosis"
                 ],
                 "MTGC 2074": [
-                    "KULIAH: Introduction to Female Genital Tract and Role of Pap Smear", "KULIAH: Collection and Fixation of Pap Smear", "KULIAH: Processing, Staining and Screening of Pap Smear", "KULIAH: Epithelial and Non-Epithelial Cells in Pap Smear", "KULIAH: Negative for Intraepithelial Lesion or Malignancy (Non-Neoplastic Lesions/Changes)", "KULIAH: Negative for Intraepithelial Lesion or Malignancy (Organisms Present)", "KULIAH: Squamous Abnormalities", "KULIAH: Glandular Abnormalities", "KULIAH: Reporting Format and Management Algorithm in Cervical Screening", "KULIAH: Pitfalls in Gynaecological Cytology Screening", "KULIAH: Management in Cytopathology Laboratory",
-                    "TUTORIAL: Processing, Staining and Screening of Pap Smear", "TUTORIAL: Epithelial and Non-Epithelial Cells in Pap Smear", "TUTORIAL: Negative for Intraepithelial Lesion or Malignancy (Non-Neoplastic Lesions/Changes)", "TUTORIAL: Squamous Abnormalities", "TUTORIAL: Pitfalls in Gynaecological Cytology Screening",
-                    "AMALI: Processing, Staining and Screening of Pap Smear", "AMALI: Epithelial and Non-Epithelial Cells in Pap Smear", "AMALI: Negative for Intraepithelial Lesion or Malignancy (Non-Neoplastic Lesions/Changes)", "AMALI: Negative for Intraepithelial Lesion or Malignancy (Organisms Present)", "AMALI: Squamous Abnormalities", "AMALI: Glandular Abnormalities", "AMALI: Reporting Format and Management Algorithm in Cervical Screening", "AMALI: Pitfalls in Gynaecological Cytology Screening"
+                    "KULIAH: Introduction to Female Genital Tract and Role of Pap Smear", "KULIAH: Collection and Fixation of Pap Smear", "KULIAH: Processing, Staining and Screening of Pap Smear", "KULIAH: Epithelial and Non-Eitelial Cells in Pap Smear", "KULIAH: Negative for Intraepithelial Lesion or Malignancy (Non-Neoplastic Lesions/Changes)", "KULIAH: Negative for Intraepithelial Lesion or Malignancy (Organisms Present)", "KULIAH: Squamous Abnormalities", "KULIAH: Glandular Abnormalities", "KULIAH: Reporting Format and Management Algorithm in Cervical Screening", "KULIAH: Pitfalls in Gynaecological Cytology Screening", "KULIAH: Management in Cytopathology Laboratory",
+                    "TUTORIAL: Processing, Staining and Screening of Pap Smear", "TUTORIAL: Epithelial and Non-Eitelial Cells in Pap Smear", "TUTORIAL: Negative for Intraepithelial Lesion or Malignancy (Non-Neoplastic Lesions/Changes)", "TUTORIAL: Squamous Abnormalities", "TUTORIAL: Pitfalls in Gynaecological Cytology Screening",
+                    "AMALI: Processing, Staining and Screening of Pap Smear", "AMALI: Epithelial and Non-Eitelial Cells in Pap Smear", "AMALI: Negative for Intraepithelial Lesion or Malignancy (Non-Neoplastic Lesions/Changes)", "AMALI: Negative for Intraepithelial Lesion or Malignancy (Organisms Present)", "AMALI: Squamous Abnormalities", "AMALI: Glandular Abnormalities", "AMALI: Reporting Format and Management Algorithm in Cervical Screening", "AMALI: Pitfalls in Gynaecological Cytology Screening"
                 ],
                 "MTMM 2053": [
                     "AMALI: Disinfection and Sterilization", "AMALI: Culture Media", "AMALI: Inoculation & Incubation Techniques", "AMALI: Dry & Wet Smear Preparation", "AMALI: Colony Morphology Characteristics of Microorganism on Media Culture", "AMALI: Staining and Microscopic Examination", "AMALI: Biochemical Test for Bacteria", "AMALI: Antimicrobial Susceptibility Test", "AMALI: Bacterial Count", "AMALI: Staphylococcus spp", "AMALI: Streptococcus spp", "AMALI: Corynebacterium spp", "AMALI: Escherichia coli", "AMALI: Klebsiella spp", "AMALI: Enterobacter spp", "AMALI: Salmonella spp", "AMALI: Shigella spp", "AMALI: Tribe Protea (Proteus sp, Providencia sp, Morganella sp)", "AMALI: Pseudomonas spp", "AMALI: Vibrios spp", "AMALI: Neisseria spp", "AMALI: Haemophillus spp & Bordetella spp", "AMALI: Acinetobacter spp", "AMALI: Laboratory Diagnosis of Acid Fast Bacilli (Mycobacterium spp)", "AMALI: Candida spp & Cryptococcus spp"
@@ -514,22 +513,26 @@
                     selectedWeek: selectedWeek
                 };
 
-                // PEMBETULAN MUTLAK: Sistem akan paksa pengesahan pangkalan data terlebih dahulu.
+                // KEMAS KINI STRATEGI DUA-HALA (MANDATORI OFFLINE-FIRST)
+                // 1. Simpan ke LocalStorage serta-merta supaya data tidak hilang jika refresh
+                const localKey = `tmp_events_cycle_${academicCycle}`;
+                setEvents(prev => {
+                    const next = { ...prev, [key]: dataToSave };
+                    localStorage.setItem(localKey, JSON.stringify(next));
+                    return next;
+                });
+                setIsModalOpen(false);
+
+                // 2. Cuba segerakkan ke Google Firebase di latar belakang
                 if (window.TMP_DB) {
                     try {
                         const { db, appId, doc, setDoc } = window.TMP_DB;
                         await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave);
-                        
-                        // Kemas kini paparan hanya setelah awan menerima data
-                        setEvents(prev => ({ ...prev, [key]: dataToSave }));
-                        setIsModalOpen(false);
+                        console.log("Jadual disegerakkan ke Firebase.");
                     } catch (error) {
-                        console.error("Firestore Error:", error);
-                        setModalError("RALAT AWAN: Gagal menyimpan jadual. Sila semak tetapan Firebase anda (Pastikan 'Rules Firestore' anda adalah allow read, write: if true;).");
+                        console.error("Firebase Gagal Menyimpan:", error);
+                        // Jangan sekat modal, hanya log ralat. Storan tempatan dijamin selamat!
                     }
-                } else {
-                    setEvents(prev => ({ ...prev, [key]: dataToSave }));
-                    setIsModalOpen(false);
                 }
             };
 
@@ -540,20 +543,25 @@
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 
                 if (userRole === 'superuser') {
+                    // 1. Padam dari LocalStorage serta-merta
+                    const localKey = `tmp_events_cycle_${academicCycle}`;
+                    setEvents(prev => {
+                        const next = { ...prev };
+                        delete next[key];
+                        localStorage.setItem(localKey, JSON.stringify(next));
+                        return next;
+                    });
+                    setIsModalOpen(false); 
+
+                    // 2. Padam dari pelayan Firebase di latar belakang
                     if (window.TMP_DB) {
                         try {
                             const { db, appId, doc, deleteDoc } = window.TMP_DB;
                             await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key));
-                            
-                            setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
-                            setIsModalOpen(false); 
+                            console.log("Jadual dipadam dari Firebase.");
                         } catch (error) {
-                            console.error("Firestore Error:", error);
-                            setModalError("RALAT AWAN: Gagal memadam jadual. Sila semak tetapan 'Rules Firestore' anda.");
+                            console.error("Firebase Gagal Memadam:", error);
                         }
-                    } else {
-                        setEvents(prev => { const next = {...prev}; delete next[key]; return next; });
-                        setIsModalOpen(false); 
                     }
                 }
             };
@@ -643,21 +651,30 @@
             };
 
             const handleFooterChange = async (field, val) => {
-                if (userRole === 'viewer' || !window.TMP_DB) return;
+                if (userRole === 'viewer') return;
                 const next = { ...footerData, [field]: val };
                 setFooterData(next);
-                const { db, appId, doc, setDoc } = window.TMP_DB;
-                try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), next); } catch(e) {}
+                localStorage.setItem(`tmp_signatures_${academicCycle}`, JSON.stringify(next));
+
+                if (window.TMP_DB) {
+                    const { db, appId, doc, setDoc } = window.TMP_DB;
+                    try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), next); } catch(e) {}
+                }
             };
 
             const saveLimits = async (newLimits) => {
-                const { db, appId, doc, setDoc } = window.TMP_DB;
-                try { 
-                    const cleanLimits = {};
-                    Object.keys(newLimits).forEach(k => { cleanLimits[k] = parseInt(newLimits[k]) || 0; });
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), cleanLimits); 
-                    setIsLimitModalOpen(false); 
-                } catch (e) { console.error("Gagal menyimpan agihan."); }
+                const cleanLimits = {};
+                Object.keys(newLimits).forEach(k => { cleanLimits[k] = parseInt(newLimits[k]) || 0; });
+                setCourseLimits(cleanLimits);
+                localStorage.setItem('tmp_course_limits', JSON.stringify(cleanLimits));
+                setIsLimitModalOpen(false); 
+
+                if (window.TMP_DB) {
+                    const { db, appId, doc, setDoc } = window.TMP_DB;
+                    try { 
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), cleanLimits); 
+                    } catch (e) { console.error("Gagal menyimpan agihan."); }
+                }
             };
 
             const autoWeekRange = useMemo(() => {
@@ -692,6 +709,37 @@
             }, [events, academicSession, academicCycle]);
 
             // --- 5. EFFECTS ---
+            // PENYELESAIAN MUTLAK: Load Offline Cache Serta-merta pada permulaan sistem
+            useEffect(() => {
+                try {
+                    const localKey = `tmp_events_cycle_${academicCycle}`;
+                    const localData = localStorage.getItem(localKey);
+                    if (localData) setEvents(JSON.parse(localData));
+
+                    const limits = localStorage.getItem('tmp_course_limits');
+                    if (limits) setCourseLimits(JSON.parse(limits));
+                    
+                    const sigs = localStorage.getItem(`tmp_signatures_${academicCycle}`);
+                    if (sigs) setFooterData(JSON.parse(sigs));
+
+                    const sat = localStorage.getItem('tmp_saturday_configs');
+                    if (sat) setSaturdayConfigs(JSON.parse(sat));
+
+                    const hol = localStorage.getItem('tmp_holidays');
+                    if (hol) setHolidays(JSON.parse(hol));
+
+                    const weekStat = localStorage.getItem('tmp_week_statuses');
+                    if (weekStat) setWeekStatuses(JSON.parse(weekStat));
+                } catch (e) {
+                    console.error("Gagal membaca LocalStorage Cache:", e);
+                }
+            }, [academicCycle]);
+
+            useEffect(() => {
+                const interval = setInterval(() => { if (window.TMP_DB) { setDbReady(true); clearInterval(interval); } }, 50);
+                return () => clearInterval(interval);
+            }, []);
+
             useEffect(() => {
                 const savedAuth = sessionStorage.getItem('tmp_auth');
                 const savedRole = sessionStorage.getItem('tmp_role');
@@ -723,31 +771,70 @@
             }, [dbReady]);
 
             useEffect(() => {
-                // PENYELESAIAN MUTLAK: Dibuang '!user' untuk memintas halangan sandaran data jika tetapan awan tidak sepadan
+                // PENYELESAIAN MUTLAK: Buang sekatan '!user' dan lakukan auto-merge data awan + storan tempatan
                 if (!dbReady || !window.TMP_DB) return;
                 const { db, appId, collection, onSnapshot, doc } = window.TMP_DB;
+                
                 const unsubEv = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`), 
-                    (s) => { const d = {}; s.forEach(doc => { d[doc.id] = doc.data(); }); setEvents(d); },
-                    (err) => console.error("Error events:", err)
+                    (s) => { 
+                        const d = {}; 
+                        s.forEach(doc => { d[doc.id] = doc.data(); }); 
+                        setEvents(prev => {
+                            const merged = { ...prev, ...d };
+                            localStorage.setItem(`tmp_events_cycle_${academicCycle}`, JSON.stringify(merged));
+                            return merged;
+                        }); 
+                    },
+                    (err) => {
+                        console.error("Error events:", err);
+                        if (err.code === 'permission-denied' || err.message.includes('permission')) {
+                            setModalError("Nota: Sistem mengesan kebenaran Firebase (Rules) anda telah luput. Sistem dialihkan kepada 'Offline Local Storan' secara automatik. Sila kemas kini rules Firebase anda.");
+                        }
+                    }
                 );
                 const unsubLim = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), 
-                    (d) => { if(d.exists()) setCourseLimits(d.data()); },
+                    (d) => { 
+                        if(d.exists()) {
+                            setCourseLimits(d.data()); 
+                            localStorage.setItem('tmp_course_limits', JSON.stringify(d.data()));
+                        }
+                    },
                     (err) => console.error("Error limits:", err)
                 );
                 const unsubSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), 
-                    (d) => { if(d.exists()) setFooterData(d.data()); },
+                    (d) => { 
+                        if(d.exists()) {
+                            setFooterData(d.data()); 
+                            localStorage.setItem(`tmp_signatures_${academicCycle}`, JSON.stringify(d.data()));
+                        }
+                    },
                     (err) => console.error("Error sigs:", err)
                 );
                 const unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), 
-                    (d) => { if(d.exists()) setSaturdayConfigs(d.data()); },
+                    (d) => { 
+                        if(d.exists()) {
+                            setSaturdayConfigs(d.data()); 
+                            localStorage.setItem('tmp_saturday_configs', JSON.stringify(d.data()));
+                        }
+                    },
                     (err) => console.error("Error sat:", err)
                 );
                 const unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), 
-                    (d) => { if(d.exists()) setHolidays(d.data()); },
+                    (d) => { 
+                        if(d.exists()) {
+                            setHolidays(d.data()); 
+                            localStorage.setItem('tmp_holidays', JSON.stringify(d.data()));
+                        }
+                    },
                     (err) => console.error("Error hol:", err)
                 );
                 const unsubWeekStat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'week_statuses'), 
-                    (d) => { if(d.exists()) setWeekStatuses(d.data()); },
+                    (d) => { 
+                        if(d.exists()) {
+                            setWeekStatuses(d.data()); 
+                            localStorage.setItem('tmp_week_statuses', JSON.stringify(d.data()));
+                        }
+                    },
                     (err) => console.error("Error week_stat:", err)
                 );
                 return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); unsubWeekStat(); };
