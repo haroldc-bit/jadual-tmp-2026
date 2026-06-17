@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadual Waktu Mingguan TMP Digital v16.12 Pro</title>
+    <title>Jadual Waktu Mingguan TMP Digital v16.13 Pro</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -13,7 +13,6 @@
     <!-- Babel & Konfigurasi Khusus (Penyelesaian Ralat JSX/Import) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script>
-        // Memaksa Babel Standalone menggunakan Classic Runtime secara stabil tanpa ralat importSource
         Babel.registerPreset('react-classic', {
             presets: [
                 [Babel.availablePresets.react, { runtime: 'classic' }]
@@ -24,7 +23,7 @@
     <!-- HTML2PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-    <!-- Firebase Compat SDK - Menyelesaikan ralat import module secara mutlak -->
+    <!-- Firebase Compat SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -96,45 +95,28 @@
         };
 
         try {
-            // Menggunakan fungsi Firebase standard (Compat) yang disokong penuh oleh GitHub Pages
             const app = firebase.initializeApp(firebaseConfig);
             const auth = firebase.auth();
             const db = firebase.firestore();
             const appId = 'jadual-tmp-master-projek';
 
-            // Memetakan semula fungsi Modular SDK kepada struktur Compat secara dinamik
             window.TMP_DB = { 
                 db, 
                 auth, 
                 appId, 
-                setDoc: async (docRef, data) => {
-                    return docRef.set(data);
-                }, 
-                doc: (dbInstance, ...paths) => {
-                    return dbInstance.doc(paths.join('/'));
-                }, 
-                collection: (dbInstance, ...paths) => {
-                    return dbInstance.collection(paths.join('/'));
-                }, 
+                setDoc: async (docRef, data) => { return docRef.set(data); }, 
+                doc: (dbInstance, ...paths) => { return dbInstance.doc(paths.join('/')); }, 
+                collection: (dbInstance, ...paths) => { return dbInstance.collection(paths.join('/')); }, 
                 onSnapshot: (ref, onNext, onError) => {
                     return ref.onSnapshot((compatSnapshot) => {
                         const wrappedSnapshot = {
-                            exists: () => {
-                                if (typeof compatSnapshot.exists === 'function') {
-                                    return compatSnapshot.exists();
-                                }
-                                return !!compatSnapshot.exists;
-                            },
+                            exists: () => { return typeof compatSnapshot.exists === 'function' ? compatSnapshot.exists() : !!compatSnapshot.exists; },
                             data: () => compatSnapshot.data(),
                             id: compatSnapshot.id,
                             forEach: (callback) => {
                                 if (typeof compatSnapshot.forEach === 'function') {
                                     compatSnapshot.forEach((docSnap) => {
-                                        callback({
-                                            id: docSnap.id,
-                                            data: () => docSnap.data(),
-                                            exists: () => true
-                                        });
+                                        callback({ id: docSnap.id, data: () => docSnap.data(), exists: () => true });
                                     });
                                 }
                             }
@@ -142,37 +124,20 @@
                         onNext(wrappedSnapshot);
                     }, onError);
                 }, 
-                onAuthStateChanged: (authInstance, cb) => {
-                    return authInstance.onAuthStateChanged(cb);
-                }, 
-                signInAnonymously: async (authInstance) => {
-                    return authInstance.signInAnonymously();
-                }, 
-                signOut: async (authInstance) => {
-                    return authInstance.signOut();
-                }, 
-                query: (ref) => {
-                    return ref;
-                }, 
-                deleteDoc: async (docRef) => {
-                    return docRef.delete();
-                }, 
+                onAuthStateChanged: (authInstance, cb) => { return authInstance.onAuthStateChanged(cb); }, 
+                signInAnonymously: async (authInstance) => { return authInstance.signInAnonymously(); }, 
+                signOut: async (authInstance) => { return authInstance.signOut(); }, 
+                query: (ref) => { return ref; }, 
+                deleteDoc: async (docRef) => { return docRef.delete(); }, 
                 getDoc: async (docRef) => {
                     const compatSnapshot = await docRef.get();
                     return {
-                        exists: () => {
-                            if (typeof compatSnapshot.exists === 'function') {
-                                return compatSnapshot.exists();
-                            }
-                            return !!compatSnapshot.exists;
-                        },
+                        exists: () => { return typeof compatSnapshot.exists === 'function' ? compatSnapshot.exists() : !!compatSnapshot.exists; },
                         data: () => compatSnapshot.data(),
                         id: compatSnapshot.id
                     };
                 }, 
-                signInWithCustomToken: async (authInstance, token) => {
-                    return authInstance.signInWithCustomToken(token);
-                } 
+                signInWithCustomToken: async (authInstance, token) => { return authInstance.signInWithCustomToken(token); } 
             };
         } catch (error) {
             console.error("Firebase Initialization Error:", error);
@@ -186,7 +151,7 @@
 
         const Icons = {
             Plus: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
-            X: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+            X: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" h="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
             Undo: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-15 9 9 0 0 0-8.31 5.5"></path></svg>,
             Save: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>,
             Lock: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
@@ -214,7 +179,9 @@
             const [academicSession, setAcademicSession] = useState('Januari - Jun');
             const [events, setEvents] = useState({});
             const [courseLimits, setCourseLimits] = useState({}); 
-            const [footerData, setFooterData] = useState({ preparedName: '', preparedDate: '', verifiedName: '', verifiedDate: '' });
+            
+            // KEMAS KINI MEMORI FOOTER (Menyimpan mengikut Semester)
+            const [footerData, setFooterData] = useState({});
             const [filterSemester, setFilterSemester] = useState('SEMUA');
             const [saturdayConfigs, setSaturdayConfigs] = useState({});
             const [holidays, setHolidays] = useState({}); 
@@ -229,12 +196,15 @@
             const [tableWidth, setTableWidth] = useState(0);
             const [modalError, setModalError] = useState("");
 
+            // Temp input state untuk mengelakkan lag
+            const [footerForm, setFooterForm] = useState({ name: '', date: '' });
+
             const topScrollRef = useRef(null);
             const tableContainerRef = useRef(null);
             const tableElementRef = useRef(null);
             const printAreaRef = useRef(null);
 
-            // --- 2. CONSTANTS & TAJUK SILIBUS ---
+            // --- 2. CONSTANTS ---
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
             const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
             const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA’IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMIESHA BINTI ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
@@ -325,7 +295,7 @@
                 "MTBT 2114": [
                     "KULIAH: Introduction to Blood Transfusion", "KULIAH: Procurement of blood", "KULIAH: Blood component processing", "KULIAH: Transfusion Microbiology Laboratory", "KULIAH: ABO Blood Group system, Subgroup and Bombay", "KULIAH: ABO Discrepancies", "KULIAH: Rh system", "KULIAH: Other blood group system", "KULIAH: Antiglobulin Testing", "KULIAH: Pre-Transfusion Testing", "KULIAH: Serologic Testing in Pre Transfusion Test", "KULIAH: Identification of antibody", "KULIAH: Group, Screen and Hold (GSH)", "KULIAH: Emergency O and safe O",
                     "TUTORIAL: Blood component processing", "TUTORIAL: Transfusion Microbiology Laboratory", "TUTORIAL: ABO Blood Group system, Subgroup and Bombay", "TUTORIAL: ABO Discrepancies", "TUTORIAL: Rh system", "TUTORIAL: Other blood group system", "TUTORIAL: Pre-Transfusion Testing", "TUTORIAL: Serologic Testing in Pre Transfusion Test", "TUTORIAL: Identification of antibody",
-                    "AMALI: Introduction to Blood Transfusion", "AMALI: Procurement of blood", "AMALI: Blood component processing", "AMALI: ABO Blood Group system, Subgroup and Bombay", "AMALI: ABO Discrepancies", "AMALI: Rh system", "AMALI: Other blood group system", "AMALI: Antiglobulin Testing", "AMALI: Serologic Testing in Pre Transfusion Test", "AMALI: Identification of antibody", "AMALI: Group, Screen and Hold (GSH)", "AMALI: Emergency O and safe O"
+                    "AMALI: Introduction to Blood Transfusion", "AMALI: Procurement of blood", "AMALI: Blood component processing", "AMALI: ABO Blood Group system, Subgroup and Bombay", "AMALI: ABO Discrepancies", "Rh system", "AMALI: Other blood group system", "AMALI: Antiglobulin Testing", "AMALI: Serologic Testing in Pre Transfusion Test", "AMALI: Identification of antibody", "AMALI: Group, Screen and Hold (GSH)", "AMALI: Emergency O and safe O"
                 ],
                 "MTPC 2133": [
                     "AMALI: Laboratory Safety in biochemistry laboratory", "AMALI: Specimen collection, preparation, handling and other pre analytical variables in biochemistry", "AMALI: Oral glucose tolerance test wet & dry and routine glucose urine test", "AMALI: Calibration and Standard graph glucose, creatinine and protein", "AMALI: Point Of Care Testing (POCT)", "AMALI: Lab instrument log, min and SD and plot LJ graph", "AMALI: Uric acid test", "AMALI: Creatinine and urea clearance wet & dry", "AMALI: UFEME and calculi", "AMALI: Determination of ALP enzyme activity using multiple point assay method", "AMALI: Biochemical test on CSF glucose, total protein and globulin"
@@ -393,9 +363,7 @@
             const handleLogin = (e) => {
                 if(e) e.preventDefault();
                 setLoginError("");
-                
                 const code = accessCode.trim().toUpperCase();
-                
                 if(code === "ADMIN2026" || code === "TMP2026"){ 
                     setIsAuthorized(true); setUserRole('superuser'); 
                     sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'superuser');
@@ -414,13 +382,10 @@
                 try {
                     sessionStorage.removeItem('tmp_auth');
                     sessionStorage.removeItem('tmp_role');
-                    sessionStorage.clear();
-                    localStorage.clear();
+                    sessionStorage.clear(); localStorage.clear();
                     if (window.TMP_DB) window.TMP_DB.signOut(window.TMP_DB.auth).catch(() => {});
                 } catch (e) {}
-                setIsAuthorized(false);
-                setUserRole(null);
-                window.location.reload(); 
+                setIsAuthorized(false); setUserRole(null); window.location.reload(); 
             };
 
             const isSlotBreak = (day, slotIdx) => {
@@ -454,7 +419,6 @@
                 if (userRole === 'viewer') return;
                 setModalError(""); 
 
-                // Halang admin daripada mengubah slot yang telah disimpan
                 if (userRole === 'admin' && editingEvent) {
                     setModalError("Ralat: Slot yang telah disimpan tidak boleh diubah. Sila hubungi Supervisor.");
                     return;
@@ -513,8 +477,6 @@
                     selectedWeek: selectedWeek
                 };
 
-                // KEMAS KINI STRATEGI DUA-HALA (MANDATORI OFFLINE-FIRST)
-                // 1. Simpan ke LocalStorage serta-merta supaya data tidak hilang jika refresh
                 const localKey = `tmp_events_cycle_${academicCycle}`;
                 setEvents(prev => {
                     const next = { ...prev, [key]: dataToSave };
@@ -523,143 +485,69 @@
                 });
                 setIsModalOpen(false);
 
-                // 2. Cuba segerakkan ke Google Firebase di latar belakang
                 if (window.TMP_DB) {
                     try {
                         const { db, appId, doc, setDoc } = window.TMP_DB;
                         await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave);
-                        console.log("Jadual disegerakkan ke Firebase.");
                     } catch (error) {
                         console.error("Firebase Gagal Menyimpan:", error);
-                        // Jangan sekat modal, hanya log ralat. Storan tempatan dijamin selamat!
                     }
                 }
             };
 
             const handleDelete = async (e) => {
                 if (e) e.preventDefault();
-                // Hanya superuser (Supervisor) sahaja boleh memadam slot
                 if (userRole === 'viewer' || userRole === 'admin') return;
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 
                 if (userRole === 'superuser') {
-                    // 1. Padam dari LocalStorage serta-merta
                     const localKey = `tmp_events_cycle_${academicCycle}`;
                     setEvents(prev => {
-                        const next = { ...prev };
-                        delete next[key];
-                        localStorage.setItem(localKey, JSON.stringify(next));
-                        return next;
+                        const next = { ...prev }; delete next[key];
+                        localStorage.setItem(localKey, JSON.stringify(next)); return next;
                     });
                     setIsModalOpen(false); 
 
-                    // 2. Padam dari pelayan Firebase di latar belakang
                     if (window.TMP_DB) {
                         try {
                             const { db, appId, doc, deleteDoc } = window.TMP_DB;
                             await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key));
-                            console.log("Jadual dipadam dari Firebase.");
-                        } catch (error) {
-                            console.error("Firebase Gagal Memadam:", error);
-                        }
+                        } catch (error) { console.error("Firebase Gagal Memadam:", error); }
                     }
                 }
             };
 
-            const handleExportPDF = () => {
-                const element = printAreaRef.current;
-                const container = tableContainerRef.current;
+            // FUNGSI SIMPAN KHUSUS BAGI PENYELARAS SEMESTER (Firebase & Cache)
+            const handleSavePenyelaras = async (e) => {
+                if (e) e.preventDefault();
+                if (userRole === 'viewer') return;
                 
-                const originalOverflow = container.style.overflow;
-                const originalMaxHeight = container.style.maxHeight;
-                const originalBorder = container.style.border;
-                
-                const noPrintElements = element.querySelectorAll('.no-print');
-                const originalDisplays = [];
-                noPrintElements.forEach(el => {
-                    originalDisplays.push(el.style.display);
-                    el.style.display = 'none';
-                });
-
-                container.style.overflow = 'visible';
-                container.style.maxHeight = 'none';
-                container.style.border = 'none';
-
-                const fullWidth = container.scrollWidth;
-
-                // TETAPAN RESOLUSI PDF SECARA MAKSIMUM (html2canvas.docx)
-                const opt = {
-                    margin: [0.3, 0.3, 0.3, 0.3], 
-                    filename: `JWM_TMP_Minggu_${selectedWeek}_Versi_${academicCycle}.pdf`,
-                    image: { type: 'jpeg', quality: 1 },
-                    html2canvas: { 
-                        scale: 3, 
-                        useCORS: true, 
-                        allowTaint: true,
-                        logging: false,
-                        backgroundColor: "#ffffff",
-                        imageTimeout: 15000,
-                        windowWidth: fullWidth + 100,
-                        width: fullWidth,
-                        scrollY: 0
-                    },
-                    jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } 
+                const currentSem = filterSemester === 'SEMUA' ? 'T1SI' : filterSemester;
+                const updatedFooter = {
+                    ...footerData,
+                    [`${currentSem}_name`]: footerForm.name,
+                    [`${currentSem}_date`]: footerForm.date
                 };
 
-                html2pdf().set(opt).from(element).save().then(() => {
-                    container.style.overflow = originalOverflow;
-                    container.style.maxHeight = originalMaxHeight;
-                    container.style.border = originalBorder;
-                    
-                    noPrintElements.forEach((el, index) => {
-                        el.style.display = originalDisplays[index];
-                    });
-                });
-            };
-
-            // --- 4. MEMOIZED DATA ---
-            const currentWeekHasSaturday = useMemo(() => saturdayConfigs[`${academicCycle}-${selectedWeek}`] === true, [saturdayConfigs, selectedWeek, academicCycle]);
-            const visibleDays = useMemo(() => currentWeekHasSaturday ? days : days.slice(0, 5), [currentWeekHasSaturday]);
-
-            // Status Minggu (TERMASUK PEPERIKSAAN AKHIR SEMESTER)
-            const weekStatus = useMemo(() => {
-                let customStatus = weekStatuses[`${academicCycle}-${selectedWeek}`];
-                if (customStatus === "PEPERIKSAAN") customStatus = "PEPERIKSAAN AKHIR SEMESTER"; // Kemas kini status lama
-                if (customStatus && customStatus !== "NORMAL") return customStatus;
-                if (customStatus === "NORMAL") return "NORMAL";
-
-                if (selectedWeek === 10) return "CUTI PERTENGAHAN SEMESTER";
-                if ([21, 22, 23].includes(selectedWeek)) return "PEPERIKSAAN AKHIR SEMESTER";
-                if ([24, 25, 26].includes(selectedWeek)) return "CUTI AKHIR SEMESTER";
-                return "NORMAL";
-            }, [selectedWeek, weekStatuses, academicCycle]);
-
-            const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
-                // BLOK PENGISIAN PADA MINGGU CUTI/PEPERIKSAAN
-                if (weekStatus !== "NORMAL") return;
-                
-                if (isSlotBreak(day, slotIdx) || userRole === 'viewer') return;
-                setModalError(""); 
-                if (event) {
-                    setFormData({ ...event, customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode });
-                    setEditingEvent(event);
-                } else {
-                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', duration: 1, sessionNumber: '' });
-                    setEditingEvent(null);
-                }
-                setIsModalOpen(true);
-            };
-
-            const handleFooterChange = async (field, val) => {
-                if (userRole === 'viewer') return;
-                const next = { ...footerData, [field]: val };
-                setFooterData(next);
-                localStorage.setItem(`tmp_signatures_${academicCycle}`, JSON.stringify(next));
+                setFooterData(updatedFooter);
+                localStorage.setItem(`tmp_signatures_${academicCycle}`, JSON.stringify(updatedFooter));
 
                 if (window.TMP_DB) {
                     const { db, appId, doc, setDoc } = window.TMP_DB;
-                    try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), next); } catch(e) {}
+                    try { 
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), updatedFooter);
+                        console.log("Penyelaras semester selamat disinkron.");
+                    } catch(err) { console.error("Firebase Gagal:", err); }
                 }
+            };
+
+            const handleClearPenyelaras = (e) => {
+                if (e) e.preventDefault();
+                setFooterForm({ name: '', date: '' });
+            };
+
+            const handleFooterChange = (field, val) => {
+                setFooterForm(prev => ({ ...prev, [field]: val }));
             };
 
             const saveLimits = async (newLimits) => {
@@ -671,11 +559,25 @@
 
                 if (window.TMP_DB) {
                     const { db, appId, doc, setDoc } = window.TMP_DB;
-                    try { 
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), cleanLimits); 
-                    } catch (e) { console.error("Gagal menyimpan agihan."); }
+                    try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), cleanLimits); } catch (e) {}
                 }
             };
+
+            // --- 4. MEMOIZED DATA ---
+            const currentWeekHasSaturday = useMemo(() => saturdayConfigs[`${academicCycle}-${selectedWeek}`] === true, [saturdayConfigs, selectedWeek, academicCycle]);
+            const visibleDays = useMemo(() => currentWeekHasSaturday ? days : days.slice(0, 5), [currentWeekHasSaturday]);
+
+            const weekStatus = useMemo(() => {
+                let customStatus = weekStatuses[`${academicCycle}-${selectedWeek}`];
+                if (customStatus === "PEPERIKSAAN") customStatus = "PEPERIKSAAN AKHIR SEMESTER"; 
+                if (customStatus && customStatus !== "NORMAL") return customStatus;
+                if (customStatus === "NORMAL") return "NORMAL";
+
+                if (selectedWeek === 10) return "CUTI PERTENGAHAN SEMESTER";
+                if ([21, 22, 23].includes(selectedWeek)) return "PEPERIKSAAN AKHIR SEMESTER";
+                if ([24, 25, 26].includes(selectedWeek)) return "CUTI AKHIR SEMESTER";
+                return "NORMAL";
+            }, [selectedWeek, weekStatuses, academicCycle]);
 
             const autoWeekRange = useMemo(() => {
                 const start = new Date(sessionStartDate);
@@ -696,20 +598,26 @@
                     ev && ev.session === academicSession && ev.cycle === academicCycle && 
                     ev.courseCode && typeof ev.courseCode === 'string' && ev.courseCode.trim() !== "" && ev.courseCode !== "Lain-lain"
                 ).forEach(ev => {
-                    const hours = parseInt(ev.duration || 1);
-                    const course = ev.courseCode;
+                    const hours = parseInt(ev.duration || 1); const course = ev.courseCode;
                     const instructor = ev.instructor && ev.instructor.trim() !== "" ? ev.instructor : 'Tidak Dinamakan';
                     if(!courseSum[course]) courseSum[course] = { total: 0, Kuliah: 0, Amali: 0, Tutorial: 0 };
-                    courseSum[course].total += hours; 
-                    if(ev.type in courseSum[course]) courseSum[course][ev.type] += hours;
+                    courseSum[course].total += hours; if(ev.type in courseSum[course]) courseSum[course][ev.type] += hours;
                     if(!instructorSum[instructor]) instructorSum[instructor] = { total: 0 };
                     instructorSum[instructor].total += hours;
                 });
                 return { courseSum, instructorSum };
             }, [events, academicSession, academicCycle]);
 
+            // Auto-update input text footer apabila jenis semester bertukar
+            useEffect(() => {
+                const targetSem = filterSemester === 'SEMUA' ? 'T1SI' : filterSemester;
+                setFooterForm({
+                    name: footerData[`${targetSem}_name`] || '',
+                    date: footerData[`${targetSem}_date`] || ''
+                });
+            }, [filterSemester, footerData]);
+
             // --- 5. EFFECTS ---
-            // PENYELESAIAN MUTLAK: Load Offline Cache Serta-merta pada permulaan sistem
             useEffect(() => {
                 try {
                     const localKey = `tmp_events_cycle_${academicCycle}`;
@@ -730,9 +638,7 @@
 
                     const weekStat = localStorage.getItem('tmp_week_statuses');
                     if (weekStat) setWeekStatuses(JSON.parse(weekStat));
-                } catch (e) {
-                    console.error("Gagal membaca LocalStorage Cache:", e);
-                }
+                } catch (e) { console.error("Gagal membaca LocalStorage Cache:", e); }
             }, [academicCycle]);
 
             useEffect(() => {
@@ -741,151 +647,71 @@
             }, []);
 
             useEffect(() => {
-                const savedAuth = sessionStorage.getItem('tmp_auth');
-                const savedRole = sessionStorage.getItem('tmp_role');
-                if (savedAuth === 'true' && savedRole) { setIsAuthorized(true); setUserRole(savedRole); }
-            }, []);
-
-            useEffect(() => {
                 if (!dbReady || !window.TMP_DB) return;
                 const { auth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } = window.TMP_DB;
-                
                 const initAuth = async () => {
                     try {
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { 
-                            try {
-                                await signInWithCustomToken(auth, __initial_auth_token); 
-                            } catch (err) {
-                                console.warn("Fallback ke anonymous auth kerana token tidak sepadan:", err);
-                                await signInAnonymously(auth);
-                            }
-                        } else { 
-                            await signInAnonymously(auth); 
-                        }
-                    } catch (e) { console.error("Auth init err:", e); }
+                            try { await signInWithCustomToken(auth, __initial_auth_token); } catch (err) { await signInAnonymously(auth); }
+                        } else { await signInAnonymously(auth); }
+                    } catch (e) {}
                 };
-                
                 initAuth();
                 const unsubAuth = onAuthStateChanged(auth, setUser);
                 return () => unsubAuth();
             }, [dbReady]);
 
             useEffect(() => {
-                // PENYELESAIAN MUTLAK: Buang sekatan '!user' dan lakukan auto-merge data awan + storan tempatan
                 if (!dbReady || !window.TMP_DB) return;
                 const { db, appId, collection, onSnapshot, doc } = window.TMP_DB;
                 
                 const unsubEv = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`), 
                     (s) => { 
-                        const d = {}; 
-                        s.forEach(doc => { d[doc.id] = doc.data(); }); 
+                        const d = {}; s.forEach(doc => { d[doc.id] = doc.data(); }); 
                         setEvents(prev => {
                             const merged = { ...prev, ...d };
                             localStorage.setItem(`tmp_events_cycle_${academicCycle}`, JSON.stringify(merged));
                             return merged;
                         }); 
-                    },
-                    (err) => {
-                        console.error("Error events:", err);
-                        if (err.code === 'permission-denied' || err.message.includes('permission')) {
-                            setModalError("Nota: Sistem mengesan kebenaran Firebase (Rules) anda telah luput. Sistem dialihkan kepada 'Offline Local Storan' secara automatik. Sila kemas kini rules Firebase anda.");
-                        }
-                    }
+                    }, (err) => {}
                 );
                 const unsubLim = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), 
-                    (d) => { 
-                        if(d.exists()) {
-                            setCourseLimits(d.data()); 
-                            localStorage.setItem('tmp_course_limits', JSON.stringify(d.data()));
-                        }
-                    },
-                    (err) => console.error("Error limits:", err)
+                    (d) => { if(d.exists()) { setCourseLimits(d.data()); localStorage.setItem('tmp_course_limits', JSON.stringify(d.data())); } }
                 );
                 const unsubSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), 
-                    (d) => { 
-                        if(d.exists()) {
-                            setFooterData(d.data()); 
-                            localStorage.setItem(`tmp_signatures_${academicCycle}`, JSON.stringify(d.data()));
-                        }
-                    },
-                    (err) => console.error("Error sigs:", err)
+                    (d) => { if(d.exists()) { setFooterData(d.data()); localStorage.setItem(`tmp_signatures_${academicCycle}`, JSON.stringify(d.data())); } }
                 );
                 const unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), 
-                    (d) => { 
-                        if(d.exists()) {
-                            setSaturdayConfigs(d.data()); 
-                            localStorage.setItem('tmp_saturday_configs', JSON.stringify(d.data()));
-                        }
-                    },
-                    (err) => console.error("Error sat:", err)
+                    (d) => { if(d.exists()) { setSaturdayConfigs(d.data()); localStorage.setItem('tmp_saturday_configs', JSON.stringify(d.data())); } }
                 );
                 const unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), 
-                    (d) => { 
-                        if(d.exists()) {
-                            setHolidays(d.data()); 
-                            localStorage.setItem('tmp_holidays', JSON.stringify(d.data()));
-                        }
-                    },
-                    (err) => console.error("Error hol:", err)
+                    (d) => { if(d.exists()) { setHolidays(d.data()); localStorage.setItem('tmp_holidays', JSON.stringify(d.data())); } }
                 );
                 const unsubWeekStat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'week_statuses'), 
-                    (d) => { 
-                        if(d.exists()) {
-                            setWeekStatuses(d.data()); 
-                            localStorage.setItem('tmp_week_statuses', JSON.stringify(d.data()));
-                        }
-                    },
-                    (err) => console.error("Error week_stat:", err)
+                    (d) => { if(d.exists()) { setWeekStatuses(d.data()); localStorage.setItem('tmp_week_statuses', JSON.stringify(d.data())); } }
                 );
                 return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); unsubWeekStat(); };
             }, [dbReady, isAuthorized, academicCycle]);
 
             useEffect(() => {
                 if (!tableElementRef.current) return;
-                
                 const updateWidth = (entries) => {
                     for (let entry of entries) {
                         const newWidth = entry.target.scrollWidth;
-                        setTableWidth(prev => {
-                            if (Math.abs(prev - newWidth) > 10) {
-                                return newWidth;
-                            }
-                            return prev;
-                        });
+                        setTableWidth(prev => { return Math.abs(prev - newWidth) > 10 ? newWidth : prev; });
                     }
                 };
-                
-                const ro = new ResizeObserver(updateWidth);
-                ro.observe(tableElementRef.current);
-                
+                const ro = new ResizeObserver(updateWidth); ro.observe(tableElementRef.current);
                 return () => ro.disconnect();
             }, [isAuthorized, filterSemester, saturdayConfigs]);
 
-            // --- 6. UI RENDER ---
             if (!isAuthorized) {
                 return (
                     <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6 text-black">
                         <div className="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full border-4 border-white text-black text-center">
-                            
-                            {/* JATA NEGARA SECARA MAKSIMUM (html 1.docx) */}
-                            <div 
-                                className="flex justify-center mb-6"
-                                style={{
-                                    minHeight: '90px',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}
-                            >
-                                <img 
-                                    src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" 
-                                    alt="Jata Negara" 
-                                    style={{ width: '90px', height: '90px', objectFit: 'contain', display: 'block' }}
-                                    crossOrigin="anonymous"
-                                    referrerPolicy="no-referrer"
-                                    onError={(e) => { e.target.style.display = 'none'; }} 
-                                />
+                            <div className="flex justify-center mb-6" style={{ minHeight: '90px', alignItems: 'center', justifyContent: 'center' }}>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" alt="Jata Negara" style={{ width: '90px', height: '90px', objectFit: 'contain', display: 'block' }} crossOrigin="anonymous" referrerPolicy="no-referrer" />
                             </div>
-                            
                             <h2 className="text-base font-black mb-8 uppercase text-slate-800 leading-tight tracking-tight">
                                 JADUAL WAKTU MINGGUAN PROGRAM TEKNOLOGI MAKMAL PERUBATAN ILKKM KUCHING
                             </h2>
@@ -932,16 +758,12 @@
                                         <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-xl border border-slate-200 h-[34px]">
                                             <span className="text-[9px] font-black uppercase text-rose-500 mr-1">Cuti HKA/CT:</span>
                                             {visibleDays.map(d => {
-                                                const holKey = `${academicCycle}-${selectedWeek}-${d}`;
-                                                const isHol = holidays[holKey];
+                                                const holKey = `${academicCycle}-${selectedWeek}-${d}`; const isHol = holidays[holKey];
                                                 return (
                                                     <button key={d} onClick={() => {
-                                                        const next = !isHol;
-                                                        setHolidays({...holidays, [holKey]: next});
+                                                        const next = !isHol; setHolidays({...holidays, [holKey]: next});
                                                         if(window.TMP_DB) window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), {...holidays, [holKey]: next}).catch(e=>console.error(e));
-                                                    }} className={`w-6 h-6 rounded-md text-[10px] font-black transition-all flex items-center justify-center ${isHol ? 'bg-rose-500 text-white shadow-sm' : 'bg-white text-slate-400 border border-slate-200 hover:bg-slate-100'}`}>
-                                                        {d.substring(0, 1)}
-                                                    </button>
+                                                    }} className={`w-6 h-6 rounded-md text-[10px] font-black transition-all flex items-center justify-center ${isHol ? 'bg-rose-500 text-white shadow-sm' : 'bg-white text-slate-400 border border-slate-200 hover:bg-slate-100'}`}>{d.substring(0, 1)}</button>
                                                 );
                                             })}
                                         </div>
@@ -951,13 +773,10 @@
                                         <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 h-[34px]">
                                             <span className="text-[9px] font-black uppercase text-slate-400">Sabtu</span>
                                             <button onClick={() => {
-                                                const satKey = `${academicCycle}-${selectedWeek}`;
-                                                const next = !currentWeekHasSaturday;
+                                                const satKey = `${academicCycle}-${selectedWeek}`; const next = !currentWeekHasSaturday;
                                                 setSaturdayConfigs({...saturdayConfigs, [satKey]: next});
                                                 if(window.TMP_DB) window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), {...saturdayConfigs, [satKey]: next}).catch(e=>console.error(e));
-                                            }} className={`w-8 h-4 rounded-full relative transition-all ${currentWeekHasSaturday ? 'bg-green-500' : 'bg-slate-300'}`}>
-                                                <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${currentWeekHasSaturday ? 'left-4' : 'left-0.5'}`}></div>
-                                            </button>
+                                            }} className={`w-8 h-4 rounded-full relative transition-all ${currentWeekHasSaturday ? 'bg-green-500' : 'bg-slate-300'}`}><div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${currentWeekHasSaturday ? 'left-4' : 'left-0.5'}`}></div></button>
                                         </div>
                                     )}
 
@@ -967,8 +786,7 @@
                                             <select 
                                                 value={weekStatuses[`${academicCycle}-${selectedWeek}`] || (weekStatus === "NORMAL" ? "NORMAL" : weekStatus)}
                                                 onChange={(e) => {
-                                                    const statKey = `${academicCycle}-${selectedWeek}`;
-                                                    const nextStat = e.target.value;
+                                                    const statKey = `${academicCycle}-${selectedWeek}`; const nextStat = e.target.value;
                                                     setWeekStatuses({...weekStatuses, [statKey]: nextStat});
                                                     if(window.TMP_DB) window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'week_statuses'), {...weekStatuses, [statKey]: nextStat}).catch(err=>console.error(err));
                                                 }}
@@ -1013,34 +831,9 @@
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
                             <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
-                            
-                            {/* JATA NEGARA SESUAI DENGAN FORMAT CORS & REFERRER (html 1.docx) */}
-                            <div 
-                                className="flex justify-center mb-3 mt-2"
-                                style={{
-                                    minHeight: '90px',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}
-                            >
-                                <img
-                                    src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg"
-                                    alt="Jata Negara Malaysia"
-                                    style={{
-                                        width: '90px',
-                                        height: '90px',
-                                        objectFit: 'contain',
-                                        display: 'block'
-                                    }}
-                                    crossOrigin="anonymous"
-                                    referrerPolicy="no-referrer"
-                                    onError={(e) => {
-                                        console.log("Logo gagal dimuatkan");
-                                        e.target.style.display = 'none';
-                                    }}
-                                />
+                            <div className="flex justify-center mb-3 mt-2" style={{ minHeight: '90px', alignItems: 'center', justifyContent: 'center' }}>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" alt="Jata Negara Malaysia" style={{ width: '90px', height: '90px', objectFit: 'contain', display: 'block' }} crossOrigin="anonymous" referrerPolicy="no-referrer" />
                             </div>
-
                             <h1 className="text-lg font-black uppercase leading-tight mt-3">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-base font-bold uppercase underline underline-offset-4 tracking-wide">Jadual Waktu Mingguan</h2>
                             
@@ -1109,18 +902,14 @@
                                                             sIdx === 0 ? (
                                                                 <td colSpan={timeSlots.length} rowSpan={vSems.length} className="bg-slate-200 border-r border-black p-4 text-center align-middle relative overflow-hidden">
                                                                     <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 8px)' }}></div>
-                                                                    <span className="relative z-10 text-xl md:text-2xl font-black uppercase tracking-[0.3em] text-slate-600 opacity-90">
-                                                                        {weekStatus}
-                                                                    </span>
+                                                                    <span className="relative z-10 text-xl md:text-2xl font-black uppercase tracking-[0.3em] text-slate-600 opacity-90">{weekStatus}</span>
                                                                 </td>
                                                             ) : null
                                                         ) : (
                                                             timeSlots.map((slot, slotIdx) => {
                                                                 if (skips.includes(slotIdx)) return null;
-                                                                const key = `${academicSession}-${selectedWeek}-${day}-${sem}-${slotIdx}`;
-                                                                const ev = events[key];
-                                                                const isBreak = isSlotBreak(day, slotIdx);
-                                                                const isHoliday = holidays[`${academicCycle}-${selectedWeek}-${day}`];
+                                                                const key = `${academicSession}-${selectedWeek}-${day}-${sem}-${slotIdx}`; const ev = events[key];
+                                                                const isBreak = isSlotBreak(day, slotIdx); const isHoliday = holidays[`${academicCycle}-${selectedWeek}-${day}`];
                                                                 
                                                                 if (isHoliday) {
                                                                     if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-rose-50/60 border-r border-black p-2 text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] text-rose-500 opacity-80">CUTI (HKA / CT)</span> </td>);
@@ -1133,10 +922,7 @@
 
                                                                 let colSpan = 1;
                                                                 if (ev && ev.duration > 1) { for(let i=1; i<ev.duration; i++) { if(!isSlotBreak(day, slotIdx+i)) { colSpan++; skips.push(slotIdx+i); } else break; } }
-                                                                
-                                                                const isMatch = searchTerm && searchTerm.trim() !== "" && ev && ev.courseCode && (
-                                                                    ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase()))
-                                                                );
+                                                                const isMatch = searchTerm && searchTerm.trim() !== "" && ev && ev.courseCode && (ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase())));
 
                                                                 return (
                                                                     <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
@@ -1164,17 +950,87 @@
                                 </table>
                             </div>
                             
+                            {/* KEMAS KINI STRUKTUR FOOTER: DINAMIK IKUT KORT SEMESTER (Bebas Lag & Mempunyai Butang Clear/Simpan) */}
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
-                                <div>
-                                    <p className="uppercase text-slate-800 tracking-wider">DISEDIAKAN OLEH:</p>
-                                    <div className="mt-8 border-b border-black flex gap-2">NAMA: <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.preparedName || ''} onChange={e => handleFooterChange('preparedName', e.target.value)} /></div>
-                                    <p className="mt-1 font-bold uppercase text-slate-500">PENGAJAR PENYELARAS</p>
-                                    <div className="mt-4 flex gap-2">TARIKH: <input type="date" className="bg-transparent outline-none font-bold" value={footerData.preparedDate || ''} onChange={e => handleFooterChange('preparedDate', e.target.value)} /></div>
+                                <div className="space-y-4">
+                                    <p className="uppercase text-slate-800 tracking-wider">
+                                        DISEDIAKAN OLEH: <span className="text-blue-600 font-black">({filterSemester === 'SEMUA' ? 'TAHUN 1 SEM 1' : semesterLabels[filterSemester]})</span>
+                                    </p>
+                                    
+                                    {/* Input Nama Berkembar: Dropdown Pembantu + Manual Input Text */}
+                                    <div className="border-b border-black pb-2 space-y-2">
+                                        <div className="flex items-center gap-2 no-print">
+                                            <span className="text-[10px] text-slate-400 uppercase font-black">Pilih Cepat:</span>
+                                            <select 
+                                                className="bg-slate-50 border p-1 rounded font-black text-[10px] text-slate-700 outline-none max-w-[200px]"
+                                                value={instructorList.includes(footerForm.name) ? footerForm.name : ''}
+                                                onChange={e => handleFooterChange('name', e.target.value)}
+                                                disabled={userRole === 'viewer'}
+                                            >
+                                                <option value="">-- Cari Nama Pengajar --</option>
+                                                {instructorList.map(n => <option key={name} value={n}>{n}</option>)}
+                                            </select>
+                                        </div>
+                                        
+                                        <div className="flex items-center justify-between w-full group">
+                                            <div className="w-full flex items-center">
+                                                <span className="shrink-0 mr-2">NAMA:</span>
+                                                <input 
+                                                    type="text" 
+                                                    className="bg-transparent outline-none w-full font-black uppercase text-blue-800" 
+                                                    value={footerForm.name} 
+                                                    onChange={e => handleFooterChange('name', e.target.value)}
+                                                    placeholder="PILIH DROPDOWN DI ATAS ATAU TAIP SINI"
+                                                    disabled={userRole === 'viewer'}
+                                                />
+                                            </div>
+                                            {footerForm.name && userRole !== 'viewer' && (
+                                                <button onClick={() => handleFooterChange('name', '')} className="text-red-500 hover:text-red-700 ml-1 no-print font-black text-xs px-1" title="Clear Nama">✕</button>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <p className="mt-1 font-bold uppercase text-slate-500">PENGAJAR PENYELARAS MINGGUAN</p>
+                                    
+                                    <div className="flex items-center justify-between border-b border-black pb-1">
+                                        <div className="flex items-center w-full">
+                                            <span className="shrink-0 mr-2">TARIKH:</span>
+                                            <input 
+                                                type="date" 
+                                                className="bg-transparent outline-none font-bold text-blue-800" 
+                                                value={footerForm.date} 
+                                                onChange={e => handleFooterChange('date', e.target.value)}
+                                                disabled={userRole === 'viewer'}
+                                            />
+                                        </div>
+                                        {footerForm.date && userRole !== 'viewer' && (
+                                            <button onClick={() => handleFooterChange('date', '')} className="text-red-500 hover:text-red-700 ml-1 no-print font-black text-xs px-1" title="Clear Tarikh">✕</button>
+                                        )}
+                                    </div>
+
+                                    {/* Panel Butang Pengurusan Penyelaras */}
+                                    {userRole !== 'viewer' && (
+                                        <div className="flex gap-2 pt-2 no-print">
+                                            <button 
+                                                onClick={handleSavePenyelaras} 
+                                                className="bg-blue-600 hover:bg-blue-700 text-white font-black text-[10px] uppercase px-4 py-2 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1 text-white"
+                                            >
+                                                💾 Simpan Penyelaras
+                                            </button>
+                                            <button 
+                                                onClick={handleClearPenyelaras} 
+                                                className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-[10px] uppercase px-3 py-2 rounded-xl border transition-all active:scale-95"
+                                            >
+                                                🔄 Clear Kedua-dua
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
+
                                 <div>
-                                    <p>DISAHKAN OLEH:</p>
+                                    <p className="uppercase text-slate-800 tracking-wider">DISAHKAN OLEH:</p>
                                     <div className="mt-8 border-b border-black flex gap-2">NAMA: <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} /></div>
-                                    <p className="mt-1 font-bold uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
+                                    <p className="mt-1 font-bold uppercase text-slate-500">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
                                     <div className="mt-4 flex gap-2">TARIKH: <input type="date" className="bg-transparent outline-none font-bold" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} /></div>
                                 </div>
                                 <div className="col-span-2 text-center pt-8 opacity-40 text-[9px] italic">** Harold Criso Anak Ajin **</div>
@@ -1191,14 +1047,8 @@
                                     <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-2 rounded-xl shadow-lg hover:rotate-90 transition-all"><Icons.X /></button>
                                 </div>
                                 <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white text-black">
-                                    {modalError && (
-                                        <div className="bg-red-100 p-4 rounded-2xl border-2 border-red-300 text-red-800 text-xs font-bold flex items-center gap-3">
-                                            ⚠️ {modalError}
-                                        </div>
-                                    )}
-                                    {userRole === 'admin' && editingEvent && (
-                                        <div className="bg-red-50 p-4 rounded-2xl border-2 border-red-200 text-red-800 text-xs font-bold flex items-center gap-3"><Icons.Lock /> Slot Terkunci. Hanya Supervisor boleh mengubah atau memadam slot yang telah disimpan.</div>
-                                    )}
+                                    {modalError && <div className="bg-red-100 p-4 rounded-2xl border-2 border-red-300 text-red-800 text-xs font-bold flex items-center gap-3">⚠️ {modalError}</div>}
+                                    {userRole === 'admin' && editingEvent && <div className="bg-red-50 p-4 rounded-2xl border-2 border-red-200 text-red-800 text-xs font-bold flex items-center gap-3"><Icons.Lock /> Slot Terkunci. Hanya Supervisor boleh mengubah atau memadam slot yang telah disimpan.</div>}
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-1">
                                             <label className="text-[11px] font-black text-slate-400 uppercase">Kod Kursus</label>
@@ -1224,11 +1074,7 @@
                                     </div>
 
                                     <div className="pt-1">
-                                        <button 
-                                            onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain' })); }} 
-                                            className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Lain-lain' ? 'bg-slate-800 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>
-                                            {formData.type === 'Lain-lain' ? 'AKTIVITI LAIN-LAIN (LL) AKTIF' : 'KLIK UNTUK PENGISIAN LAIN-LAIN (LL)'}
-                                        </button>
+                                        <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Lain-lain' ? 'bg-slate-800 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Lain-lain' ? 'AKTIVITI LAIN-LAIN (LL) AKTIF' : 'KLIK UNTUK PENGISIAN LAIN-LAIN (LL)'}</button>
                                     </div>
                                     
                                     {formData.type !== 'Lain-lain' && (
@@ -1236,7 +1082,7 @@
                                             <label className="text-[11px] font-black text-slate-400 uppercase">Jenis Sesi</label>
                                             <div className="flex flex-wrap gap-2 text-black">
                                                 {sessionTypes.map(t => (
-                                                    <button key={t.value} onClick={(e) => { e.preventDefault(); setFormData({...formData, type: t.value}); }} className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all border-2 ${formData.type === t.value ? t.color + ' border-blue-600 shadow-md scale-105' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'}`}> {t.label} </button>
+                                                    <button key={t.value} onClick={(e) => { e.preventDefault(); setFormData({...formData, type: t.value}); }} className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all border-2 ${formData.type === t.value ? t.color + ' border-blue-600 shadow-md scale-105' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'}`}>{t.label}</button>
                                                 ))}
                                             </div>
                                         </div>
@@ -1251,27 +1097,13 @@
 
                                     <div className="space-y-1 text-black">
                                         <label className="text-[11px] font-black text-slate-400 uppercase">{formData.type === 'Lain-lain' ? 'Nama Aktiviti / Perkara' : 'Tajuk Pembelajaran'}</label>
-                                        
-                                        {/* Dropdown Isi Pantas Tajuk (Sentiasa Kelihatan) */}
                                         {formData.type !== 'Lain-lain' && (
-                                            <select 
-                                                className="w-full p-3 mb-2 bg-emerald-50 border-2 border-emerald-400 rounded-xl font-black text-[11px] text-emerald-900 shadow-sm outline-none cursor-pointer"
-                                                onChange={(e) => {
-                                                    if(e.target.value) setFormData({...formData, topic: e.target.value});
-                                                    e.target.value = ""; 
-                                                }}
-                                            >
+                                            <select className="w-full p-3 mb-2 bg-emerald-50 border-2 border-emerald-400 rounded-xl font-black text-[11px] text-emerald-900 shadow-sm outline-none cursor-pointer" onChange={(e) => { if(e.target.value) setFormData({...formData, topic: e.target.value}); e.target.value = ""; }}>
                                                 <option value="">⬇️ KLIK SINI UNTUK SENARAI TAJUK SILIBUS ⬇️</option>
-                                                {formData.courseCode && courseTopics[formData.courseCode] && courseTopics[formData.courseCode].map((tajuk, idx) => (
-                                                    <option key={idx} value={tajuk}>{tajuk}</option>
-                                                ))}
-                                                {(!formData.courseCode || !courseTopics[formData.courseCode] || courseTopics[formData.courseCode].length === 0) && (
-                                                    <option value="" disabled>-- Tiada senarai tajuk dimasukkan untuk kursus ini --</option>
-                                                )}
+                                                {formData.courseCode && courseTopics[formData.courseCode] && courseTopics[formData.courseCode].map((tajuk, idx) => <option key={idx} value={tajuk}>{tajuk}</option>)}
                                             </select>
                                         )}
-
-                                        <textarea rows="3" className="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none font-bold text-sm text-black shadow-sm" placeholder={formData.type === 'Lain-lain' ? "Sila catat maklumat aktiviti..." : "Taip secara manual atau pilih dari senarai dropdown di atas..."} value={formData.topic || ''} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
+                                        <textarea rows="3" className="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none font-bold text-sm text-black shadow-sm" placeholder={formData.type === 'Lain-lain' ? "Sila catat maklumat aktiviti..." : "Taip secara manual..."} value={formData.topic || ''} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
                                     </div>
                                     <div className="space-y-1 text-black">
                                         <label className="text-[11px] font-black text-slate-400 uppercase">Nama Pengajar / Pegawai Bertanggungjawab</label>
@@ -1282,13 +1114,9 @@
                                     </div>
                                 </div>
                                 <div className="p-10 bg-slate-50 border-t-2 flex gap-4">
-                                    {!(userRole === 'admin' && editingEvent) && (
-                                        <button onClick={(e) => { e.preventDefault(); setFormData(p => ({...p, topic: '', instructor: '', sessionNumber: ''}))}} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border-2 active:scale-90 transition-all uppercase tracking-widest"><Icons.Undo /> Undo</button>
-                                    )}
+                                    {!(userRole === 'admin' && editingEvent) && ( <button onClick={(e) => { e.preventDefault(); setFormData(p => ({...p, topic: '', instructor: '', sessionNumber: ''}))}} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border-2 active:scale-90 transition-all uppercase tracking-widest"><Icons.Undo /> Undo</button> )}
                                     {editingEvent && userRole === 'superuser' && ( <button onClick={handleDelete} className="p-5 bg-white text-red-600 border-2 border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all"><Icons.Trash /></button> )}
-                                    {!(userRole === 'admin' && editingEvent) && (
-                                        <button onClick={handleSave} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 shadow-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2"> <Icons.Save /> Simpan Rekod </button>
-                                    )}
+                                    {!(userRole === 'admin' && editingEvent) && ( <button onClick={handleSave} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 shadow-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2"> <Icons.Save /> Simpan Rekod </button> )}
                                 </div>
                             </div>
                         </div>
@@ -1341,7 +1169,7 @@
                         </div>
                     )}
 
-                    {/* MODAL SET AGIHAN (Superuser Only) */}
+                    {/* MODAL SET AGIHAN */}
                     {isLimitModalOpen && (
                         <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm no-print animate-in fade-in">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-indigo-600 flex flex-col text-black">
