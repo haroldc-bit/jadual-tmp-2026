@@ -458,8 +458,10 @@
                 if (userRole === 'viewer') return;
                 setModalError(""); 
 
-                // KEMAS KINI MUKTAMAD: Pengajar DTMP2026 (admin) kini dibenarkan mengedit slot disimpan!
-                // Pengesahan sekatan save telah dibuang sepenuhnya untuk admin.
+                if (userRole === 'admin' && editingEvent) {
+                    setModalError("Ralat: Slot yang telah disimpan tidak boleh diubah. Sila hubungi Supervisor.");
+                    return;
+                }
 
                 const finalCode = formData.type === 'Lain-lain' ? 'Lain-Lain' : formData.courseCode;
                 
@@ -509,6 +511,7 @@
                     semester: formData.semester,
                     duration: parseInt(formData.duration) || 1,
                     sessionNumber: formData.sessionNumber || '',
+                    align: formData.align || 'left', // TAMBAHAN: Menyimpan konfigurasi penjajaran teks
                     cycle: academicCycle,
                     session: academicSession,
                     lastUpdate: Date.now(),
@@ -697,11 +700,12 @@
                     setFormData({ 
                         ...event, 
                         customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode,
-                        benchTutors: event.benchTutors || ''
+                        benchTutors: event.benchTutors || '',
+                        align: event.align || 'left' // TAMBAHAN: Muatkan data penjajaran teks jika ada
                     });
                     setEditingEvent(event);
                 } else {
-                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', benchTutors: '', duration: 1, sessionNumber: '' });
+                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', benchTutors: '', duration: 1, sessionNumber: '', align: 'left' });
                     setEditingEvent(null);
                 }
                 setIsModalOpen(true);
@@ -964,7 +968,7 @@
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
                             <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
                             <div className="flex justify-center mb-3 mt-2" style={{ minHeight: '90px', alignItems: 'center', justifyContent: 'center' }}>
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" alt="Jata Negara" style={{ width: '90px', height: '90px', objectFit: 'contain', display: 'block' }} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" alt="Jata Negara Malaysia" style={{ width: '90px', height: '90px', objectFit: 'contain', display: 'block' }} crossOrigin="anonymous" referrerPolicy="no-referrer" />
                             </div>
                             <h1 className="text-lg font-black uppercase leading-tight mt-3">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-base font-bold uppercase underline underline-offset-4 tracking-wide">Jadual Waktu Mingguan</h2>
@@ -1057,25 +1061,26 @@
                                                                 const isMatch = searchTerm && searchTerm.trim() !== "" && ev && ev.courseCode && (ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase())));
 
                                                                 return (
-                                                                    <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
-                                                                        <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${ev && ev.courseCode ? `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4'}` : 'border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200'} ${isMatch ? 'search-match' : ''} ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : ''}`}>
-                                                                            {ev && ev.courseCode ? (
-                                                                                <React.Fragment>
-                                                                                    <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0">
-                                                                                        {ev.courseCode} {ev.sessionNumber ? `${sessionInitials[ev.type].replace(')', ev.sessionNumber + ')')}` : sessionInitials[ev.type] || '(L)'}
-                                                                                        {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
-                                                                                    </div>
-                                                                                    <div className="font-bold leading-tight mb-1 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>{ev.topic}</div>
-                                                                                    <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">
-                                                                                        {ev.instructor} {ev.benchTutors ? `/ ${ev.benchTutors}` : ''}
-                                                                                    </div>
-                                                                                </React.Fragment>
-                                                                            ) : (userRole !== 'viewer' && <Icons.Plus />)}
-                                                                        </div>
-                                                                    </td>
-                                                                );
-                                                            })
-                                                        )}
+                                                                <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
+                                                                    <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${ev && ev.courseCode ? `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4'}` : 'border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200'} ${isMatch ? 'search-match' : ''} ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : ''}`}>
+                                                                        {ev && ev.courseCode ? (
+                                                                            <React.Fragment>
+                                                                                <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0">
+                                                                                    {ev.courseCode} {ev.sessionNumber ? `${sessionInitials[ev.type].replace(')', ev.sessionNumber + ')')}` : sessionInitials[ev.type] || '(L)'}
+                                                                                    {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
+                                                                                </div>
+                                                                                {/* TAMBAHAN: Membaca dan melaksanakan penjajaran teks dinamik */}
+                                                                                <div className="font-bold leading-tight mb-1 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', textAlign: ev.align || 'left' }}>{ev.topic}</div>
+                                                                                <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">
+                                                                                    {ev.instructor} {ev.benchTutors ? `/ ${ev.benchTutors}` : ''}
+                                                                                </div>
+                                                                            </React.Fragment>
+                                                                        ) : (userRole !== 'viewer' && <Icons.Plus />)}
+                                                                    </div>
+                                                                </td>
+                                                            );
+                                                        })
+                                                    )}
                                                     </tr>
                                                 );
                                             });
@@ -1264,6 +1269,30 @@
                                         <textarea rows="3" className="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none font-bold text-sm text-black shadow-sm" placeholder={formData.type === 'Lain-lain' ? "Sila catat maklumat aktiviti..." : "Taip secara manual..."} value={formData.topic || ''} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
                                     </div>
                                     
+                                    {/* TAMBAHAN: Panel Pilihan Penjajaran Teks (Align Left, Center, Right, Justify) */}
+                                    <div className="space-y-1 text-black">
+                                        <label className="text-[11px] font-black text-slate-400 uppercase">Susun Atur Perkataan (Alignment)</label>
+                                        <div className="flex gap-2">
+                                            {['left', 'center', 'right', 'justify'].map((alignMode) => (
+                                                <button
+                                                    key={alignMode}
+                                                    type="button"
+                                                    onClick={(e) => { e.preventDefault(); setFormData({ ...formData, align: alignMode }); }}
+                                                    className={`flex-1 py-3 px-2 rounded-2xl text-[11px] font-black uppercase border-2 transition-all active:scale-95 ${
+                                                        (formData.align || 'left') === alignMode
+                                                            ? 'bg-blue-600 border-blue-600 text-white shadow-md'
+                                                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                                                    }`}
+                                                >
+                                                    {alignMode === 'left' && '⬅️ Kiri'}
+                                                    {alignMode === 'center' && '⬜ Tengah'}
+                                                    {alignMode === 'right' && '➡️ Kanan'}
+                                                    {alignMode === 'justify' && '↔️ Sisi'}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
                                     <div className="space-y-1 text-black">
                                         <label className="text-[11px] font-black text-slate-400 uppercase">Nama Pengajar / Pegawai Bertanggungjawab</label>
                                         <select className="w-full p-4 bg-slate-50 border-2 rounded-2xl font-black text-sm text-black shadow-sm" value={formData.instructor || ''} onChange={(e) => setFormData({...formData, instructor: e.target.value})}>
