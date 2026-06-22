@@ -234,7 +234,7 @@
             const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
             const [editingEvent, setEditingEvent] = useState(null);
             const [lastUpdatedKey, setLastUpdatedKey] = useState(null);
-            const [formData, setFormData] = useState({ id: '', day: '', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', benchTutors: '', semester: '', duration: 1, sessionNumber: '' });
+            const [formData, setFormData] = useState({ id: '', day: '', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', benchTutors: '', semester: '', duration: 1, sessionNumber: '', align: 'left' });
             const [tableWidth, setTableWidth] = useState(0);
             const [modalError, setModalError] = useState("");
 
@@ -1061,26 +1061,26 @@
                                                                 const isMatch = searchTerm && searchTerm.trim() !== "" && ev && ev.courseCode && (ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase())));
 
                                                                 return (
-                                                                <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
-                                                                    <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${ev && ev.courseCode ? `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4'}` : 'border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200'} ${isMatch ? 'search-match' : ''} ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : ''}`}>
-                                                                        {ev && ev.courseCode ? (
-                                                                            <React.Fragment>
-                                                                                <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0">
-                                                                                    {ev.courseCode} {ev.sessionNumber ? `${sessionInitials[ev.type].replace(')', ev.sessionNumber + ')')}` : sessionInitials[ev.type] || '(L)'}
-                                                                                    {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
-                                                                                </div>
-                                                                                {/* TAMBAHAN: Membaca dan melaksanakan penjajaran teks dinamik */}
-                                                                                <div className="font-bold leading-tight mb-1 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', textAlign: ev.align || 'left' }}>{ev.topic}</div>
-                                                                                <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">
-                                                                                    {ev.instructor} {ev.benchTutors ? `/ ${ev.benchTutors}` : ''}
-                                                                                </div>
-                                                                            </React.Fragment>
-                                                                        ) : (userRole !== 'viewer' && <Icons.Plus />)}
-                                                                    </div>
-                                                                </td>
-                                                            );
-                                                        })
-                                                    )}
+                                                                    <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
+                                                                        <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${ev && ev.courseCode ? `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4'}` : 'border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200'} ${isMatch ? 'search-match' : ''} ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : ''}`}>
+                                                                            {ev && ev.courseCode ? (
+                                                                                <React.Fragment>
+                                                                                    <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0">
+                                                                                        {ev.courseCode} {ev.sessionNumber ? `${sessionInitials[ev.type].replace(')', ev.sessionNumber + ')')}` : sessionInitials[ev.type] || '(L)'}
+                                                                                        {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
+                                                                                    </div>
+                                                                                    {/* PERBAIKAN UTAMA: whitespace-pre-wrap ditambah kembali di sini untuk membolehkan teks enter berfungsi */}
+                                                                                    <div className="font-bold leading-tight mb-1 flex-1 overflow-y-auto whitespace-pre-wrap" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', textAlign: ev.align || 'left' }}>{ev.topic}</div>
+                                                                                    <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">
+                                                                                        {ev.instructor} {ev.benchTutors ? `/ ${ev.benchTutors}` : ''}
+                                                                                    </div>
+                                                                                </React.Fragment>
+                                                                            ) : (userRole !== 'viewer' && <Icons.Plus />)}
+                                                                        </div>
+                                                                    </td>
+                                                                );
+                                                            })
+                                                        )}
                                                     </tr>
                                                 );
                                             });
@@ -1103,7 +1103,7 @@
                                             <select 
                                                 value={footerSemActive} 
                                                 onChange={e => setFooterSemActive(e.target.value)}
-                                                className="bg-white border text-[10px] font-bold p-1 rounded outline-none text-black"
+                                                className="bg-white border text-[10px] font-bold p-1 rounded outline-none text-black animate-none"
                                             >
                                                 {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
                                             </select>
