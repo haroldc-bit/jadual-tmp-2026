@@ -307,7 +307,7 @@
                     "AMALI: Introduction to Urine Analysis"
                 ],
                 "MTMM 2043": [
-                    "KULIAH: Universal Precautions & Safety in Medical Microbiology Laboratory", "KULIAH: Instrumentation in Medical Microbiology Laboratory", "KULIAH: Disinfection and Sterilization", "KULIAH: Specimen Collection and Transportations", "KULIAH: Bacteria Growth and Nutrition", "KULIAH: Culture Media", "KULIAH: Basic Technique in Microbiology", "KULIAH: Colony Morphology Characteristics of Microorganism on Media Culture", "KULIAH: Staining and Microscopic Examination", "KULIAH: Biochemical Test for Gram Positive Bacteria", "KULIAH: Biochemical Test for Gram Negative Bacteria", "KULIAH: Antimicrobial Susceptibility Test", "KULIAH: Bacteria Count", "KULIAH: Normal Flora Microorganism", "KULIAH: Staphylococcus spp", "KULIAH: Streptococcus spp", "KULIAH: Corynebacterium spp", "KULIAH: Bacillus spp", "KULIAH: Clostridium spp", "KULIAH: Listeria spp", "KULIAH: Escherichia coli", "KULIAH: Klebsiella spp", "KULIAH: Enterobacter spp", "KULIAH: Salmonella spp", "KULIAH: Shigella spp", "KULIAH: Tribe Protea (Proteus spp, Providencia spp, Morganella spp)", "KULIAH: Pseudomonas spp", "KULIAH: Vibrio spp", "KULIAH: Neisseria spp", "KULIAH: Haemophilus spp & Bordetella spp", "KULIAH: Acinetobacter spp", "KULIAH: Mycobacterium tuberculosis", "KULIAH: Mycobacterium leprae", "KULIAH: Atypical Mycobacterium", "KULIAH: Candida spp", "KULIAH: Cryptococcus spp", "KULIAH: Other Important Fungi (Aspergillus sp, Fusarium sp & Pneumocystitis carinii)",
+                    "KULIAH: Universal Precautions & Safety in Medical Microbiology Laboratory", "KULIAH: Instrumentation in Medical Microbiology Laboratory", "KULIAH: Disinfection and Sterilization", "KULIAH: Specimen Collection and Transportations", "KULIAH: Bacteria Growth and Nutrition", "KULIAH: Culture Media", "KULIAH: Basic Technique in Microbiology", "KULIAH: Colony Morphology Characteristics of Microorganism on Media Culture", "KULIAH: Staining and Microscopic Examination", "KULIAH: Biochemical Test for Gram Positive Bacteria", "KULIAH: Biochemical Test for Gram Negative Bacteria", "KULIAH: Antimicrobial Susceptibility Test", "KULIAH: Bacteria Count", "KULIAH: Normal Flora Microorganism", "KULIAH: Staphylococcus spp", "KULIAH: Streptococcus spp", "KULIAH: Corynebacterium spp", "KULIAH: Bacillus spp", "KULIAH: Clostridium spp", "KULIAH: Listeria spp", "KULIAH: Escherichia coli", "KULIAH: Klebsiella spp", "KULIAH: Enterobacter spp", "KULIAH: Salmonella spp", "KULIAH: Shigella spp", "KULIAH: Tribe Protea (Proteus spp, Providencia spp, Morganella spp)", "KULIAH: Pseudomonas spp", "KULIAH: Vibrio spp", "KULIAH: Neisseria spp", "KULIAH: Haemophilus spp & Bordetella spp", "KULIAH: Acinetobacter spp", "KULIAH: Mycobacterium tuberculosis", "KULIAH: Mycobacterium leprae", "KULIAH: Atypical Mycobacterium", "KULIAH: Candida spp", "KULIAH: Cryptococcus spp", "KULIAH: Other Important Fungi (Aspergillus p, Fusarium sp & Pneumocystitis carinii)",
                     "TUTORIAL: Biochemical Test for Gram Positive Bacteria", "TUTORIAL: Biochemical Test for Gram Negative Bacteria", "TUTORIAL: Staphylococcus spp", "TUTORIAL: Escherichia coli", "TUTORIAL: Tribe Protea (Proteus spp, Providencia spp, Morganella spp)", "TUTORIAL: Mycobacterium tuberculosis"
                 ],
                 "MTGC 2074": [
@@ -393,7 +393,7 @@
                     "AMALI: Carbohydrate Stains", "AMALI: Connective Tissues and Amyloid", "AMALI: Microorganisms", "AMALI: Pigments and Minerals", "AMALI: Immunohistochemical Test"
                 ],
                 "CCRM 2013": [
-                    "KULIAH: Introduction to Basic Research Methodology", "KULIAH: Research Problem Research Question and Hypothesis", "KULIAH: Literature Review", "KULIAH: Research Design", "KULIAH: Data Analysis", "KULIAH: Report Writing Technique", "KULIAH: Introduction To Statistics", "KULIAH: Descriptive Statistics", "KULIAH: Computer software Application",
+                    "KULIAH: Introduction to Basic Research Methodology", "KULIAH: Research Problem Research Question and Hypothesis", "KULIAH: Literature Review", "Research Design", "KULIAH: Data Analysis", "KULIAH: Report Writing Technique", "KULIAH: Introduction To Statistics", "KULIAH: Descriptive Statistics", "KULIAH: Computer software Application",
                     "TUTORIAL: Research Problem Research Question and Hypothesis", "TUTORIAL: Literature Review", "TUTORIAL: Research Design", "TUTORIAL: Descriptive Statistics",
                     "AMALI: Literature Review", "AMALI: Computer software Application"
                 ]
@@ -459,9 +459,6 @@
                 if (userRole === 'viewer') return;
                 setModalError(""); 
 
-                // PEMBETULAN UTAMA: Pengajar lain (Admin) kini dibenarkan untuk mengedit dan menyimpan semula mana-mana slot waktu yang telah disimpan, walaupun asalnya disimpan oleh superuser/supervisor.
-                // Sekatan `if (userRole === 'admin' && editingEvent)` telah dikeluarkan sepenuhnya di sini.
-
                 // Termasuk "IL" dalam penentuan pengecualian kod kursus agihan jam
                 const finalCode = (formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? 'Lain-Lain' : formData.courseCode;
                 
@@ -479,7 +476,8 @@
                 }
 
                 if (formData.instructor && formData.instructor.trim() !== "" && formData.instructor !== "Lain-lain") {
-                    const isConflict = Object.values(events).some(ev => {
+                    // PENAMBAHBAIKAN: Membuat pengecualian semakan pertembungan pengajar jika Minggu 1 aktif
+                    const isConflict = selectedWeek === 1 ? false : Object.values(events).some(ev => {
                         if (!ev || ev.instructor !== formData.instructor) return false;
                         if (ev.session !== academicSession || ev.cycle !== academicCycle || ev.selectedWeek !== selectedWeek || ev.day !== formData.day) return false;
                         if (ev.semester === formData.semester) return false;
@@ -538,7 +536,6 @@
 
             const handleDelete = async (e) => {
                 if (e) e.preventDefault();
-                // Sekat admin daripada memadam slot yang disimpan secara terus. Hanya Superuser boleh padam.
                 if (userRole === 'viewer' || userRole === 'admin') return;
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 
@@ -962,10 +959,18 @@
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
                             <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPL.KKM.PK(T) 048B/17</div>
-                            <div className="flex justify-center mb-3 mt-2" style={{ minHeight: '90px', alignItems: 'center', justifyContent: 'center' }}>
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" alt="Jata Negara Malaysia" style={{ width: '90px', height: '90px', objectFit: 'contain', display: 'block' }} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                            <div className="flex justify-center mb-1">
+                                <img 
+                                    src="https://www.parlimen.gov.my/images/webdev/logo/jata-negara.png" 
+                                    alt="Jata Negara" 
+                                    className="h-16 w-auto object-contain" 
+                                    onError={(e) => { 
+                                        e.target.onerror = null; 
+                                        e.target.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png"; 
+                                    }} 
+                                />
                             </div>
-                            <h1 className="text-lg font-black uppercase leading-tight mt-3">KEMENTERIAN KESIHATAN MALAYSIA</h1>
+                            <h1 className="text-lg font-black uppercase leading-tight">KEMENTERIAN KESIHATAN MALAYSIA</h1>
                             <h2 className="text-base font-bold uppercase underline underline-offset-4 tracking-wide">Jadual Waktu Mingguan</h2>
                             
                             <div className="mt-6 flex flex-col text-left gap-2 font-sans">
@@ -1028,57 +1033,52 @@
                                                             </td>
                                                         )}
                                                         <td className="p-2 bg-white text-center font-black text-[11px] border-r border-black">{sem}</td>
-                                                        
-                                                        {weekStatus !== "NORMAL" ? (
-                                                            sIdx === 0 ? (
-                                                                <td colSpan={timeSlots.length} rowSpan={vSems.length} className="bg-slate-200 border-r border-black p-4 text-center align-middle relative overflow-hidden">
-                                                                    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 8px)' }}></div>
-                                                                    <span className="relative z-10 text-xl md:text-2xl font-black uppercase tracking-[0.3em] text-slate-600 opacity-90">{weekStatus}</span>
+                                                        {timeSlots.map((slot, slotIdx) => {
+                                                            if (skips.includes(slotIdx)) return null;
+                                                            const key = `${academicSession}-${selectedWeek}-${day}-${sem}-${slotIdx}`;
+                                                            const ev = events[key];
+                                                            const isBreak = isSlotBreak(day, slotIdx);
+                                                            const isHoliday = holidays[`${academicCycle}-${selectedWeek}-${day}`];
+                                                            
+                                                            if (isHoliday) {
+                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-rose-50/60 border-r border-black p-2 text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] text-rose-500 opacity-80">CUTI (HKA / CT)</span> </td>);
+                                                                return null;
+                                                            }
+                                                            if (isBreak) {
+                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border-r border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">REHAT</span> </td>);
+                                                                return null;
+                                                            }
+
+                                                            let colSpan = 1;
+                                                            if (ev && ev.duration > 1) { for(let i=1; i<ev.duration; i++) { if(!isSlotBreak(day, slotIdx+i)) { colSpan++; skips.push(slotIdx+i); } else break; } }
+                                                            
+                                                            const isMatch = searchTerm && searchTerm.trim() !== "" && ev && ev.courseCode && (
+                                                                ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase()))
+                                                            );
+
+                                                            return (
+                                                                <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
+                                                                    <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${ev && ev.courseCode ? `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4'}` : 'border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200'} ${isMatch ? 'search-match' : ''} ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : ''}`}>
+                                                                        {ev && ev.courseCode ? (
+                                                                            <React.Fragment>
+                                                                                <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0 min-h-[16px]">
+                                                                                    {ev.type === 'IL' ? (
+                                                                                        "INDEPENDENT LEARNING (IL)"
+                                                                                    ) : !(ev.type === 'Lain-lain' || ev.type === 'Taklimat' || ev.type === 'Penyediaan' || ev.courseCode.toUpperCase() === 'LAIN-LAIN') ? (
+                                                                                        `${ev.courseCode} ${ev.sessionNumber ? `${sessionInitials[ev.type].replace(')', ev.sessionNumber + ')')}` : sessionInitials[ev.type] || '(L)'}`
+                                                                                    ) : ""}
+                                                                                    {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
+                                                                                </div>
+                                                                                <div className="font-bold leading-tight mb-1 flex-1 overflow-y-auto whitespace-pre-wrap" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', textAlign: ev.align || 'left' }}>{ev.topic}</div>
+                                                                                <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">
+                                                                                    {ev.instructor} {ev.benchTutors ? `/ ${ev.benchTutors}` : ''}
+                                                                                </div>
+                                                                            </React.Fragment>
+                                                                        ) : (userRole !== 'viewer' && <Icons.Plus />)}
+                                                                    </div>
                                                                 </td>
-                                                            ) : null
-                                                        ) : (
-                                                            timeSlots.map((slot, slotIdx) => {
-                                                                if (skips.includes(slotIdx)) return null;
-                                                                const key = `${academicSession}-${selectedWeek}-${day}-${sem}-${slotIdx}`; const ev = events[key];
-                                                                const isBreak = isSlotBreak(day, slotIdx); const isHoliday = holidays[`${academicCycle}-${selectedWeek}-${day}`];
-                                                                
-                                                                if (isHoliday) {
-                                                                    if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-rose-50/60 border-r border-black p-2 text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] text-rose-500 opacity-80">CUTI (HKA / CT)</span> </td>);
-                                                                    return null;
-                                                                }
-                                                                if (isBreak) {
-                                                                    if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border-r border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">REHAT</span> </td>);
-                                                                    return null;
-                                                                }
-
-                                                                let colSpan = 1;
-                                                                if (ev && ev.duration > 1) { for(let i=1; i<ev.duration; i++) { if(!isSlotBreak(day, slotIdx+i)) { colSpan++; skips.push(slotIdx+i); } else break; } }
-                                                                const isMatch = searchTerm && searchTerm.trim() !== "" && ev && ev.courseCode && (ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase())));
-
-                                                                return (
-                                                                    <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
-                                                                        <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${ev && ev.courseCode ? `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4'}` : 'border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200'} ${isMatch ? 'search-match' : ''} ${userRole !== 'viewer' ? 'cursor-pointer active:scale-95' : ''}`}>
-                                                                            {ev && ev.courseCode ? (
-                                                                                <React.Fragment>
-                                                                                    <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0 min-h-[16px]">
-                                                                                        {ev.type === 'IL' ? (
-                                                                                            "INDEPENDENT LEARNING (IL)"
-                                                                                        ) : !(ev.type === 'Lain-lain' || ev.type === 'Taklimat' || ev.type === 'Penyediaan' || ev.courseCode.toUpperCase() === 'LAIN-LAIN') ? (
-                                                                                            `${ev.courseCode} ${ev.sessionNumber ? `${sessionInitials[ev.type].replace(')', ev.sessionNumber + ')')}` : sessionInitials[ev.type] || '(L)'}`
-                                                                                        ) : ""}
-                                                                                        {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
-                                                                                    </div>
-                                                                                    <div className="font-bold leading-tight mb-1 flex-1 overflow-y-auto whitespace-pre-wrap" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', textAlign: ev.align || 'left' }}>{ev.topic}</div>
-                                                                                    <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">
-                                                                                        {ev.instructor} {ev.benchTutors ? `/ ${ev.benchTutors}` : ''}
-                                                                                    </div>
-                                                                                </React.Fragment>
-                                                                            ) : (userRole !== 'viewer' && <Icons.Plus />)}
-                                                                        </div>
-                                                                    </td>
-                                                                );
-                                                            })
-                                                        )}
+                                                            );
+                                                        })}
                                                     </tr>
                                                 );
                                             });
@@ -1087,14 +1087,12 @@
                                 </table>
                             </div>
                             
-                            {/* KEMAS KINI STRUKTUR FOOTER: DINAMIK IKUT KORT SEMESTER (Bebas Lag & Mempunyai Butang Clear/Simpan) */}
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
                                 <div className="space-y-4">
                                     <p className="uppercase text-slate-800 tracking-wider">
                                         DISEDIAKAN OLEH: <span className="text-blue-600 font-black">({semesterLabels[footerSemActive]})</span>
                                     </p>
                                     
-                                    {/* Pemilih Tahun & Semester di bahagian tandatangan */}
                                     {filterSemester === 'SEMUA' && userRole !== 'viewer' && (
                                         <div className="flex items-center gap-2 no-print bg-slate-50 p-2 rounded-xl border border-slate-100">
                                             <span className="text-[10px] text-slate-400 uppercase font-black">Kohort Kemasukan:</span>
@@ -1108,7 +1106,6 @@
                                         </div>
                                     )}
 
-                                    {/* Dropdown Pembantu Pemilihan Nama Pengajar */}
                                     {userRole !== 'viewer' && (
                                         <div className="flex items-center gap-2 no-print bg-slate-50 p-2 rounded-xl border border-slate-100">
                                             <span className="text-[10px] text-slate-400 uppercase font-black">Pilih Nama Cepat:</span>
@@ -1126,7 +1123,6 @@
                                         </div>
                                     )}
 
-                                    {/* Input Nama Rasmi */}
                                     <div className="border-b border-black pb-1 space-y-1">
                                         <div className="flex items-center justify-between w-full">
                                             <div className="w-full flex items-center">
@@ -1145,7 +1141,6 @@
 
                                     <p className="mt-1 font-bold uppercase text-slate-500">PENGAJAR PENYELARAS</p>
                                     
-                                    {/* Input Tarikh Penyelaras */}
                                     <div className="border-b border-black pb-1">
                                         <div className="flex items-center w-full">
                                             <span className="shrink-0 mr-2">TARIKH:</span>
@@ -1159,7 +1154,6 @@
                                         </div>
                                     </div>
 
-                                    {/* Butang Aksi Pengurusan (DISEMBUNYIKAN SEPENUHNYA DARI TRAINEE/VIEWER) */}
                                     {userRole !== 'viewer' && (
                                         <div className="flex gap-2 pt-2 no-print">
                                             <button 
@@ -1185,11 +1179,10 @@
                                         </div>
                                     )}
                                 </div>
-
                                 <div>
-                                    <p className="uppercase text-slate-800 tracking-wider">DISAHKAN OLEH:</p>
+                                    <p>DISAHKAN OLEH:</p>
                                     <div className="mt-8 border-b border-black flex gap-2">NAMA: <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} /></div>
-                                    <p className="mt-1 font-bold uppercase text-slate-500">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
+                                    <p className="mt-1 font-bold uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
                                     <div className="mt-4 flex gap-2">TARIKH: <input type="date" className="bg-transparent outline-none font-bold" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} /></div>
                                 </div>
                                 <div className="col-span-2 text-center pt-8 opacity-40 text-[9px] italic">** Harold Criso Anak Ajin **</div>
