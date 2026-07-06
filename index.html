@@ -256,7 +256,7 @@
             const [events, setEvents] = useState({});
             const [courseLimits, setCourseLimits] = useState({}); 
             const [isTimetableLocked, setIsTimetableLocked] = useState(false); // Penambahan state kunci jadual
-            const [selectedLoginInstructor, setSelectedLoginInstructor] = useState(""); // State menyimpan pemilih nama dari dropdown log masuk
+            const [selectedLoginInstructor, setSelectedLoginInstructor] = useState(""); // State rekod nama pengajar semasa log masuk
             
             // KEMAS KINI MEMORI FOOTER (Menyimpan mengikut Semester)
             const [footerData, setFooterData] = useState({});
@@ -307,7 +307,7 @@
 
             const courseTopics = {
                 "MTIM 2013": [
-                    "KULIAH: Laboratory Hazards and Personnel Protective Equipment", "KULIAH: Glassware and Pipettes", "KULIAH: Balances", "KULIAH: Distiller & Deionizer", "KULIAH: Oven, Water Bath and Incubator", "KULIAH: Autoclave", "KULIAH: Centrifuge", "KULIAH: pH Meter", "KULIAH: Chromatography and Electrophoresis System", "KULIAH: Microscope: Components and Application", "KULIAH: The Concept and Application of Photometry", "KULIAH: Atom Structures and Periodic Tables", "KULIAH: Concept of Ion, Electrolyte, Oxidation and Reduction Reaction", "KULIAH: Acid, Base and Buffer", "KULIAH: Composition in Chemical Reagent", "KULIAH: Preparation of Reagent and Solution",
+                    "KULIAH: Laboratory Hazards and Personnel Protective Equipment", "KULIAH: Glassware and Pipettes", "KULIAH: Balances", "KULIAH: Distiller & Deionizer", "KULIAH: Oven, Water Bath and Incubator", "KULIAH: Autoclave", "KULIAH: Centrifuge", "KULIAH: pH Meter", "KULIAH: Chromatography and Electrophoresis System", "KULIAH: Microscope: Components and Application", "KULIAH: The Concept and Application of Photometry", "KULIAH: Atom Structures and Periodic Tables", "KULIAH: Concept of Ion, Electrolyte, Oxidation and Reduction Reaction", "KULIAH: Acid, Base and Buffer", "KULIAH: Composition in Chemical Reagent", "KULIAH: Application of Conversion Measurement Unit", "KULIAH: Preparation of Reagent and Solution",
                     "TUTORIAL: Laboratory Hazards and Personnel Protective Equipment", "TUTORIAL: Centrifuge", "TUTORIAL: Microscope: Components and Application", "TUTORIAL: The Concept and Application of Photometry",
                     "AMALI: Laboratory Hazards and Personnel Protective Equipment", "AMALI: Glassware and Pipettes", "AMALI: Balances", "AMALI: Distiller & Deionizer", "AMALI: Oven, Water Bath and Incubator", "AMALI: Autoclave", "AMALI: Centrifuge", "AMALI: pH Meter", "AMALI: Chromatography and Electrophoresis System", "AMALI: Microscope: Components and Application", "AMALI: The Concept and Application of Photometry", "AMALI: Composition in Chemical Reagent", "AMALI: Preparation of Reagent and Solution"
                 ]
@@ -320,7 +320,7 @@
                 const code = accessCode.trim().toUpperCase();
                 
                 // MENGAKTIFKAN LOGIK LOG MASUK BARU YANG MEMADANKAN KATA LALUAN UNIK SETIAP PENGAJAR
-                if (selectedLoginInstructor && selectedLoginInstructor !== "SUPERUSER_ADMIN" && selectedLoginInstructor !== "TRAINEE_VIEWER") {
+                if (selectedLoginInstructor && selectedLoginInstructor !== "TRAINEE_VIEWER") {
                     const correctPass = instructorPasswords[selectedLoginInstructor];
                     if (code === correctPass) {
                         setIsAuthorized(true);
@@ -335,29 +335,41 @@
                     }
                 }
 
-                // Log masuk berpusat untuk superuser, trainee, atau akses kecemasan umum (KATA LALUAN SUPERUSER KINI "PENTADBIR2026")
-                if (selectedLoginInstructor === "SUPERUSER_ADMIN" || (!selectedLoginInstructor && (code === "PENTADBIR2026" || code === "ADMIN2026" || code === "TMP2026"))) {
-                    if (code === "PENTADBIR2026" || code === "ADMIN2026" || code === "TMP2026") {
-                        setIsAuthorized(true); setUserRole('superuser'); 
-                        sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'superuser');
+                // PEMBETULAN: Semakan Kata Laluan Superuser menggunakan "PENTADBIR2026" tanpa pendedahan profil
+                if (!selectedLoginInstructor) {
+                    if (code === "PENTADBIR2026" || code === "TMP2026") {
+                        setIsAuthorized(true); 
+                        setUserRole('superuser'); 
+                        sessionStorage.setItem('tmp_auth', 'true'); 
+                        sessionStorage.setItem('tmp_role', 'superuser');
                         sessionStorage.setItem('tmp_user_name', 'SUPERUSER/SUPERVISOR');
-                        return;
-                    } else {
-                        setLoginError("Kata Laluan Superuser Salah.");
                         return;
                     }
                 }
 
-                if (selectedLoginInstructor === "TRAINEE_VIEWER" || (!selectedLoginInstructor && code === "JTMP2026")) {
+                // Pemadanan Pelatih (Trainee) apabila profil pelatih dipilih
+                if (selectedLoginInstructor === "TRAINEE_VIEWER") {
                     if (code === "JTMP2026") {
-                        setIsAuthorized(true); setUserRole('viewer'); 
-                        sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'viewer');
+                        setIsAuthorized(true); 
+                        setUserRole('viewer'); 
+                        sessionStorage.setItem('tmp_auth', 'true'); 
+                        sessionStorage.setItem('tmp_role', 'viewer');
                         sessionStorage.setItem('tmp_user_name', 'TRAINEE/VIEWER');
                         return;
                     } else {
                         setLoginError("Kata Laluan Pelatih Salah.");
                         return;
                     }
+                }
+
+                // Kebolehan masuk terus menggunakan kod pelatih (JTMP2026) tanpa pilih profil
+                if (!selectedLoginInstructor && code === "JTMP2026") {
+                    setIsAuthorized(true); 
+                    setUserRole('viewer'); 
+                    sessionStorage.setItem('tmp_auth', 'true'); 
+                    sessionStorage.setItem('tmp_role', 'viewer');
+                    sessionStorage.setItem('tmp_user_name', 'TRAINEE/VIEWER');
+                    return;
                 }
 
                 setLoginError("Kod Akses Atau Profil Salah.");
@@ -648,7 +660,7 @@
                     });
                     setEditingEvent(event);
                 } else {
-                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', benchTutors: '', duration: 1, sessionNumber: '', align: 'left' });
+                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', duration: 1, sessionNumber: '' });
                     setEditingEvent(null);
                 }
                 setIsModalOpen(true);
@@ -781,7 +793,7 @@
                                 JADUAL WAKTU MINGGUAN PROGRAM TEKNOLOGI MAKMAL PERUBATAN ILKKM KUCHING
                             </h2>
                             <form onSubmit={handleLogin} className="space-y-4">
-                                {/* PEMBETULAN MUKTAMAD: Dropdown log masuk yang bersih tanpa memaparkan profil Superuser / Kata Laluan Pelatih */}
+                                {/* PEMBETULAN MUKTAMAD: Reka bentuk borang log masuk berasaskan senarai dropdown profil yang bersih */}
                                 <div className="space-y-1 text-left">
                                     <label className="text-xs font-black text-slate-500 uppercase px-1">Pilih Profil Akses:</label>
                                     <select 
@@ -1063,131 +1075,18 @@
                                     </tbody>
                                 </table>
                             </div>
-                            
-                            {/* KEMAS KINI STRUKTUR FOOTER: DINAMIK IKUT KORT SEMESTER (Bebas Lag & Mempunyai Butang Clear/Simpan) */}
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
-                                <div className="space-y-4">
-                                    <p className="uppercase text-slate-800 tracking-wider">
-                                        DISEDIAKAN OLEH: <span className="text-blue-600 font-black">({semesterLabels[footerSemActive]})</span>
-                                    </p>
-                                    
-                                    {/* Pemilih Tahun & Semester di bahagian tandatangan */}
-                                    {filterSemester === 'SEMUA' && userRole !== 'viewer' && (
-                                        <div className="flex items-center gap-2 no-print bg-slate-50 p-2 rounded-xl border border-slate-100">
-                                            <span className="text-[10px] text-slate-400 uppercase font-black">Kohort Kemasukan:</span>
-                                            <select 
-                                                value={footerSemActive} 
-                                                onChange={e => setFooterSemActive(e.target.value)}
-                                                className="bg-white border text-[10px] font-bold p-1 rounded outline-none text-black animate-none"
-                                            >
-                                                {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
-                                            </select>
-                                        </div>
-                                    )}
-
-                                    {/* Dropdown Pembantu Pemilihan Nama Pengajar */}
-                                    {userRole !== 'viewer' && (
-                                        <div className="flex items-center gap-2 no-print bg-slate-50 p-2 rounded-xl border border-slate-100">
-                                            <span className="text-[10px] text-slate-400 uppercase font-black">Pilih Nama Cepat:</span>
-                                            <select 
-                                                value={instructorList.includes(tempPreparedName) ? tempPreparedName : ''}
-                                                onChange={e => setTempPreparedName(e.target.value)}
-                                                className="bg-white border text-[10px] font-bold p-1 rounded outline-none w-full max-w-[220px] text-black"
-                                                disabled={userRole === 'viewer'}
-                                            >
-                                                <option value="">-- Tiada / Taip Manual --</option>
-                                                {instructorList.filter(inst => inst !== 'Lain-lain').map(inst => (
-                                                    <option key={inst} value={inst}>{inst}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    )}
-
-                                    {/* Input Nama Rasmi */}
-                                    <div className="border-b border-black pb-1 space-y-1">
-                                        <div className="flex items-center justify-between w-full">
-                                            <div className="w-full flex items-center">
-                                                <span className="shrink-0 mr-2">NAMA:</span>
-                                                {userRole === 'viewer' ? (
-                                                    <span className="font-black uppercase text-blue-800">{tempPreparedName || 'TIADA REKOD PENYELARAS'}</span>
-                                                ) : (
-                                                    <input 
-                                                        type="text" 
-                                                        className="bg-transparent outline-none w-full font-black uppercase text-blue-800 animate-none" 
-                                                        value={tempPreparedName} 
-                                                        onChange={e => setTempPreparedName(e.target.value)}
-                                                        placeholder="SILA PILIH NAMA ATAU TAIP MANUAL DI SINI"
-                                                    />
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <p className="mt-1 font-bold uppercase text-slate-500">PENGAJAR PENYELARAS</p>
-                                    
-                                    {/* Input Tarikh Penyelaras */}
-                                    <div className="border-b border-black pb-1">
-                                        <div className="flex items-center w-full">
-                                            <span className="shrink-0 mr-2">TARIKH:</span>
-                                            {userRole === 'viewer' ? (
-                                                <span className="font-bold text-blue-800">{tempPreparedDate ? formatDateDisplay(tempPreparedDate) : ''}</span>
-                                            ) : (
-                                                <input 
-                                                    type="date" 
-                                                    className="bg-transparent outline-none font-bold text-blue-800 animate-none" 
-                                                    value={tempPreparedDate} 
-                                                    onChange={e => setTempPreparedDate(e.target.value)}
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Butang Aksi Pengurusan (DISEMBUNYIKAN SEPENUHNYA DARI TRAINEE/VIEWER) */}
-                                    {userRole !== 'viewer' && (
-                                        <div className="flex gap-2 pt-2 no-print">
-                                            <button 
-                                                onClick={(e) => { e.preventDefault(); savePenyelaras(footerSemActive, tempPreparedName, tempPreparedDate); }}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white font-black text-[9px] uppercase px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1"
-                                            >
-                                                💾 Simpan Penyelaras
-                                            </button>
-                                            <button 
-                                                onClick={handleClearPenyelaras}
-                                                className="bg-red-50 hover:bg-red-100 text-red-600 font-black text-[9px] uppercase px-3 py-2.5 rounded-xl border border-red-200 transition-all active:scale-95"
-                                                title="Padam input semasa"
-                                            >
-                                                🗑️ Clear
-                                            </button>
-                                            <button 
-                                                onClick={handleUndoPenyelaras}
-                                                className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-[9px] uppercase px-3 py-2.5 rounded-xl border transition-all active:scale-95"
-                                                title="Kembali ke rekod terakhir"
-                                            >
-                                                ↩️ Undo
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-
                                 <div>
-                                    <p className="uppercase text-slate-800 tracking-wider">DISAHKAN OLEH:</p>
-                                    <div className="mt-8 border-b border-black flex gap-2">
-                                        NAMA: {userRole === 'viewer' ? (
-                                            <span className="font-black uppercase">{footerData.verifiedName || ''}</span>
-                                        ) : (
-                                            <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} />
-                                        )}
-                                    </div>
-                                    <p className="mt-1 font-bold uppercase text-slate-500">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
-                                    
-                                    {/* PENAMBAHBAIKAN: Menyembunyikan input tarikh datepicker di sudut kanan bawah ( verifiedDate ) daripada pelatih */}
-                                    <div className="mt-4 flex gap-2">
-                                        TARIKH: {userRole === 'viewer' ? (
-                                            <span className="font-bold">{footerData.verifiedDate ? formatDateDisplay(footerData.verifiedDate) : ''}</span>
-                                        ) : (
-                                            <input type="date" className="bg-transparent outline-none font-bold" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} />
-                                        )}
-                                    </div>
+                                    <p>DISEDIAKAN OLEH:</p>
+                                    <div className="mt-8 border-b border-black flex gap-2">NAMA: <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.preparedName || ''} onChange={e => handleFooterChange('preparedName', e.target.value)} /></div>
+                                    <p className="mt-1 font-bold">PENGAJAR PENYELARAS</p>
+                                    <div className="mt-4 flex gap-2">TARIKH: <input type="date" className="bg-transparent outline-none font-bold" value={footerData.preparedDate || ''} onChange={e => handleFooterChange('preparedDate', e.target.value)} /></div>
+                                </div>
+                                <div>
+                                    <p>DISAHKAN OLEH:</p>
+                                    <div className="mt-8 border-b border-black flex gap-2">NAMA: <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} /></div>
+                                    <p className="mt-1 font-bold uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
+                                    <div className="mt-4 flex gap-2">TARIKH: <input type="date" className="bg-transparent outline-none font-bold" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} /></div>
                                 </div>
                                 <div className="col-span-2 text-center pt-8 opacity-40 text-[9px] italic">** Harold Criso Anak Ajin **</div>
                             </div>
@@ -1203,11 +1102,8 @@
                                     <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-2 rounded-xl shadow-lg hover:rotate-90 transition-all"><Icons.X /></button>
                                 </div>
                                 <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white text-black">
-                                    {modalError && <div className="bg-red-100 p-4 rounded-2xl border-2 border-red-300 text-red-800 text-xs font-bold flex items-center gap-3">⚠️ {modalError}</div>}
-                                    {userRole === 'admin' && editingEvent && (
-                                        <div className="bg-blue-50 p-4 rounded-2xl border-2 border-blue-200 text-blue-800 text-xs font-bold flex items-center gap-3">
-                                            <Icons.Lock /> Slot ini telah disimpan. Anda boleh mengedit tetapi hanya Supervisor sahaja boleh memadam slot ini secara kekal.
-                                        </div>
+                                    {userRole === 'admin' && isLocked(editingEvent) && (
+                                        <div className="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 text-amber-800 text-xs font-bold flex items-center gap-3"><Icons.Lock /> Slot Terkunci (melebihi 24j). Mohon pindaan jika perlu.</div>
                                     )}
                                     
                                     {editingEvent && editingEvent.updatedBy && (
@@ -1240,7 +1136,6 @@
                                         </div>
                                     </div>
 
-                                    {/* Bahagian butang berasingan (Lain-lain, Taklimat, Penyediaan, dan Independent Learning) */}
                                     <div className="pt-1 space-y-2">
                                         <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Lain-lain' ? 'bg-slate-800 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Lain-lain' ? 'AKTIVITI LAIN-LAIN (LL) AKTIF' : 'KLIK UNTUK PENGISIAN LAIN-LAIN (LL)'}</button>
                                         <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Taklimat' ? 'Kuliah' : 'Taklimat' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Taklimat' ? 'bg-indigo-800 border-indigo-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Taklimat' ? 'AKTIVITI TAKLIMAT AKTIF' : 'KLIK UNTUK PENGISIAN TAKLIMAT'}</button>
@@ -1248,7 +1143,6 @@
                                         <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'IL' ? 'Kuliah' : 'IL' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'IL' ? 'bg-yellow-500 border-yellow-600 text-white shadow-lg font-black' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'IL' ? 'INDEPENDENT LEARNING (IL) AKTIF' : 'KLIK UNTUK PENGISIAN INDEPENDENT LEARNING (IL)'}</button>
                                     </div>
                                     
-                                    {/* Menampilkan Jenis Sesi (IL telah difilter keluar dari map utama) */}
                                     {(formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') && (
                                         <div className="space-y-3 animate-in fade-in duration-300">
                                             <label className="text-[11px] font-black text-slate-400 uppercase">Jenis Sesi</label>
@@ -1278,7 +1172,6 @@
                                         <textarea rows="3" className="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none font-bold text-sm text-black shadow-sm" placeholder={(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? "Sila catat maklumat aktiviti..." : "Taip secara manual..."} value={formData.topic || ''} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
                                     </div>
                                     
-                                    {/* Panel Pilihan Penjajaran Teks (Align Left, Center, Right, Justify) */}
                                     <div className="space-y-1 text-black">
                                         <label className="text-[11px] font-black text-slate-400 uppercase">Susun Atur Perkataan (Alignment)</label>
                                         <div className="flex gap-2">
