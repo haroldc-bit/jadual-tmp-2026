@@ -35,12 +35,14 @@
             .no-print { display: none !important; }
             body { background: white !important; padding: 0; margin: 0; font-family: 'Times New Roman', serif; color: black !important; }
             main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-            .freeze-container { overflow: visible !important; max-height: none !important; border: none !important; display: block !important; }
-            table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: 1px solid black !important; }
-            th, td { border: 1px solid black !important; background: white !important; color: black !important; }
+            /* Penstabilan Cetakan: Memaksa kontena mengikut kelebaran halaman cetak */
+            .freeze-container { overflow: visible !important; max-height: none !important; border: none !important; display: block !important; width: 100% !important; }
+            /* Penstabilan Cetakan: Mengatasi had min-w-[1500px] secara mutlak semasa cetakan dilakukan */
+            table { width: 100% !important; min-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: 1px solid black !important; }
+            th, td { border: 1px solid black !important; background: white !important; color: black !important; padding: 4px 2px !important; }
             .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
             input, select, textarea { border: none !important; background: transparent !important; color: black !important; appearance: none; }
-            thead, .table-to-scroll thead th { position: sticky; top: 0; z-index: 50; background: #f8fafc !important; box-shadow: inset 0 -2px 0 #000; }
+            thead, .table-to-scroll thead th { position: static !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
         
@@ -256,7 +258,7 @@
             const [events, setEvents] = useState({});
             const [courseLimits, setCourseLimits] = useState({}); 
             const [isTimetableLocked, setIsTimetableLocked] = useState(false); // Penambahan state kunci jadual
-            const [selectedLoginInstructor, setSelectedLoginInstructor] = useState(""); // State rekod nama pengajar semasa log masuk
+            const [selectedLoginInstructor, setSelectedLoginInstructor] = useState(""); // State menyimpan pemilih nama dari dropdown log masuk
             
             // KEMAS KINI MEMORI FOOTER (Menyimpan mengikut Semester)
             const [footerData, setFooterData] = useState({});
@@ -338,10 +340,8 @@
                 // PEMBETULAN: Semakan Kata Laluan Superuser menggunakan "PENTADBIR2026" tanpa pendedahan profil
                 if (!selectedLoginInstructor) {
                     if (code === "PENTADBIR2026" || code === "TMP2026") {
-                        setIsAuthorized(true); 
-                        setUserRole('superuser'); 
-                        sessionStorage.setItem('tmp_auth', 'true'); 
-                        sessionStorage.setItem('tmp_role', 'superuser');
+                        setIsAuthorized(true); setUserRole('superuser'); 
+                        sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'superuser');
                         sessionStorage.setItem('tmp_user_name', 'SUPERUSER/SUPERVISOR');
                         return;
                     }
@@ -350,10 +350,8 @@
                 // Pemadanan Pelatih (Trainee) apabila profil pelatih dipilih
                 if (selectedLoginInstructor === "TRAINEE_VIEWER") {
                     if (code === "JTMP2026") {
-                        setIsAuthorized(true); 
-                        setUserRole('viewer'); 
-                        sessionStorage.setItem('tmp_auth', 'true'); 
-                        sessionStorage.setItem('tmp_role', 'viewer');
+                        setIsAuthorized(true); setUserRole('viewer'); 
+                        sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'viewer');
                         sessionStorage.setItem('tmp_user_name', 'TRAINEE/VIEWER');
                         return;
                     } else {
@@ -364,10 +362,8 @@
 
                 // Kebolehan masuk terus menggunakan kod pelatih (JTMP2026) tanpa pilih profil
                 if (!selectedLoginInstructor && code === "JTMP2026") {
-                    setIsAuthorized(true); 
-                    setUserRole('viewer'); 
-                    sessionStorage.setItem('tmp_auth', 'true'); 
-                    sessionStorage.setItem('tmp_role', 'viewer');
+                    setIsAuthorized(true); setUserRole('viewer'); 
+                    sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'viewer');
                     sessionStorage.setItem('tmp_user_name', 'TRAINEE/VIEWER');
                     return;
                 }
@@ -580,10 +576,12 @@
                 const element = printAreaRef.current;
                 const container = tableContainerRef.current;
                 
+                // Backup gaya asal
                 const originalOverflow = container.style.overflow;
                 const originalMaxHeight = container.style.maxHeight;
                 const originalBorder = container.style.border;
                 
+                // Sembunyikan elemen .no-print sementara
                 const noPrintElements = element.querySelectorAll('.no-print');
                 const originalDisplays = [];
                 noPrintElements.forEach(el => {
@@ -591,6 +589,7 @@
                     el.style.display = 'none';
                 });
 
+                // Ubah gaya kontena untuk paparan penuh tanpa potongan jadual
                 container.style.overflow = 'visible';
                 container.style.maxHeight = 'none';
                 container.style.border = 'none';
@@ -598,24 +597,22 @@
                 const fullWidth = container.scrollWidth;
 
                 const opt = {
-                    margin: [0.3, 0.3, 0.3, 0.3], 
+                    margin: [0.3, 0.3, 0.3, 0.3], // Margin secukup rasa
                     filename: `JWM_TMP_Minggu_${selectedWeek}_Versi_${academicCycle}.pdf`,
                     image: { type: 'jpeg', quality: 1 },
                     html2canvas: { 
-                        scale: 3, 
+                        scale: 2, // Resolusi tinggi
                         useCORS: true, 
-                        allowTaint: true,
                         logging: false,
-                        backgroundColor: "#ffffff",
-                        imageTimeout: 15000,
-                        windowWidth: fullWidth + 100,
+                        windowWidth: fullWidth + 50,
                         width: fullWidth,
                         scrollY: 0
                     },
-                    jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } 
+                    jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } // A3 Landskap menampung format jadual lebar
                 };
 
                 html2pdf().set(opt).from(element).save().then(() => {
+                    // Kembalikan gaya kepada keadaan asal selepas eksport siap
                     container.style.overflow = originalOverflow;
                     container.style.maxHeight = originalMaxHeight;
                     container.style.border = originalBorder;
@@ -761,8 +758,6 @@
                 const unsubSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), (d) => { if(d.exists()) setFooterData(d.data()); });
                 const unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), (d) => { if(d.exists()) setSaturdayConfigs(d.data()); });
                 const unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), (d) => { if(d.exists()) setHolidays(d.data()); });
-                
-                // Menerima sinkronisasi status Lock Jadual dari pangkalan data Firebase
                 const unsubLock = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'global_lock'), (d) => {
                     if (d.exists()) setIsTimetableLocked(!!d.data().locked);
                 });
@@ -1075,18 +1070,131 @@
                                     </tbody>
                                 </table>
                             </div>
+                            
+                            {/* KEMAS KINI STRUKTUR FOOTER: DINAMIK IKUT KORT SEMESTER (Bebas Lag & Mempunyai Butang Clear/Simpan) */}
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
-                                <div>
-                                    <p>DISEDIAKAN OLEH:</p>
-                                    <div className="mt-8 border-b border-black flex gap-2">NAMA: <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.preparedName || ''} onChange={e => handleFooterChange('preparedName', e.target.value)} /></div>
-                                    <p className="mt-1 font-bold">PENGAJAR PENYELARAS</p>
-                                    <div className="mt-4 flex gap-2">TARIKH: <input type="date" className="bg-transparent outline-none font-bold" value={footerData.preparedDate || ''} onChange={e => handleFooterChange('preparedDate', e.target.value)} /></div>
+                                <div className="space-y-4">
+                                    <p className="uppercase text-slate-800 tracking-wider">
+                                        DISEDIAKAN OLEH: <span className="text-blue-600 font-black">({semesterLabels[footerSemActive]})</span>
+                                    </p>
+                                    
+                                    {/* Pemilih Tahun & Semester di bahagian tandatangan */}
+                                    {filterSemester === 'SEMUA' && userRole !== 'viewer' && (
+                                        <div className="flex items-center gap-2 no-print bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                            <span className="text-[10px] text-slate-400 uppercase font-black">Kohort Kemasukan:</span>
+                                            <select 
+                                                value={footerSemActive} 
+                                                onChange={e => setFooterSemActive(e.target.value)}
+                                                className="bg-white border text-[10px] font-bold p-1 rounded outline-none text-black animate-none"
+                                            >
+                                                {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
+                                            </select>
+                                        </div>
+                                    )}
+
+                                    {/* Dropdown Pembantu Pemilihan Nama Pengajar */}
+                                    {userRole !== 'viewer' && (
+                                        <div className="flex items-center gap-2 no-print bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                            <span className="text-[10px] text-slate-400 uppercase font-black">Pilih Nama Cepat:</span>
+                                            <select 
+                                                value={instructorList.includes(tempPreparedName) ? tempPreparedName : ''}
+                                                onChange={e => setTempPreparedName(e.target.value)}
+                                                className="bg-white border text-[10px] font-bold p-1 rounded outline-none w-full max-w-[220px] text-black"
+                                                disabled={userRole === 'viewer'}
+                                            >
+                                                <option value="">-- Tiada / Taip Manual --</option>
+                                                {instructorList.filter(inst => inst !== 'Lain-lain').map(inst => (
+                                                    <option key={inst} value={inst}>{inst}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+
+                                    {/* Input Nama Rasmi */}
+                                    <div className="border-b border-black pb-1 space-y-1">
+                                        <div className="flex items-center justify-between w-full">
+                                            <div className="w-full flex items-center">
+                                                <span className="shrink-0 mr-2">NAMA:</span>
+                                                {userRole === 'viewer' ? (
+                                                    <span className="font-black uppercase text-blue-800">{tempPreparedName || 'TIADA REKOD PENYELARAS'}</span>
+                                                ) : (
+                                                    <input 
+                                                        type="text" 
+                                                        className="bg-transparent outline-none w-full font-black uppercase text-blue-800 animate-none" 
+                                                        value={tempPreparedName} 
+                                                        onChange={e => setTempPreparedName(e.target.value)}
+                                                        placeholder="SILA PILIH NAMA ATAU TAIP MANUAL DI SINI"
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p className="mt-1 font-bold uppercase text-slate-500">PENGAJAR PENYELARAS</p>
+                                    
+                                    {/* Input Tarikh Penyelaras */}
+                                    <div className="border-b border-black pb-1">
+                                        <div className="flex items-center w-full">
+                                            <span className="shrink-0 mr-2">TARIKH:</span>
+                                            {userRole === 'viewer' ? (
+                                                <span className="font-bold text-blue-800">{tempPreparedDate ? formatDateDisplay(tempPreparedDate) : ''}</span>
+                                            ) : (
+                                                <input 
+                                                    type="date" 
+                                                    className="bg-transparent outline-none font-bold text-blue-800 animate-none" 
+                                                    value={tempPreparedDate} 
+                                                    onChange={e => setTempPreparedDate(e.target.value)}
+                                                />
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Butang Aksi Pengurusan (DISEMBUNYIKAN SEPENUHNYA DARI TRAINEE/VIEWER) */}
+                                    {userRole !== 'viewer' && (
+                                        <div className="flex gap-2 pt-2 no-print">
+                                            <button 
+                                                onClick={(e) => { e.preventDefault(); savePenyelaras(footerSemActive, tempPreparedName, tempPreparedDate); }}
+                                                className="bg-blue-600 hover:bg-blue-700 text-white font-black text-[9px] uppercase px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1"
+                                            >
+                                                💾 Simpan Penyelaras
+                                            </button>
+                                            <button 
+                                                onClick={handleClearPenyelaras}
+                                                className="bg-red-50 hover:bg-red-100 text-red-600 font-black text-[9px] uppercase px-3 py-2.5 rounded-xl border border-red-200 transition-all active:scale-95"
+                                                title="Padam input semasa"
+                                            >
+                                                🗑️ Clear
+                                            </button>
+                                            <button 
+                                                onClick={handleUndoPenyelaras}
+                                                className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-[9px] uppercase px-3 py-2.5 rounded-xl border transition-all active:scale-95"
+                                                title="Kembali ke rekod terakhir"
+                                            >
+                                                ↩️ Undo
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
+
                                 <div>
-                                    <p>DISAHKAN OLEH:</p>
-                                    <div className="mt-8 border-b border-black flex gap-2">NAMA: <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} /></div>
-                                    <p className="mt-1 font-bold uppercase">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
-                                    <div className="mt-4 flex gap-2">TARIKH: <input type="date" className="bg-transparent outline-none font-bold" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} /></div>
+                                    <p className="uppercase text-slate-800 tracking-wider">DISAHKAN OLEH:</p>
+                                    <div className="mt-8 border-b border-black flex gap-2">
+                                        NAMA: {userRole === 'viewer' ? (
+                                            <span className="font-black uppercase">{footerData.verifiedName || ''}</span>
+                                        ) : (
+                                            <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} />
+                                        )}
+                                    </div>
+                                    <p className="mt-1 font-bold uppercase text-slate-500">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
+                                    
+                                    {/* PENAMBAHBAIKAN: Menyembunyikan input tarikh datepicker di sudut kanan bawah ( verifiedDate ) daripada pelatih */}
+                                    <div className="mt-4 flex gap-2">
+                                        TARIKH: {userRole === 'viewer' ? (
+                                            <span className="font-bold">{footerData.verifiedDate ? formatDateDisplay(footerData.verifiedDate) : ''}</span>
+                                        ) : (
+                                            <input type="date" className="bg-transparent outline-none font-bold" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} />
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="col-span-2 text-center pt-8 opacity-40 text-[9px] italic">** Harold Criso Anak Ajin **</div>
                             </div>
@@ -1163,12 +1271,6 @@
 
                                     <div className="space-y-1 text-black">
                                         <label className="text-[11px] font-black text-slate-400 uppercase">{(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? 'Nama Aktiviti / Perkara' : 'Tajuk Pembelajaran'}</label>
-                                        {(formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') && (
-                                            <select className="w-full p-3 mb-2 bg-emerald-50 border-2 border-emerald-400 rounded-xl font-black text-[11px] text-emerald-900 shadow-sm outline-none cursor-pointer" onChange={(e) => { if(e.target.value) setFormData({...formData, topic: e.target.value}); e.target.value = ""; }}>
-                                                <option value="">⬇️ KLIK SINI UNTUK SENARAI TAJUK SILIBUS ⬇️</option>
-                                                {formData.courseCode && courseTopics[formData.courseCode] && courseTopics[formData.courseCode].map((tajuk, idx) => <option key={idx} value={tajuk}>{tajuk}</option>)}
-                                            </select>
-                                        )}
                                         <textarea rows="3" className="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none font-bold text-sm text-black shadow-sm" placeholder={(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? "Sila catat maklumat aktiviti..." : "Taip secara manual..."} value={formData.topic || ''} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
                                     </div>
                                     
