@@ -544,19 +544,11 @@
             };
 
             const handleFooterChange = async (field, val) => {
-                if (userRole === 'viewer') return;
+                if (userRole === 'viewer' || !window.TMP_DB) return;
                 const next = { ...footerData, [field]: val };
                 setFooterData(next);
-                localStorage.setItem(`tmp_signatures_${academicCycle}`, JSON.stringify(next));
-
-                if (window.TMP_DB) {
-                    const { db, appId, doc, setDoc } = window.TMP_DB;
-                    try { 
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), next); 
-                    } catch (e) {
-                        console.error("Gagal simpan signatures:", e);
-                    }
-                }
+                const { db, appId, doc, setDoc } = window.TMP_DB;
+                try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), next); } catch(e) {}
             };
 
             const saveLimits = async (newLimits) => {
@@ -572,6 +564,7 @@
                 }
             };
 
+            // PENAMBAHBAIKAN UTAMA: Memastikan rakaman PDF tidak memotong lajur 4.00 - 5.00
             const handleExportPDF = () => {
                 const element = printAreaRef.current;
                 const container = tableContainerRef.current;
@@ -580,6 +573,8 @@
                 const originalOverflow = container.style.overflow;
                 const originalMaxHeight = container.style.maxHeight;
                 const originalBorder = container.style.border;
+                const originalWidth = element.style.width;
+                const originalMaxWidth = element.style.maxWidth;
                 
                 // Sembunyikan elemen .no-print sementara
                 const noPrintElements = element.querySelectorAll('.no-print');
@@ -589,33 +584,39 @@
                     el.style.display = 'none';
                 });
 
-                // Ubah gaya kontena untuk paparan penuh tanpa potongan jadual
+                // Dapatkan lebar skrol penuh kontena jadual
+                const fullWidth = container.scrollWidth;
+
+                // Paksa element luar mengikut lebar penuh skrol
+                element.style.width = `${fullWidth + 40}px`;
+                element.style.maxWidth = 'none';
+
                 container.style.overflow = 'visible';
                 container.style.maxHeight = 'none';
                 container.style.border = 'none';
 
-                const fullWidth = container.scrollWidth;
-
                 const opt = {
-                    margin: [0.3, 0.3, 0.3, 0.3], // Margin secukup rasa
+                    margin: [0.3, 0.3, 0.3, 0.3], // Sisi margin
                     filename: `JWM_TMP_Minggu_${selectedWeek}_Versi_${academicCycle}.pdf`,
                     image: { type: 'jpeg', quality: 1 },
                     html2canvas: { 
-                        scale: 2, // Resolusi tinggi
+                        scale: 2, // Ketajaman imej
                         useCORS: true, 
                         logging: false,
-                        windowWidth: fullWidth + 50,
-                        width: fullWidth,
+                        windowWidth: fullWidth + 150, // Ruang lega lajur kanan (4.00 - 5.00)
+                        width: fullWidth + 100,
                         scrollY: 0
                     },
-                    jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } // A3 Landskap menampung format jadual lebar
+                    jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } // Landskap saiz A3 bagi mengekalkan kualiti
                 };
 
                 html2pdf().set(opt).from(element).save().then(() => {
-                    // Kembalikan gaya kepada keadaan asal selepas eksport siap
+                    // Kembalikan gaya kepada keadaan asal selepas muat turun siap
                     container.style.overflow = originalOverflow;
                     container.style.maxHeight = originalMaxHeight;
                     container.style.border = originalBorder;
+                    element.style.width = originalWidth;
+                    element.style.maxWidth = originalMaxWidth;
                     
                     noPrintElements.forEach((el, index) => {
                         el.style.display = originalDisplays[index];
@@ -638,30 +639,6 @@
                 if ([24, 25, 26].includes(selectedWeek)) return "CUTI AKHIR SEMESTER";
                 return "NORMAL";
             }, [selectedWeek, weekStatuses, academicCycle]);
-
-            const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
-                if (weekStatus !== "NORMAL") return;
-                if (isSlotBreak(day, slotIdx)) return;
-
-                // Membenarkan edit mengikut status sekatan global lock
-                const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked);
-                if (!canEdit) return;
-
-                setModalError(""); 
-                if (event) {
-                    setFormData({ 
-                        ...event, 
-                        customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode,
-                        benchTutors: event.benchTutors || '',
-                        align: event.align || 'left'
-                    });
-                    setEditingEvent(event);
-                } else {
-                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', duration: 1, sessionNumber: '' });
-                    setEditingEvent(null);
-                }
-                setIsModalOpen(true);
-            };
 
             const autoWeekRange = useMemo(() => {
                 const start = new Date(sessionStartDate);
@@ -692,12 +669,14 @@
                 return { courseSum, instructorSum };
             }, [events, academicSession, academicCycle]);
 
+            // Auto-align footer sem aktif apabila semester saringan atas berubah
             useEffect(() => {
                 if (filterSemester !== 'SEMUA') {
                     setFooterSemActive(filterSemester);
                 }
             }, [filterSemester]);
 
+            // Auto-update input text footer apabila jenis semester bertukar
             useEffect(() => {
                 setTempPreparedName(footerData[`preparedName_${footerSemActive}`] || '');
                 setTempPreparedDate(footerData[`preparedDate_${footerSemActive}`] || '');
@@ -788,7 +767,6 @@
                                 JADUAL WAKTU MINGGUAN PROGRAM TEKNOLOGI MAKMAL PERUBATAN ILKKM KUCHING
                             </h2>
                             <form onSubmit={handleLogin} className="space-y-4">
-                                {/* PEMBETULAN MUKTAMAD: Reka bentuk borang log masuk berasaskan senarai dropdown profil yang bersih */}
                                 <div className="space-y-1 text-left">
                                     <label className="text-xs font-black text-slate-500 uppercase px-1">Pilih Profil Akses:</label>
                                     <select 
@@ -1210,8 +1188,11 @@
                                     <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-2 rounded-xl shadow-lg hover:rotate-90 transition-all"><Icons.X /></button>
                                 </div>
                                 <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white text-black">
-                                    {userRole === 'admin' && isLocked(editingEvent) && (
-                                        <div className="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 text-amber-800 text-xs font-bold flex items-center gap-3"><Icons.Lock /> Slot Terkunci (melebihi 24j). Mohon pindaan jika perlu.</div>
+                                    {modalError && <div className="bg-red-100 p-4 rounded-2xl border-2 border-red-300 text-red-800 text-xs font-bold flex items-center gap-3">⚠️ {modalError}</div>}
+                                    {userRole === 'admin' && editingEvent && (
+                                        <div className="bg-blue-50 p-4 rounded-2xl border-2 border-blue-200 text-blue-800 text-xs font-bold flex items-center gap-3">
+                                            <Icons.Lock /> Slot ini telah disimpan. Anda boleh mengedit tetapi hanya Supervisor sahaja boleh memadam slot ini secara kekal.
+                                        </div>
                                     )}
                                     
                                     {editingEvent && editingEvent.updatedBy && (
@@ -1244,6 +1225,7 @@
                                         </div>
                                     </div>
 
+                                    {/* Bahagian butang berasingan (Lain-lain, Taklimat, Penyediaan, dan Independent Learning) */}
                                     <div className="pt-1 space-y-2">
                                         <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Lain-lain' ? 'bg-slate-800 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Lain-lain' ? 'AKTIVITI LAIN-LAIN (LL) AKTIF' : 'KLIK UNTUK PENGISIAN LAIN-LAIN (LL)'}</button>
                                         <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Taklimat' ? 'Kuliah' : 'Taklimat' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Taklimat' ? 'bg-indigo-800 border-indigo-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Taklimat' ? 'AKTIVITI TAKLIMAT AKTIF' : 'KLIK UNTUK PENGISIAN TAKLIMAT'}</button>
@@ -1251,6 +1233,7 @@
                                         <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'IL' ? 'Kuliah' : 'IL' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'IL' ? 'bg-yellow-500 border-yellow-600 text-white shadow-lg font-black' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'IL' ? 'INDEPENDENT LEARNING (IL) AKTIF' : 'KLIK UNTUK PENGISIAN INDEPENDENT LEARNING (IL)'}</button>
                                     </div>
                                     
+                                    {/* Menampilkan Jenis Sesi (IL telah difilter keluar dari map utama) */}
                                     {(formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') && (
                                         <div className="space-y-3 animate-in fade-in duration-300">
                                             <label className="text-[11px] font-black text-slate-400 uppercase">Jenis Sesi</label>
