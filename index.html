@@ -307,7 +307,7 @@
 
             const courseTopics = {
                 "MTIM 2013": [
-                    "KULIAH: Laboratory Hazards and Personnel Protective Equipment", "KULIAH: Glassware and Pipettes", "KULIAH: Balances", "KULIAH: Distiller & Deionizer", "KULIAH: Oven, Water Bath and Incubator", "KULIAH: Autoclave", "KULIAH: Centrifuge", "KULIAH: pH Meter", "KULIAH: Chromatography and Electrophoresis System", "KULIAH: Microscope: Components and Application", "KULIAH: The Concept and Application of Photometry", "KULIAH: Atom Structures and Periodic Tables", "KULIAH: Concept of Ion, Electrolyte, Oxidation and Reduction Reaction", "KULIAH: Acid, Base and Buffer", "KULIAH: Composition in Chemical Reagent", "KULIAH: Application of Conversion Measurement Unit", "KULIAH: Preparation of Reagent and Solution",
+                    "KULIAH: Laboratory Hazards and Personnel Protective Equipment", "KULIAH: Glassware and Pipettes", "KULIAH: Balances", "KULIAH: Distiller & Deionizer", "KULIAH: Oven, Water Bath and Incubator", "KULIAH: Autoclave", "KULIAH: Centrifuge", "KULIAH: pH Meter", "KULIAH: Chromatography and Electrophoresis System", "KULIAH: Microscope: Components and Application", "KULIAH: The Concept and Application of Photometry", "KULIAH: Atom Structures and Periodic Tables", "KULIAH: Concept of Ion, Electrolyte, Oxidation and Reduction Reaction", "KULIAH: Acid, Base and Buffer", "KULIAH: Composition in Chemical Reagent", "KULIAH: Preparation of Reagent and Solution",
                     "TUTORIAL: Laboratory Hazards and Personnel Protective Equipment", "TUTORIAL: Centrifuge", "TUTORIAL: Microscope: Components and Application", "TUTORIAL: The Concept and Application of Photometry",
                     "AMALI: Laboratory Hazards and Personnel Protective Equipment", "AMALI: Glassware and Pipettes", "AMALI: Balances", "AMALI: Distiller & Deionizer", "AMALI: Oven, Water Bath and Incubator", "AMALI: Autoclave", "AMALI: Centrifuge", "AMALI: pH Meter", "AMALI: Chromatography and Electrophoresis System", "AMALI: Microscope: Components and Application", "AMALI: The Concept and Application of Photometry", "AMALI: Composition in Chemical Reagent", "AMALI: Preparation of Reagent and Solution"
                 ]
@@ -683,14 +683,12 @@
                 return { courseSum, instructorSum };
             }, [events, academicSession, academicCycle]);
 
-            // Auto-align footer sem aktif apabila semester saringan atas berubah
             useEffect(() => {
                 if (filterSemester !== 'SEMUA') {
                     setFooterSemActive(filterSemester);
                 }
             }, [filterSemester]);
 
-            // Auto-update input text footer apabila jenis semester bertukar
             useEffect(() => {
                 setTempPreparedName(footerData[`preparedName_${footerSemActive}`] || '');
                 setTempPreparedDate(footerData[`preparedDate_${footerSemActive}`] || '');
@@ -783,7 +781,7 @@
                                 JADUAL WAKTU MINGGUAN PROGRAM TEKNOLOGI MAKMAL PERUBATAN ILKKM KUCHING
                             </h2>
                             <form onSubmit={handleLogin} className="space-y-4">
-                                {/* PEMBETULAN MUKTAMAD: Reka bentuk borang log masuk berasaskan senarai dropdown profil yang bersih */}
+                                {/* PEMBETULAN MUKTAMAD: Dropdown log masuk yang bersih tanpa memaparkan profil Superuser / Kata Laluan Pelatih */}
                                 <div className="space-y-1 text-left">
                                     <label className="text-xs font-black text-slate-500 uppercase px-1">Pilih Profil Akses:</label>
                                     <select 
@@ -792,7 +790,6 @@
                                         className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl font-black text-sm text-black outline-none focus:border-blue-600 cursor-pointer"
                                     >
                                         <option value="">-- SILA PILIH PROFIL AKSES --</option>
-                                        <option value="SUPERUSER_ADMIN">SUPERUSER / KETUA PROGRAM</option>
                                         <option value="TRAINEE_VIEWER">PELATIH / VIEW MODE ONLY</option>
                                         <optgroup label="PROFIL PENGAJAR (KATA LALUAN UNIK)">
                                             {instructorList.filter(name => name !== 'Lain-lain').map(name => (
@@ -895,26 +892,6 @@
                                                 setSaturdayConfigs({...saturdayConfigs, [satKey]: next});
                                                 if(window.TMP_DB) window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), {...saturdayConfigs, [satKey]: next}).catch(e=>console.error(e));
                                             }} className={`w-8 h-4 rounded-full relative transition-all ${currentWeekHasSaturday ? 'bg-green-500' : 'bg-slate-300'}`}><div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${currentWeekHasSaturday ? 'left-4' : 'left-0.5'}`}></div></button>
-                                        </div>
-                                    )}
-
-                                    {userRole === 'superuser' && (
-                                        <div className="flex items-center gap-1 bg-purple-50 px-2 py-1.5 rounded-xl border border-purple-200 h-[34px] no-print">
-                                            <span className="text-[9px] font-black uppercase text-purple-600 mr-1">Status M{selectedWeek}:</span>
-                                            <select 
-                                                value={weekStatuses[`${academicCycle}-${selectedWeek}`] || (weekStatus === "NORMAL" ? "NORMAL" : weekStatus)}
-                                                onChange={(e) => {
-                                                    const statKey = `${academicCycle}-${selectedWeek}`; const nextStat = e.target.value;
-                                                    setWeekStatuses({...weekStatuses, [statKey]: nextStat});
-                                                    if(window.TMP_DB) window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'week_statuses'), {...weekStatuses, [statKey]: nextStat}).catch(err=>console.error(err));
-                                                }}
-                                                className="bg-transparent text-purple-800 text-[10px] font-black outline-none cursor-pointer uppercase"
-                                            >
-                                                <option value="NORMAL">Biasa (Normal)</option>
-                                                <option value="CUTI PERTENGAHAN SEMESTER">Cuti Pertengahan Sem</option>
-                                                <option value="CUTI AKHIR SEMESTER">Cuti Akhir Sem</option>
-                                                <option value="PEPERIKSAAN AKHIR SEMESTER">Peperiksaan Akhir Sem</option>
-                                            </select>
                                         </div>
                                     )}
 
