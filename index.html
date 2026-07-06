@@ -198,7 +198,7 @@
             Printer: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>,
             Search: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
             Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
-            FileText: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            FileText: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" h="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         };
 
         // --- PENYELARAS FORMAT TARIKH RAW -> DISPLAY ---
@@ -230,6 +230,7 @@
             const [events, setEvents] = useState({});
             const [courseLimits, setCourseLimits] = useState({}); 
             const [isTimetableLocked, setIsTimetableLocked] = useState(false); // Penambahan state kunci jadual
+            const [selectedLoginInstructor, setSelectedLoginInstructor] = useState(""); // State rekod nama pengajar semasa log masuk
             
             // KEMAS KINI MEMORI FOOTER (Menyimpan mengikut Semester)
             const [footerData, setFooterData] = useState({});
@@ -293,7 +294,7 @@
                     "TUTORIAL: Pathogen and Pathogenesis", "TUTORIAL: Gram Positive Bacteria", "TUTORIAL: Gram Negative Bacteria", "TUTORIAL: RNA Viruses", "TUTORIAL: DNA Viruses", "TUTORIAL: Classification, Diseases and Pathogenesis of Fungi", "TUTORIAL: Protozoa", "TUTORIAL: Helminths", "TUTORIAL: Immune Response", "TUTORIAL: Community Based Infection"
                 ],
                 "GCSF 2013": [
-                    "KULIAH: Structural Organization of Human Body", "KULIAH: Cell Structure and Function", "KULIAH: Basic Chemistry", "KULIAH: Cellular Reproduction", "KULIAH: Tissues", "KULIAH: Structure and Function of Integumentary System", "KULIAH: Blood", "KULIAH: Structure and Organization of the Heart", "KULIAH: Cardiac Cycle", "KULIAH: Structure of Blood Vessel, Function and Circulatory Routes", "KULIAH: Lymphatic System", "KULIAH: Structures and Function of Respiratory System", "KULIAH: Pulmonary Ventilation", "KULIAH: Control of Respiration", "KULIAH: Components of Endocrine System", "KULIAH: Introduction to Digestive System", "KULIAH: Structures and Functions of Organs in Diagnostic System", "KULIAH: Accessory Organs of the Digestive System", "KULIAH: Digestion, Absorption and Defecation", "KULIAH: Organisation of Nervous System and Nerve Cells", "KULIAH: Central Nervous System", "KULIAH: Peripheral Nervous System", "KULIAH: Skeletal System", "KULIAH: Classification of Joints", "KULIAH: Muscular System", "KULIAH: Components of Urinary System", "KULIAH: Physiology of Urinary System", "KULIAH: Male Reproductive System", "KULIAH: Female Reproductive System", "KULIAH: Structure and Functions of Ear and Other Sensory Organs", "KULIAH: Structure and Functions of Eye",
+                    "KULIAH: Structural Organization of Human Body", "KULIAH: Cell Structure and Function", "KULIAH: Basic Chemistry", "KULIAH: Cellular Reproduction", "KULIAH: Tissues", "KULIAH: Structure and Function of Integumentary System", "KULIAH: Blood", "KULIAH: Structure and Organization of the Heart", "KULIAH: Cardiac Cycle", "KULIAH: Structure of Blood Vessel, Function and Circulatory Routes", "KULIAH: Lymphatic System", "KULIAH: Structures and Function of Respiratory System", "KULIAH: Pulmonary Ventilation", "KULIAH: Control of Respiration", "KULIAH: Components of Endocrine System", "KULIAH: Introduction to Digestive System", "KULIAY: Structures and Functions of Organs in Diagnostic System", "KULIAH: Accessory Organs of the Digestive System", "KULIAH: Digestion, Absorption and Defecation", "KULIAH: Organisation of Nervous System and Nerve Cells", "KULIAH: Central Nervous System", "KULIAH: Peripheral Nervous System", "KULIAH: Skeletal System", "KULIAH: Classification of Joints", "KULIAH: Muscular System", "KULIAH: Components of Urinary System", "KULIAH: Physiology of Urinary System", "KULIAH: Male Reproductive System", "KULIAH: Female Reproductive System", "KULIAH: Structure and Functions of Ear and Other Sensory Organs", "KULIAH: Structure and Functions of Eye",
                     "TUTORIAL: Cell Structure and Function", "TUTORIAL: Tissues", "TUTORIAL: Structure and Function of Integumentary System", "TUTORIAL: Blood", "TUTORIAL: Cardiac Cycle", "TUTORIAL: Structure of Blood Vessel, Function and Circulatory Routes", "TUTORIAL: Structures and Function of Respiratory System", "TUTORIAL: Pulmonary Ventilation", "TUTORIAL: Components of Endocrine System", "TUTORIAL: Structures and Functions of Organs in Digestive System", "TUTORIAL: Digestion, Absorption and Defecation", "TUTORIAL: Organisation of Nervous System and Nerve Cells", "TUTORIAL: Skeletal System", "TUTORIAL: Physiology of Urinary System", "TUTORIAL: Female Reproductive System", "TUTORIAL: Structure and Functions of Ear and Other Sensory Organs"
                 ],
                 "GCSP 2033": [
@@ -391,7 +392,7 @@
                 ],
                 "MTVS 2142": [
                     "KULIAH: Safety in Medical Virology and Serology Laboratory", "KULIAH: Instrumentation in Medical Virology and Serology Laboratory", "KULIAH: Specimen Collections and Transportations in Virology and Serology Laboratory", "KULIAH: Virus Isolation and Identification Techniques", "KULIAH: RPR / VDRL / TPPA / TPHA", "KULIAH: ANA / ASOT / IIP", "KULIAH: Dengue and Leptospiral Antibody", "KULIAH: HIV Antigen Antibody and Confirmatory Test", "KULRubella and TORCHES", "KULIAH: Serological Test for Parasitic Infection", "KULIAH: Respiratory Viral Infection", "KULIAH: GIT Viral Infection", "KULIAH: Central Nervous System Viral Infection", "KULIAH: Skin Viral Infection", "KULIAH: Sexually Transmitted Viral Infection", "KULIAH: Hemorrhagic Fever",
-                    "TUTORIAL: Safety in Medical Virology and Serology Laboratory", "TUTORIAL: Virus Isolation and Identification Techniques", "TUTORIAL: RPR / VDRL / TPPA / TPHA", "TUTORIAL: ANA / ASOT / IIP", "TUTORIAL: Dengue and Leptospiral - Antibody", "TUTORIAL: HIV Antigen Antibody and Confirmatory Test", "TUTORIAL: Rubella and TORCHES", "TUTORIAL: Serological Test for Parasitic Infection", "TUTORIAL: Respiratory Viral Infection", "TUTORIAL: GIT Viral Infection", "TUTORIAL: Central Nervous System Viral Infection", "TUTORIAL: Skin Viral Infection", "TUTORIAL: Sexually Transmitted Viral Infection", "TUTORIAL: Hemorrhagic Fever"
+                    "TUTORIAL: Safety in Medical Virology and Serology Laboratory", "TUTORIAL: Virus Isolation and Identification Techniques", "TUTORIAL: RPR / VDRL / TPPA / TPHA", "TUTORIAL: ANA / ASOT / IIP", "TUTREQ_FLAG_OR_DENGUE Dengue and Leptospiral - Antibody", "TUTORIAL: HIV Antigen Antibody and Confirmatory Test", "TUTORIAL: Rubella and TORCHES", "TUTORIAL: Serological Test for Parasitic Infection", "TUTORIAL: Respiratory Viral Infection", "TUTORIAL: GIT Viral Infection", "TUTORIAL: Central Nervous System Viral Infection", "TUTORIAL: Skin Viral Infection", "TUTORIAL: Sexually Transmitted Viral Infection", "TUTORIAL: Hemorrhagic Fever"
                 ],
                 "MTMM 2153": [
                     "KULIAH: Anaerobic Infections", "KULIAH: Upper Respiratory Tract Infections (URTI)", "KULIAH: Lower Respiratory Tract Infections (LRTI)", "KULIAH: Skin & Soft Tissue Infections", "KULIAH: Nosocomial Infections", "KULIAH: Shigellosis and Enteric Fever Infection", "KULIAH: Cholera and Food Poisoning Infection", "KULIAH: Central Nervous System Infections", "KULIAH: Bacteraemia and Sepsis", "KULIAH: Urinary Tract Infections", "KULIAH: Sexual Transmitted Diseases", "KULIAH: Quality Assurance Programme", "KULIAH: Quality Control", "KULIAH: Emerging & Re-emerging Micro-organism", "KULIAH: Latest Equipment, Technique and Test in Microbiology",
@@ -940,26 +941,6 @@
                                         </div>
                                     )}
 
-                                    {userRole === 'superuser' && (
-                                        <div className="flex items-center gap-1 bg-purple-50 px-2 py-1.5 rounded-xl border border-purple-200 h-[34px] no-print">
-                                            <span className="text-[9px] font-black uppercase text-purple-600 mr-1">Status M{selectedWeek}:</span>
-                                            <select 
-                                                value={weekStatuses[`${academicCycle}-${selectedWeek}`] || (weekStatus === "NORMAL" ? "NORMAL" : weekStatus)}
-                                                onChange={(e) => {
-                                                    const statKey = `${academicCycle}-${selectedWeek}`; const nextStat = e.target.value;
-                                                    setWeekStatuses({...weekStatuses, [statKey]: nextStat});
-                                                    if(window.TMP_DB) window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'week_statuses'), {...weekStatuses, [statKey]: nextStat}).catch(err=>console.error(err));
-                                                }}
-                                                className="bg-transparent text-purple-800 text-[10px] font-black outline-none cursor-pointer uppercase"
-                                            >
-                                                <option value="NORMAL">Biasa (Normal)</option>
-                                                <option value="CUTI PERTENGAHAN SEMESTER">Cuti Pertengahan Sem</option>
-                                                <option value="CUTI AKHIR SEMESTER">Cuti Akhir Sem</option>
-                                                <option value="PEPERIKSAAN AKHIR SEMESTER">Peperiksaan Akhir Sem</option>
-                                            </select>
-                                        </div>
-                                    )}
-
                                     <div className="flex flex-col gap-1 border-r pr-3 border-slate-100">
                                         <label className="text-[9px] font-black uppercase text-slate-400 leading-none">Sesi</label>
                                         <select value={academicSession} onChange={e => setAcademicSession(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg border border-blue-100 outline-none cursor-pointer">
@@ -1116,9 +1097,7 @@
                                                                                     {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
                                                                                 </div>
                                                                                 <div className="font-bold leading-tight mb-1 flex-1 overflow-y-auto whitespace-pre-wrap" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', textAlign: ev.align || 'left' }}>{ev.topic}</div>
-                                                                                <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">
-                                                                                    {ev.instructor} {ev.benchTutors ? `/ ${ev.benchTutors}` : ''}
-                                                                                </div>
+                                                                                <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">{ev.instructor}</div>
                                                                             </React.Fragment>
                                                                         ) : (userRole !== 'viewer' && <Icons.Plus />)}
                                                                     </div>
