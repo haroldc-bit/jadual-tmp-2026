@@ -88,6 +88,7 @@
 <body class="bg-white min-h-screen text-black">
     <div id="root"></div>
 
+    <!-- Firebase Compat Initialization & Mapping Layer -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDoMacsYw5OF7F8kDpTsAB79jwJ3RsqG0s",
@@ -435,7 +436,7 @@
             const handleLogin = (e) => {
                 if(e) e.preventDefault();
                 setLoginError("");
-                const code = accessCode.trim();
+                const code = accessCode.trim().toUpperCase();
                 
                 // MENGAKTIFKAN LOGIK LOG MASUK BARU YANG MEMADANKAN KATA LALUAN UNIK SETIAP PENGAJAR
                 if (selectedLoginInstructor && selectedLoginInstructor !== "TRAINEE_VIEWER") {
@@ -455,7 +456,8 @@
 
                 // PEMBETULAN: Semakan Kata Laluan Superuser menggunakan "HcA4604Q" secara mixed-case tanpa pendedahan profil
                 if (!selectedLoginInstructor) {
-                    if (code === "HcA4604Q" || code.toUpperCase() === "TMP2026") {
+                    const rawCode = accessCode.trim();
+                    if (rawCode === "HcA4604Q" || code === "TMP2026") {
                         setIsAuthorized(true); setUserRole('superuser'); 
                         sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'superuser');
                         sessionStorage.setItem('tmp_user_name', 'SUPERUSER/SUPERVISOR');
@@ -465,7 +467,7 @@
 
                 // Pemadanan Pelatih (Trainee) apabila profil pelatih dipilih
                 if (selectedLoginInstructor === "TRAINEE_VIEWER") {
-                    if (code.toUpperCase() === "JTMP2026") {
+                    if (code === "JTMP2026") {
                         setIsAuthorized(true); setUserRole('viewer'); 
                         sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'viewer');
                         sessionStorage.setItem('tmp_user_name', 'TRAINEE/VIEWER');
@@ -477,7 +479,7 @@
                 }
 
                 // Kebolehan masuk terus menggunakan kod pelatih (JTMP2026) tanpa pilih profil
-                if (!selectedLoginInstructor && code.toUpperCase() === "JTMP2026") {
+                if (!selectedLoginInstructor && code === "JTMP2026") {
                     setIsAuthorized(true); 
                     setUserRole('viewer'); 
                     sessionStorage.setItem('tmp_auth', 'true'); 
@@ -526,6 +528,7 @@
                     .reduce((sum, ev) => sum + (parseInt(ev.duration) || 1), 0);
             };
 
+            // PEMBETULAN UNTUK MEMASTIKAN TIADA RALAT CRASH APABILA KELAS LAIN SEPERTI ACARA DIRENDANG
             const getSessionLabel = (ev) => {
                 if (!ev) return '';
                 const initial = sessionInitials[ev.type] || '(L)';
@@ -1078,26 +1081,6 @@
                                         </div>
                                     )}
 
-                                    {userRole === 'superuser' && (
-                                        <div className="flex items-center gap-1 bg-purple-50 px-2 py-1.5 rounded-xl border border-purple-200 h-[34px] no-print">
-                                            <span className="text-[9px] font-black uppercase text-purple-600 mr-1">Status M{selectedWeek}:</span>
-                                            <select 
-                                                value={weekStatuses[`${academicCycle}-${selectedWeek}`] || (weekStatus === "NORMAL" ? "NORMAL" : weekStatus)}
-                                                onChange={(e) => {
-                                                    const statKey = `${academicCycle}-${selectedWeek}`; const nextStat = e.target.value;
-                                                    setWeekStatuses({...weekStatuses, [statKey]: nextStat});
-                                                    if(window.TMP_DB) window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'week_statuses'), {...weekStatuses, [statKey]: nextStat}).catch(err=>console.error(err));
-                                                }}
-                                                className="bg-transparent text-purple-800 text-[10px] font-black outline-none cursor-pointer uppercase"
-                                            >
-                                                <option value="NORMAL">Biasa (Normal)</option>
-                                                <option value="CUTI PERTENGAHAN SEMESTER">Cuti Pertengahan Sem</option>
-                                                <option value="CUTI AKHIR SEMESTER">Cuti Akhir Sem</option>
-                                                <option value="PEPERIKSAAN AKHIR SEMESTER">Peperiksaan Akhir Sem</option>
-                                            </select>
-                                        </div>
-                                    )}
-
                                     <div className="flex flex-col gap-1 border-r pr-3 border-slate-100">
                                         <label className="text-[9px] font-black uppercase text-slate-400 leading-none">Sesi</label>
                                         <select value={academicSession} onChange={e => setAcademicSession(e.target.value)} className="bg-blue-50 text-blue-800 text-[10px] font-black p-1.5 rounded-lg border border-blue-100 outline-none cursor-pointer">
@@ -1272,7 +1255,7 @@
                                                                                         </div>
                                                                                     </React.Fragment>
                                                                                 ) : (
-                                                                                    /* RENDERAN STANDAR JIKA BUKAN SLOT IL BOOKED */
+                                                                                    /* RENDERAN STANDAR JIKA BUKAN SLOT IL BOOKED (PEMBETULAN CRASH BABEL: Menggunakan fungsi pembantu getSessionLabel yang kalis ralat) */
                                                                                     <React.Fragment>
                                                                                         <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0 min-h-[16px]">
                                                                                             {ev.type === 'IL' ? (
@@ -1302,7 +1285,7 @@
                                 </table>
                             </div>
                             
-                            {/* KEMAS KINI STRUKTUR FOOTER (Menyimpan mengikut Semester) */}
+                            {/* KEMAS KINI STRUKTUR FOOTER: DINAMIK IKUT KORT SEMESTER (Bebas Lag & Mempunyai Butang Clear/Simpan) */}
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
                                 <div className="space-y-4">
                                     <p className="uppercase text-slate-800 tracking-wider">
