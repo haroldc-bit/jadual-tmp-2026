@@ -440,7 +440,7 @@
                 // MENGAKTIFKAN LOGIK LOG MASUK BARU YANG MEMADANKAN KATA LALUAN UNIK SETIAP PENGAJAR
                 if (selectedLoginInstructor && selectedLoginInstructor !== "TRAINEE_VIEWER") {
                     const correctPass = instructorPasswords[selectedLoginInstructor];
-                    if (code.toUpperCase() === correctPass.toUpperCase()) {
+                    if (code === correctPass) {
                         setIsAuthorized(true);
                         setUserRole('admin');
                         sessionStorage.setItem('tmp_auth', 'true');
@@ -524,6 +524,15 @@
                 return Object.values(events)
                     .filter(ev => ev && ev.courseCode && typeof ev.courseCode === 'string' && ev.courseCode.trim() === courseCode.trim() && ev.session === academicSession && ev.cycle === academicCycle)
                     .reduce((sum, ev) => sum + (parseInt(ev.duration) || 1), 0);
+            };
+
+            const getSessionLabel = (ev) => {
+                if (!ev) return '';
+                const initial = sessionInitials[ev.type] || '(L)';
+                if (ev.sessionNumber) {
+                    return initial.replace(')', ev.sessionNumber + ')');
+                }
+                return initial;
             };
 
             const handleSave = async (e) => {
@@ -687,7 +696,7 @@
                 }
             };
 
-            // PENAMBAHBAIKAN: Menyegerakan pertukaran tarikh 'sessionStartDate' secara masa nyata (Firebase)
+            // PENAMBAHBAIKAN UTAMA: Menyegerakan pertukaran tarikh 'sessionStartDate' secara masa nyata (Firebase)
             const handleStartDateChange = async (newDate) => {
                 setSessionStartDate(newDate);
                 if (userRole !== 'viewer' && window.TMP_DB) {
@@ -700,7 +709,7 @@
                 }
             };
 
-            // PENAMBAHBAIKAN: Memastikan rakaman PDF tidak memotong lajur 4.00 - 5.00
+            // PENAMBAHBAIKAN UTAMA: Memastikan rakaman PDF tidak memotong lajur 4.00 - 5.00
             const handleExportPDF = () => {
                 const element = printAreaRef.current;
                 const container = tableContainerRef.current;
@@ -839,11 +848,31 @@
             }, [filterSemester]);
 
             useEffect(() => {
-                setTempPreparedName(footerData[`preparedName_${footerSemActive}`] || '');
-                setTempPreparedDate(footerData[`preparedDate_${footerSemActive}`] || '');
+                setTempPreparedName((footerData && footerData[`preparedName_${footerSemActive}`]) || '');
+                setTempPreparedDate((footerData && footerData[`preparedDate_${footerSemActive}`]) || '');
             }, [footerSemActive, footerData]);
 
             // --- 5. EFFECTS ---
+            // Pemulihan Sesi Log Masuk Berasaskan sessionStorage Pada Mount Pertama (Mencegah paparan kosong viewer)
+            useEffect(() => {
+                try {
+                    const authSaved = sessionStorage.getItem('tmp_auth');
+                    const roleSaved = sessionStorage.getItem('tmp_role');
+                    const nameSaved = sessionStorage.getItem('tmp_user_name');
+                    if (authSaved === 'true' && roleSaved) {
+                        setIsAuthorized(true);
+                        setUserRole(roleSaved);
+                        if (roleSaved === 'admin' && nameSaved) {
+                            setSelectedLoginInstructor(nameSaved);
+                        } else if (roleSaved === 'viewer') {
+                            setSelectedLoginInstructor('TRAINEE_VIEWER');
+                        }
+                    }
+                } catch (e) {
+                    console.error("Gagal memulihkan sesi:", e);
+                }
+            }, []);
+
             useEffect(() => {
                 try {
                     const localKey = `tmp_events_cycle_${academicCycle}`;
@@ -1249,7 +1278,7 @@
                                                                                             {ev.type === 'IL' ? (
                                                                                                 "INDEPENDENT LEARNING (IL)"
                                                                                             ) : !(ev.type === 'Lain-lain' || ev.type === 'Taklimat' || ev.type === 'Penyediaan' || ev.courseCode.toUpperCase() === 'LAIN-LAIN') ? (
-                                                                                                `${ev.courseCode} ${ev.sessionNumber ? `${sessionInitials[ev.type].replace(')', ev.sessionNumber + ')')}` : sessionInitials[ev.type] || '(L)'}`
+                                                                                                `${ev.courseCode} ${getSessionLabel(ev)}`
                                                                                             ) : ""}
                                                                                             {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
                                                                                         </div>
@@ -1318,7 +1347,7 @@
                                             <div className="w-full flex items-center">
                                                 <span className="shrink-0 mr-2">NAMA:</span>
                                                 {userRole === 'viewer' ? (
-                                                    <span className="font-black uppercase text-blue-800">{tempPreparedName || 'TIADA REKOD PENYELARAS'}</span>
+                                                    <span className="font-black uppercase text-blue-800">{(footerData && footerData[`preparedName_${footerSemActive}`]) || 'TIADA REKOD PENYELARAS'}</span>
                                                 ) : (
                                                     <input 
                                                         type="text" 
@@ -1339,7 +1368,7 @@
                                         <div className="flex items-center w-full">
                                             <span className="shrink-0 mr-2">TARIKH:</span>
                                             {userRole === 'viewer' ? (
-                                                <span className="font-bold text-blue-800">{tempPreparedDate ? formatDateDisplay(tempPreparedDate) : ''}</span>
+                                                <span className="font-bold text-blue-800">{(footerData && footerData[`preparedDate_${footerSemActive}`]) ? formatDateDisplay(footerData[`preparedDate_${footerSemActive}`]) : ''}</span>
                                             ) : (
                                                 <input 
                                                     type="date" 
@@ -1382,9 +1411,9 @@
                                     <p className="uppercase text-slate-800 tracking-wider">DISAHKAN OLEH:</p>
                                     <div className="mt-8 border-b border-black flex gap-2">
                                         NAMA: {userRole === 'viewer' ? (
-                                            <span className="font-black uppercase">{footerData.verifiedName || ''}</span>
+                                            <span className="font-black uppercase">{(footerData && footerData.verifiedName) || ''}</span>
                                         ) : (
-                                            <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} />
+                                            <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={(footerData && footerData.verifiedName) || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} />
                                         )}
                                     </div>
                                     <p className="mt-1 font-bold uppercase text-slate-500">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
@@ -1392,9 +1421,9 @@
                                     {/* PENAMBAHBAIKAN: Menyembunyikan input tarikh datepicker di sudut kanan bawah ( verifiedDate ) daripada pelatih */}
                                     <div className="mt-4 flex gap-2">
                                         TARIKH: {userRole === 'viewer' ? (
-                                            <span className="font-bold">{footerData.verifiedDate ? formatDateDisplay(footerData.verifiedDate) : ''}</span>
+                                            <span className="font-bold">{(footerData && footerData.verifiedDate) ? formatDateDisplay(footerData.verifiedDate) : ''}</span>
                                         ) : (
-                                            <input type="date" className="bg-transparent outline-none font-bold" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} />
+                                            <input type="date" className="bg-transparent outline-none font-bold" value={(footerData && footerData.verifiedDate) || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} />
                                         )}
                                     </div>
                                 </div>
