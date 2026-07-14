@@ -1,0 +1,528 @@
+const { useState, useEffect, useMemo, useRef } = React;
+
+window.getSessionLabel = function(ev) {
+    if (!ev) return "";
+    const initials = { 'Kuliah': '(L)', 'Amali': '(P)', 'IL': '(IL)', 'Tutorial': '(T)', 'CA': '(CA)', 'Ulangkaji': '(UK)', 'Lain-lain': '(LL)', 'Others': '(O)', 'Taklimat': '(Taklimat)', 'Penyediaan': '(Penyediaan)' };
+    const base = initials[ev.type] || '(L)';
+    if (ev.sessionNumber) {
+        return base.replace(')', ev.sessionNumber + ')');
+    }
+    return base;
+};
+
+const App = () => {
+    const [dbReady, setDbReady] = useState(false); 
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    const [userRole, setUserRole] = useState(null);
+    const [user, setUser] = useState(null);
+    const [accessCode, setAccessCode] = useState("");
+    const [loginError, setLoginError] = useState("");
+    const [academicCycle, setAcademicCycle] = useState('A'); 
+    const [selectedWeek, setSelectedWeek] = useState(1);
+    const [sessionStartDate, setSessionStartDate] = useState('2026-01-05');
+    const [academicSession, setAcademicSession] = useState('Januari - Jun');
+    const [events, setEvents] = useState({});
+    const [courseLimits, setCourseLimits] = useState({}); 
+    const [isTimetableLocked, setIsTimetableLocked] = useState(false);
+    const [selectedLoginInstructor, setSelectedLoginInstructor] = useState(""); 
+    
+    const [footerData, setFooterData] = useState({});
+    const [footerSemActive, setFooterSemActive] = useState('T1SI');
+    const [tempPreparedName, setTempPreparedName] = useState('');
+    const [tempPreparedDate, setTempPreparedDate] = useState('');
+
+    const [filterSemester, setFilterSemester] = useState('SEMUA');
+    const [saturdayConfigs, setSaturdayConfigs] = useState({});
+    const [holidays, setHolidays] = useState({}); 
+    const [weekStatuses, setWeekStatuses] = useState({});
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+    const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
+    const [editingEvent, setEditingEvent] = useState(null);
+    const [lastUpdatedKey, setLastUpdatedKey] = useState(null);
+    
+    const [formData, setFormData] = useState({ 
+        id: '', day: '', timeSlotIndex: 0, courseCode: 'MTBT 2114', customCourseCode: '', 
+        topic: '', type: 'Kuliah', instructor: '', benchTutors: '', semester: '', 
+        duration: 1, sessionNumber: '', align: 'left',
+        isBooked: false, bookedCourse: '', bookedPurpose: 'Amali'
+    });
+    
+    const [tableWidth, setTableWidth] = useState(0);
+    const [modalError, setModalError] = useState("");
+
+    const topScrollRef = useRef(null);
+    const tableContainerRef = useRef(null);
+    const tableElementRef = useRef(null);
+    const printAreaRef = useRef(null);
+
+    const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
+    const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
+    const semesterLabels = { 'T1SI': 'Tahun 1 Semester I', 'T1SII': 'Tahun 1 Semester II', 'T2SI': 'Tahun 2 Semester I', 'T2SII': 'Tahun 2 Semester II' };
+    const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+    
+    const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA’IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMISHA ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
+    const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTMM 2153", "MTBC 2032", "MTBC 2114", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTBT 2193", "MTPC 2203", "MTNF 2162", "MTHE 2182", "MTVS 2142", "MTAP 2094", "MTAP 2172", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "CCRM 2013", "GCSF 2013", "CCPS 2022", "CCEH 2012", "GCSP 2033", "Lain-lain"];
+    
+    const sessionTypes = [
+        { label: 'Kuliah (L)', value: 'Kuliah', color: 'bg-blue-50 border-blue-500 text-blue-700' },
+        { label: 'Amali (P)', value: 'Amali', color: 'bg-emerald-50 border-emerald-500 text-emerald-700' },
+        { label: 'INDEPENDENT LEARNING (IL)', value: 'IL', color: 'bg-yellow-50 border-yellow-500 text-yellow-700' }, 
+        { label: 'Tutorial (T)', value: 'Tutorial', color: 'bg-purple-50 border-purple-400 text-purple-700' },
+        { label: 'CA (Assessment)', value: 'CA', color: 'bg-red-50 border-red-400 text-red-700' },
+        { label: 'Ulangkaji', value: 'Ulangkaji', color: 'bg-orange-50 border-orange-400 text-orange-700' },
+        { label: 'Others (O)', value: 'Others', color: 'bg-teal-50 border-teal-500 text-teal-700' }
+    ];
+
+    const handleLogin = (e) => {
+        if(e) e.preventDefault();
+        setLoginError("");
+        const code = accessCode.trim();
+        
+        if (selectedLoginInstructor && selectedLoginInstructor !== "TRAINEE_VIEWER") {
+            const correctPass = instructorPasswords[selectedLoginInstructor];
+            if (code.toUpperCase() === correctPass) {
+                setIsAuthorized(true); setUserRole('admin');
+                sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'admin');
+                sessionStorage.setItem('tmp_user_name', selectedLoginInstructor);
+                return;
+            } else {
+                setLoginError("Kata Laluan Unik Pengajar Adalah Salah."); return;
+            }
+        }
+
+        if (!selectedLoginInstructor) {
+            if (code === "HcA4604Q" || code.toUpperCase() === "TMP2026") {
+                setIsAuthorized(true); setUserRole('superuser'); 
+                sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'superuser');
+                sessionStorage.setItem('tmp_user_name', 'SUPERUSER/SUPERVISOR');
+                return;
+            }
+        }
+
+        if (selectedLoginInstructor === "TRAINEE_VIEWER" || code.toUpperCase() === "JTMP2026") {
+            if (code.toUpperCase() === "JTMP2026") {
+                setIsAuthorized(true); setUserRole('viewer'); 
+                sessionStorage.setItem('tmp_auth', 'true'); sessionStorage.setItem('tmp_role', 'viewer');
+                sessionStorage.setItem('tmp_user_name', 'TRAINEE/VIEWER');
+                return;
+            } else {
+                setLoginError("Kata Laluan Pelatih Salah."); return;
+            }
+        }
+        setLoginError("Kod Akses Atau Profil Salah.");
+    };
+
+    const handleLogout = () => {
+        sessionStorage.clear(); localStorage.clear();
+        if (window.TMP_DB) window.TMP_DB.signOut(window.TMP_DB.auth).catch(() => {});
+        setIsAuthorized(false); setUserRole(null); window.location.reload(); 
+    };
+
+    const isSlotBreak = (day, slotIdx) => {
+        const slot = timeSlots[slotIdx];
+        if (slot === '10.00 - 10.30') return true; 
+        if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true; 
+        if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx); 
+        return false;
+    };
+
+    const isLocked = (event) => {
+        if (!event || !event.lastUpdate) return false;
+        return (Date.now() - event.lastUpdate) > (24 * 60 * 60 * 1000);
+    };
+
+    const getDisplayDateForDay = (dayIdx) => {
+        const start = new Date(sessionStartDate);
+        start.setDate(start.getDate() + (selectedWeek - 1) * 7 + dayIdx);
+        return start.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
+    const getCourseSemesterCount = (courseCode) => {
+        if (!courseCode) return 0;
+        return Object.values(events)
+            .filter(ev => ev && ev.courseCode === courseCode && ev.session === academicSession && ev.cycle === academicCycle)
+            .reduce((sum, ev) => sum + (parseInt(ev.duration) || 1), 0);
+    };
+
+    const handleSave = async (e) => {
+        if (e) e.preventDefault();
+        if (userRole === 'viewer') return;
+        setModalError(""); 
+
+        const finalCode = (formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? 'Lain-Lain' : formData.courseCode;
+        const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
+        const currentUserSavedName = sessionStorage.getItem('tmp_user_name') || 'Admin / Pengajar';
+        
+        const dataToSave = {
+            id: formData.id || Math.random().toString(36).substr(2, 9),
+            day: formData.day,
+            timeSlotIndex: formData.timeSlotIndex,
+            courseCode: finalCode || '',
+            topic: formData.topic || '',
+            type: formData.type || 'Kuliah',
+            instructor: formData.instructor || '',
+            benchTutors: formData.benchTutors || '',
+            semester: formData.semester,
+            duration: parseInt(formData.duration) || 1,
+            sessionNumber: formData.sessionNumber || '',
+            align: formData.align || 'left',
+            cycle: academicCycle,
+            session: academicSession,
+            lastUpdate: Date.now(),
+            selectedWeek: selectedWeek,
+            updatedBy: currentUserSavedName,
+            isBooked: formData.isBooked || false,
+            bookedCourse: formData.bookedCourse || '',
+            bookedPurpose: formData.bookedPurpose || 'Amali'
+        };
+
+        setEvents(prev => {
+            const next = { ...prev, [key]: dataToSave };
+            localStorage.setItem(`tmp_events_cycle_${academicCycle}`, JSON.stringify(next));
+            return next;
+        });
+        setIsModalOpen(false);
+
+        if (window.TMP_DB) {
+            try {
+                await window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key), dataToSave);
+            } catch (error) {}
+        }
+    };
+
+    const handleDelete = async (e) => {
+        if (e) e.preventDefault();
+        if (userRole === 'viewer' || userRole === 'admin') return;
+        const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
+        
+        setEvents(prev => {
+            const next = { ...prev }; delete next[key];
+            localStorage.setItem(`tmp_events_cycle_${academicCycle}`, JSON.stringify(next)); 
+            return next;
+        });
+        setIsModalOpen(false); 
+
+        if (window.TMP_DB) {
+            try {
+                await window.TMP_DB.deleteDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', `jadual_cycle_${academicCycle}`, key));
+            } catch (error) {}
+        }
+    };
+
+    const handleStartDateChange = async (newDate) => {
+        setSessionStartDate(newDate);
+        if (userRole !== 'viewer' && window.TMP_DB) {
+            try {
+                await window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'session_start_date'), { date: newDate });
+            } catch (e) {}
+        }
+    };
+
+    const handleExportPDF = () => {
+        const element = printAreaRef.current;
+        const container = tableContainerRef.current;
+        const originalOverflow = container.style.overflow;
+        const originalMaxHeight = container.style.maxHeight;
+        const originalWidth = element.style.width;
+
+        const fullWidth = container.scrollWidth;
+        element.style.width = `${fullWidth + 40}px`;
+        container.style.overflow = 'visible';
+        container.style.maxHeight = 'none';
+
+        const opt = {
+            margin: [0.3, 0.3, 0.3, 0.3],
+            filename: `JWM_TMP_Minggu_${selectedWeek}_Versi_${academicCycle}.pdf`,
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2, useCORS: true, windowWidth: fullWidth + 150, width: fullWidth + 100, scrollY: 0 },
+            jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            container.style.overflow = originalOverflow;
+            container.style.maxHeight = originalMaxHeight;
+            element.style.width = originalWidth;
+        });
+    };
+
+    const currentWeekHasSaturday = useMemo(() => saturdayConfigs[`${academicCycle}-${selectedWeek}`] === true, [saturdayConfigs, selectedWeek, academicCycle]);
+    const visibleDays = useMemo(() => currentWeekHasSaturday ? days : days.slice(0, 5), [currentWeekHasSaturday]);
+
+    const weekStatus = useMemo(() => {
+        let customStatus = weekStatuses[`${academicCycle}-${selectedWeek}`];
+        if (customStatus === "PEPERIKSAAN") return "PEPERIKSAAN AKHIR SEMESTER";
+        return customStatus || "NORMAL";
+    }, [selectedWeek, weekStatuses, academicCycle]);
+
+    const autoWeekRange = useMemo(() => {
+        const start = new Date(sessionStartDate);
+        start.setDate(start.getDate() + (selectedWeek - 1) * 7);
+        const end = new Date(start);
+        end.setDate(start.getDate() + (currentWeekHasSaturday ? 5 : 4));
+        return `${start.toLocaleDateString('en-GB')} - ${end.toLocaleDateString('en-GB')}`;
+    }, [sessionStartDate, selectedWeek, currentWeekHasSaturday]);
+
+    const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
+        if (weekStatus !== "NORMAL" || isSlotBreak(day, slotIdx)) return;
+        if (userRole === 'viewer' || (userRole === 'admin' && isTimetableLocked)) return;
+
+        if (event) {
+            setFormData({ ...event, isBooked: event.isBooked || false, bookedCourse: event.bookedCourse || '', bookedPurpose: event.bookedPurpose || 'Amali' });
+            setEditingEvent(event);
+        } else {
+            setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', benchTutors: '', semester: sem, duration: 1, sessionNumber: '', align: 'left', isBooked: false, bookedCourse: '', bookedPurpose: 'Amali' });
+            setEditingEvent(null);
+        }
+        setIsModalOpen(true);
+    };
+
+    useEffect(() => {
+        const checkSession = sessionStorage.getItem('tmp_auth');
+        if(checkSession === 'true') {
+            setIsAuthorized(true);
+            setUserRole(sessionStorage.getItem('tmp_role'));
+        }
+        setDbReady(true);
+    }, []);
+
+    useEffect(() => {
+        if (!dbReady || !isAuthorized || !window.TMP_DB) return;
+        const { db, appId, collection, onSnapshot, doc } = window.TMP_DB;
+        
+        const unsubEv = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`), (s) => {
+            const d = {}; s.forEach(doc => { d[doc.id] = doc.data(); }); setEvents(d);
+        });
+        const unsubLock = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'global_lock'), (d) => {
+            if (d.exists()) setIsTimetableLocked(!!d.data().locked);
+        });
+        const unsubStartDate = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'session_start_date'), (d) => {
+            if (d.exists() && d.data().date) setSessionStartDate(d.data().date);
+        });
+
+        return () => { unsubEv(); unsubLock(); unsubStartDate(); };
+    }, [dbReady, isAuthorized, academicCycle]);
+
+    if (!isAuthorized) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6 text-black">
+                <div className="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full border-4 border-white text-center">
+                    <div className="flex justify-center mb-6">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" alt="Jata Negara" className="w-[90px] h-[90px]" />
+                    </div>
+                    <h2 className="text-base font-black mb-8 uppercase text-slate-800">JADUAL WAKTU TMP ILKKM KUCHING</h2>
+                    <form onSubmit={handleLogin} className="space-y-4">
+                        <select value={selectedLoginInstructor} onChange={(e) => setSelectedLoginInstructor(e.target.value)} className="w-full p-4 bg-slate-50 border-2 rounded-2xl font-black text-sm">
+                            <option value="">-- SILA PILIH PROFIL AKSES --</option>
+                            <option value="TRAINEE_VIEWER">PELATIH / VIEW MODE ONLY</option>
+                            {instructorList.filter(n => n !== 'Lain-lain').map(n => <option key={n} value={n}>{n}</option>)}
+                        </select>
+                        <input type="password" value={accessCode} onChange={e => setAccessCode(e.target.value)} placeholder="Kata Laluan" className="w-full p-4 bg-slate-50 border-2 rounded-2xl text-center font-bold" />
+                        <button type="submit" className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase">Masuk</button>
+                        {loginError && <p className="text-red-600 text-xs font-black">{loginError}</p>}
+                    </form>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="pb-20 bg-white text-black font-sans">
+            <nav className="bg-white border-b sticky top-0 z-[100] px-6 py-4 no-print shadow-sm flex flex-col gap-4">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="bg-blue-700 p-2 rounded-xl text-white font-black italic">TMP</div>
+                        <h1 className="font-black text-slate-800 text-lg">JADUAL MASTER (M{selectedWeek})</h1>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {userRole === 'superuser' && (
+                            <button onClick={async () => {
+                                const next = !isTimetableLocked;
+                                setIsTimetableLocked(next);
+                                if(window.TMP_DB) await window.TMP_DB.setDoc(window.TMP_DB.doc(window.TMP_DB.db, 'artifacts', window.TMP_DB.appId, 'public', 'data', 'jadual_meta_shared', 'global_lock'), { locked: next });
+                            }} className={`px-3 py-2 rounded-xl text-xs font-black text-white ${isTimetableLocked ? 'bg-red-600' : 'bg-slate-500'}`}>
+                                {isTimetableLocked ? '🔒 Kunci: ON' : '🔓 Kunci: OFF'}
+                            </button>
+                        )}
+                        <button onClick={() => window.print()} className="bg-slate-800 text-white px-3 py-2 rounded-xl text-xs font-black">Cetak</button>
+                        <button onClick={handleExportPDF} className="bg-blue-600 text-white px-3 py-2 rounded-xl text-xs font-black">PDF</button>
+                        <button onClick={handleLogout} className="bg-red-100 text-red-600 px-3 py-2 rounded-xl text-xs font-black">Keluar</button>
+                    </div>
+                </div>
+                <div className="flex gap-2 overflow-x-auto py-1">
+                    {Array.from({length: 26}, (_, i) => i + 1).map(w => (
+                        <button key={w} onClick={() => setSelectedWeek(w)} className={`px-3 py-1.5 rounded-xl font-black text-xs ${selectedWeek === w ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`}>M{w}</button>
+                    ))}
+                </div>
+            </nav>
+
+            <main ref={printAreaRef} className="p-4 md:p-8">
+                <div className="text-center border-b-2 border-black pb-4 mb-4">
+                    <h2 className="text-lg font-black uppercase">INSTITUT LATIHAN KEMENTERIAN KESIHATAN MALAYSIA KUCHING</h2>
+                    <p className="text-sm font-bold text-blue-700">TARIKH: {autoWeekRange} (MINGGU {selectedWeek})</p>
+                </div>
+
+                <div ref={tableContainerRef} className="freeze-container">
+                    <div ref={tableElementRef}>
+                        <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full">
+                            <thead>
+                                <tr className="bg-slate-50 border-b-2 border-black text-xs font-black">
+                                    <th className="w-36 p-3 border border-black">Hari / Tarikh</th>
+                                    <th className="w-16 border-web black text-center">Sem</th>
+                                    {timeSlots.map(slot => <th key={slot} className="p-2 border border-black text-center">{slot}</th>)}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {visibleDays.map((day, dIdx) => {
+                                    const vSems = filterSemester === 'SEMUA' ? semesters : [filterSemester];
+                                    return vSems.map((sem, sIdx) => {
+                                        const skips = [];
+                                        return (
+                                            <tr key={`${day}-${sem}`} className="border-b border-black/20">
+                                                {sIdx === 0 && (
+                                                    <td rowSpan={vSems.length} className="p-3 bg-white border border-black text-center align-middle font-black text-xs">
+                                                        <div>{day}</div>
+                                                        <div className="text-[10px] text-blue-600 mt-1">{getDisplayDateForDay(dIdx)}</div>
+                                                    </td>
+                                                )}
+                                                <td className="p-2 bg-white text-center font-black text-xs border border-black">{sem}</td>
+                                                {timeSlots.map((slot, slotIdx) => {
+                                                    if (skips.includes(slotIdx)) return null;
+                                                    const key = `${academicSession}-${selectedWeek}-${day}-${sem}-${slotIdx}`;
+                                                    const ev = events[key];
+                                                    const isBreak = isSlotBreak(day, slotIdx);
+                                                    
+                                                    if (isBreak) {
+                                                        if (sIdx === 0) return <td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border border-black text-center align-middle text-[10px] font-black uppercase tracking-widest opacity-40">REHAT</td>;
+                                                        return null;
+                                                    }
+
+                                                    let colSpan = 1;
+                                                    if (ev && ev.duration > 1) {
+                                                        for(let i=1; i<ev.duration; i++) {
+                                                            if(!isSlotBreak(day, slotIdx+i)) { colSpan++; skips.push(slotIdx+i); } else break;
+                                                        }
+                                                    }
+
+                                                    let bgStyle = "border border-dashed border-slate-200 text-slate-300";
+                                                    if (ev && ev.courseCode) {
+                                                        if (ev.type === 'IL' && ev.isBooked) {
+                                                            bgStyle = "bg-rose-100 border-rose-500 text-rose-800 border-l-4 group relative";
+                                                        } else {
+                                                            bgStyle = sessionTypes.find(t => t.value === ev.type)?.color || "bg-slate-50";
+                                                        }
+                                                    }
+
+                                                    return (
+                                                        <td key={slotIdx} colSpan={colSpan} className="p-1 h-32 align-top border border-black/20">
+                                                            <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden cursor-pointer ${bgStyle}`}>
+                                                                {ev && ev.courseCode ? (
+                                                                    <React.Fragment>
+                                                                        <div className="font-black uppercase truncate min-h-[15px]">
+                                                                            {ev.type === 'IL' ? "INDEPENDENT LEARNING (IL)" : `${ev.courseCode} ${window.getSessionLabel(ev)}`}
+                                                                        </div>
+                                                                        {ev.type === 'IL' && ev.isBooked ? (
+                                                                            <div className="font-black italic text-rose-600 mt-2">(Slot di-booking)</div>
+                                                                        ) : (
+                                                                            <div className="font-bold leading-tight mt-1 whitespace-pre-wrap" style={{textAlign: ev.align || 'left'}}>{ev.topic}</div>
+                                                                        )}
+                                                                        
+                                                                        {ev.type === 'IL' && ev.isBooked && (
+                                                                            <div className="absolute hidden group-hover:block bg-slate-900 text-white p-3 rounded-xl shadow-xl w-64 z-[200] bottom-full left-0 mb-2 no-print font-sans text-xs">
+                                                                                <p className="font-black text-amber-400 uppercase">📌 Maklumat Tempahan:</p>
+                                                                                <p className="mt-1"><strong className="opacity-70">Kursus:</strong> {ev.bookedCourse}</p>
+                                                                                <p><strong className="opacity-70">Tujuan:</strong> {ev.bookedPurpose}</p>
+                                                                                <p><strong className="opacity-70">Silibus:</strong> {ev.topic || 'Tiada'}</p>
+                                                                                <p><strong className="opacity-70">Pengajar:</strong> {ev.instructor || 'Tiada'}</p>
+                                                                            </div>
+                                                                        )}
+
+                                                                        {!(ev.type === 'IL' && ev.isBooked) && (
+                                                                            <div className="mt-auto font-black opacity-60 text-[8px] uppercase">{ev.instructor}</div>
+                                                                        )}
+                                                                    </React.Fragment>
+                                                                ) : "+"}
+                                                            </div>
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                        );
+                                    });
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+
+            {isModalOpen && (
+                <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm text-black">
+                    <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg p-8 border-4 border-blue-600">
+                        <h3 className="font-black text-base uppercase mb-4">Kemas Kini Slot Waktu</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-xs font-black text-slate-400 uppercase">Jenis Sesi</label>
+                                <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} className="w-full p-3 bg-slate-50 border rounded-xl font-bold">
+                                    {sessionTypes.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                                </select>
+                            </div>
+
+                            {formData.type === 'IL' && (
+                                <div className="bg-rose-50 border border-rose-200 p-4 rounded-xl space-y-3">
+                                    <label className="flex items-center gap-2 font-black text-xs text-rose-900 cursor-pointer">
+                                        <input type="checkbox" checked={formData.isBooked} onChange={e => setFormData({...formData, isBooked: e.target.checked})} className="w-4 h-4" />
+                                        Tanda jika slot IL ini di-booking oleh Kursus
+                                    </label>
+                                    {formData.isBooked && (
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <select value={formData.bookedCourse} onChange={e => setFormData({...formData, bookedCourse: e.target.value})} className="p-2 bg-white border rounded-lg font-bold text-xs">
+                                                <option value="">Pilih Kod Kursus</option>
+                                                {courseCodes.filter(c => c !== 'Lain-lain').map(c => <option key={c} value={c}>{c}</option>)}
+                                            </select>
+                                            <select value={formData.bookedPurpose} onChange={e => setFormData({...formData, bookedPurpose: e.target.value})} className="p-2 bg-white border rounded-lg font-bold text-xs">
+                                                <option value="Amali">Amali</option>
+                                                <option value="Ulangkaji">Ulangkaji</option>
+                                                <option value="Perbincangan">Perbincangan</option>
+                                            </select>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="text-xs font-black text-slate-400 uppercase">Tajuk Silibus Pembelajaran</label>
+                                {window.courseTopics[formData.courseCode] && (
+                                    <select onChange={e => setFormData({...formData, topic: e.target.value})} className="w-full p-2 mb-2 bg-emerald-50 border border-emerald-300 rounded-lg text-xs font-bold">
+                                        <option value="">-- PILIH TAJUK SILIBUS --</option>
+                                        {window.courseTopics[formData.courseCode].map((t, idx) => <option key={idx} value={t}>{t}</option>)}
+                                    </select>
+                                )}
+                                <textarea value={formData.topic} onChange={e => setFormData({...formData, topic: e.target.value})} className="w-full p-3 bg-slate-50 border rounded-xl text-xs font-bold" rows="2" placeholder="Huraian manual..." />
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-black text-slate-400 uppercase">Pengajar</label>
+                                <select value={formData.instructor} onChange={e => setFormData({...formData, instructor: e.target.value})} className="w-full p-3 bg-slate-50 border rounded-xl font-bold">
+                                    <option value="">Pilih Pengajar</option>
+                                    {instructorList.map(n => <option key={n} value={n}>{n}</option>)}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="flex gap-2 mt-6">
+                            <button onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-slate-100 rounded-xl font-black text-xs uppercase">Batal</button>
+                            {editingEvent && userRole === 'superuser' && (
+                                <button onClick={handleDelete} className="px-4 py-3 bg-red-100 text-red-600 rounded-xl font-black text-xs uppercase">Padam</button>
+                            )}
+                            <button onClick={handleSave} className="flex-[2] py-3 bg-blue-600 text-white rounded-xl font-black text-xs uppercase">Simpan</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
