@@ -10,10 +10,9 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel & Konfigurasi Khusus (Penyelesaian Ralat JSX/Import) -->
+    <!-- Babel Standalone -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script>
-        // Memaksa Babel Standalone menggunakan Classic Runtime secara stabil tanpa ralat importSource
         Babel.registerPreset('react-classic', {
             presets: [
                 [Babel.availablePresets.react, { runtime: 'classic' }]
@@ -24,7 +23,7 @@
     <!-- HTML2PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-    <!-- Firebase Compat SDK - Menyelesaikan ralat import module secara mutlak -->
+    <!-- Firebase Compat SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -35,9 +34,7 @@
             .no-print { display: none !important; }
             body { background: white !important; padding: 0; margin: 0; font-family: 'Times New Roman', serif; color: black !important; }
             main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-            /* Penstabilan Cetakan: Memaksa kontena mengikut kelebaran halaman cetak */
             .freeze-container { overflow: visible !important; max-height: none !important; border: none !important; display: block !important; width: 100% !important; }
-            /* Penstabilan Cetakan: Mengatasi had min-w-[1500px] secara mutlak semasa cetakan dilakukan */
             table { width: 100% !important; min-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: 1px solid black !important; }
             th, td { border: 1px solid black !important; background: white !important; color: black !important; padding: 4px 2px !important; }
             .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
@@ -88,7 +85,7 @@
 <body class="bg-white min-h-screen text-black">
     <div id="root"></div>
 
-    <!-- Firebase Compat Initialization & Mapping Layer -->
+    <!-- Firebase Compat SDK Setup -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDoMacsYw5OF7F8kDpTsAB79jwJ3RsqG0s",
@@ -187,6 +184,43 @@
     <script type="text/babel" data-presets="react-classic,env">
         const { useState, useEffect, useMemo, useRef } = React;
 
+        // PEMBETULAN PARSING: Menubuhkan pembolehubah format tarikh global yang hilang
+        const formatDateDisplay = (dateStr) => {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return dateStr;
+        };
+
+        // PEMBETULAN MUTLAK: Menyediakan semula pangkalan data kata laluan unik bagi setiap pengajar
+        const instructorPasswords = {
+            "HAROLD CRISO ANAK AJIN": "HAROLD2026",
+            "MAXSION BIN BATUT": "MAXSION2026",
+            "ADELINE BONG HUI FEN": "ADELINE2026",
+            "MOHD SYAHID HARRIS ABDULLAH": "SYAHID2026",
+            "INDRAWATI BINTI AMBO": "INDRAWATI2026",
+            "HAZLIANA BINTI HAZALI": "HAZLIANA2026",
+            "HARNIYATIE BINTI MOHAMAD": "HARNIYATIE2026",
+            "AHMAD FAIZAL BIN OTHMAN": "FAIZAL2026",
+            "ISSYATUL SOFEA ABDULLAH": "SOFEA2026",
+            "JOCELYN CHAN YUNN NING": "JOCELYN2026",
+            "NOOR AYUNIE BINTI MOHAMAD": "AYUNIE2026",
+            "LING SIEW LING": "LING2026",
+            "WONG SUK CHIE": "WONG2026",
+            "TERRYIE BIN EDDIE": "TERRYIE2026",
+            "TERRY ANSLEM RIMPA": "TERRY2026",
+            "MUHAMMAD IQBAL NA’IM BIN ZAMRI": "IQBAL2026",
+            "NURUL NADIAH BINTI MAZLAN": "NADIAH2026",
+            "HANNA ATHIRAH BINTI AMREE": "HANNA2026",
+            "RAJA NURUL AMIRAH BINTI RAJA ZAMRI": "AMIRAH2026",
+            "NUR AMISHA ABDULLAH": "AMISHA2026",
+            "NURHIDATUN BINTI ANNUAR RIGOS": "NURHIDATUN2026",
+            "LESAH BINTI ISMAIL LEE GIAP BENG": "LESAH2026",
+            "JAYANTHI A/P MARIMUTHU": "JAYANTHI2026"
+        };
+
         const Icons = {
             Plus: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
             X: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" h="6" x2="6" y2="18"></line><line x1="6" h="6" x2="18" y2="18"></line></svg>,
@@ -197,7 +231,7 @@
             External: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>,
             User: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
             Chart: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" h="20" x2="6" y2="14"></line></svg>,
-            Printer: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>,
+            Printer: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>,
             Search: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
             Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
             FileText: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -232,7 +266,7 @@
                 "TUTORIAL: Pathogen and Pathogenesis", "TUTORIAL: Gram Positive Bacteria", "TUTORIAL: Gram Negative Bacteria", "TUTORIAL: RNA Viruses", "TUTORIAL: DNA Viruses", "TUTORIAL: Classification, Diseases and Pathogenesis of Fungi", "TUTORIAL: Protozoa", "TUTORIAL: Helminths", "TUTORIAL: Immune Response", "TUTORIAL: Community Based Infection"
             ],
             "GCSF 2013": [
-                "KULIAH: Structural Organization of Human Body", "KULIAH: Cell Structure and Function", "KULIAH: Basic Chemistry", "KULIAH: Cellular Reproduction", "KULIAH: Tissues", "KULIAH: Structure and Function of Integumentary System", "KULIAH: Blood", "KULIAH: Structure and Organization of the Heart", "KULIAH: Cardiac Cycle", "KULIAH: Structure of Blood Vessel, Function and Circulatory Routes", "KULIAH: Lymphatic System", "KULIAH: Structures and Function of Respiratory System", "KULIAH: Pulmonary Ventilation", "KULIAH: Control of Respiration", "KULIAH: Components of Endocrine System", "KULIAH: Introduction to Diagnostic System", "KULIAH: Structures and Functions of Organs in Diagnostic System", "KULIAH: Accessory Organs of the Diagnostic System", "KULIAH: Digestion, Absorption and Defecation", "KULIAH: Organisation of Nervous System and Nerve Cells", "KULIAH: Central Nervous System", "KULIAH: Peripheral Nervous System", "KULIAH: Skeletal System", "KULIAH: Classification of Joints", "KULIAH: Muscular System", "KULIAH: Components of Urinary System", "KULIAH: Physiology of Urinary System", "KULIAH: Male Reproductive System", "KULIAH: Female Reproductive System", "KULIAH: Structure and Functions of Ear and Other Sensory Organs", "KULIAH: Structure and Functions of Eye",
+                "KULIAH: Structural Organization of Human Body", "KULIAH: Cell Structure and Function", "KULIAH: Basic Chemistry", "KULIAH: Cellular Reproduction", "KULIAH: Tissues", "KULIAH: Structure and Function of Integumentary System", "KULIAH: Blood", "KULIAH: Structure and Organization of the Heart", "KULIAH: Cardiac Cycle", "KULIAH: Structure of Blood Vessel, Function and Circulatory Routes", "KULIAH: Lymphatic System", "KULIAH: Structures and Function of Respiratory System", "KULIAH: Pulmonary Ventilation", "KULIAH: Control of Respiration", "KULIAH: Components of Endocrine System", "KULIAH: Introduction to Diagnostic System", "KULIAH: Structures and Functions of Organs in Diagnostic System", "KULIAH: Accessory Organs of the Digestive System", "KULIAH: Digestion, Absorption and Defecation", "KULIAH: Organisation of Nervous System and Nerve Cells", "KULIAH: Central Nervous System", "KULIAH: Peripheral Nervous System", "KULIAH: Skeletal System", "KULIAH: Classification of Joints", "KULIAH: Muscular System", "KULIAH: Components of Urinary System", "KULIAH: Physiology of Urinary System", "KULIAH: Male Reproductive System", "KULIAH: Female Reproductive System", "KULIAH: Structure and Functions of Ear and Other Sensory Organs", "KULIAH: Structure and Functions of Eye",
                 "TUTORIAL: Cell Structure and Function", "TUTORIAL: Tissues", "TUTORIAL: Structure and Function of Integumentary System", "TUTORIAL: Blood", "TUTORIAL: Cardiac Cycle", "TUTORIAL: Structure of Blood Vessel, Function and Circulatory Routes", "TUTORIAL: Structures and Function of Respiratory System", "TUTORIAL: Pulmonary Ventilation", "TUTORIAL: Components of Endocrine System", "TUTORIAL: Structures and Functions of Organs in Diagnostic System", "TUTORIAL: Digestion, Absorption and Defecation", "TUTORIAL: Organisation of Nervous System and Nerve Cells", "TUTORIAL: Skeletal System", "TUTORIAL: Physiology of Urinary System", "TUTORIAL: Female Reproductive System", "TUTORIAL: Structure and Functions of Ear and Other Sensory Organs"
             ],
             "GCSP 2033": [
@@ -354,10 +388,8 @@
         };
 
         const App = () => {
-            // --- CONFIG: DRIVE FILE ID JATA NEGARA ---
             const JATA_NEGARA_FILE_ID = "1ZqpkDsIF_OsgLW8zvLePk6HKlwMX8WMM";
 
-            // --- 1. STATES ---
             const [dbReady, setDbReady] = useState(false); 
             const [isAuthorized, setIsAuthorized] = useState(false);
             const [userRole, setUserRole] = useState(null);
@@ -414,7 +446,6 @@
             const tableElementRef = useRef(null);
             const printAreaRef = useRef(null);
 
-            // --- 2. CONSTANTS ---
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
             const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
             const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA’IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMISHA ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
@@ -440,7 +471,7 @@
                 
                 if (selectedLoginInstructor && selectedLoginInstructor !== "TRAINEE_VIEWER") {
                     const correctPass = instructorPasswords[selectedLoginInstructor];
-                    if (codeUpper === correctPass.toUpperCase()) {
+                    if (correctPass && codeUpper === correctPass.toUpperCase()) {
                         setIsAuthorized(true);
                         setUserRole('admin');
                         sessionStorage.setItem('tmp_auth', 'true');
@@ -464,7 +495,7 @@
                     }
                 }
 
-                if (selectedLoginInstructor === "TRAINEE_VIEWER") {
+                if (selectedLoginInstructor === "TRAINEE_VIEWER" || codeUpper === "JTMP2026") {
                     if (codeUpper === "JTMP2026") {
                         setIsAuthorized(true); 
                         setUserRole('viewer'); 
@@ -478,19 +509,9 @@
                     }
                 }
 
-                if (!selectedLoginInstructor && codeUpper === "JTMP2026") {
-                    setIsAuthorized(true); 
-                    setUserRole('viewer'); 
-                    sessionStorage.setItem('tmp_auth', 'true'); 
-                    sessionStorage.setItem('tmp_role', 'viewer');
-                    sessionStorage.setItem('tmp_user_name', 'TRAINEE/VIEWER');
-                    return;
-                }
-
                 setLoginError("Kod Akses Atau Profil Salah.");
             };
 
-            // Memulihkan sesi log masuk berasaskan sessionStorage pada Mount pertama (Mencegah blank screen)
             useEffect(() => {
                 try {
                     const authSaved = sessionStorage.getItem('tmp_auth');
@@ -830,6 +851,17 @@
                 return { courseSum, instructorSum };
             }, [events, academicSession, academicCycle]);
 
+            const handleLogout = () => {
+                try {
+                    sessionStorage.removeItem('tmp_auth');
+                    sessionStorage.removeItem('tmp_role');
+                    sessionStorage.removeItem('tmp_user_name');
+                    sessionStorage.clear(); localStorage.clear();
+                    if (window.TMP_DB) window.TMP_DB.signOut(window.TMP_DB.auth).catch(() => {});
+                } catch (e) {}
+                setIsAuthorized(false); setUserRole(null); window.location.reload(); 
+            };
+
             useEffect(() => {
                 if (filterSemester !== 'SEMUA') {
                     setFooterSemActive(filterSemester);
@@ -873,6 +905,7 @@
                 const unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), (d) => { if(d.exists()) setSaturdayConfigs(d.data()); });
                 const unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), (d) => { if(d.exists()) setHolidays(d.data()); });
                 
+                // PEMBETULAN UTAMA: Menyegerakan status Lock Jadual ke laluan pangkalan data yang betul (jadual_meta_shared/global_lock)
                 const unsubLock = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'global_lock'), (d) => {
                     if (d.exists()) setIsTimetableLocked(!!d.data().locked);
                 });
@@ -1152,7 +1185,7 @@
                                                             const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked);
 
                                                             // Reka Bentuk Warna Dinamik bagi Ciri IL Booking
-                                                            let bgStyle = "border border-dashed border-slate-100 flex items-center justify-center text-slate-200";
+                                                            let bgStyle = "border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200";
                                                             if (ev && ev.courseCode) {
                                                                 if (ev.type === 'IL' && ev.isBooked) {
                                                                     bgStyle = "bg-rose-100 border-rose-500 text-rose-800 border-l-4 group relative flex flex-col";
@@ -1215,7 +1248,7 @@
                                 </table>
                             </div>
                             
-                            {/* KEMAS KINI STRUKTUR FOOTER: DINAMIK IKUT KORT SEMESTER (Bebas Lag & Mempunyai Butang Clear/Simpan) */}
+                            {}
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
                                 <div className="space-y-4">
                                     <p className="uppercase text-slate-800 tracking-wider">
@@ -1429,7 +1462,7 @@
                                                         <select 
                                                             value={formData.bookedCourse || ''} 
                                                             onChange={(e) => setFormData({...formData, bookedCourse: e.target.value})} 
-                                                            className="w-full p-2 bg-white border border-rose-300 rounded-xl font-bold text-xs text-black"
+                                                            className="w-full p-2 bg-white border border-rose-300 rounded-xl font-bold text-xs"
                                                         >
                                                             <option value="">Pilih Kursus</option>
                                                             {courseCodes.filter(c => c !== 'Lain-lain').map(c => <option key={c} value={c}>{c}</option>)}
@@ -1440,8 +1473,9 @@
                                                         <select 
                                                             value={formData.bookedPurpose || ''} 
                                                             onChange={(e) => setFormData({...formData, bookedPurpose: e.target.value})} 
-                                                            className="w-full p-2 bg-white border border-rose-300 rounded-xl font-bold text-xs text-black"
+                                                            className="w-full p-2 bg-white border border-rose-300 rounded-xl font-bold text-xs"
                                                         >
+                                                            <option value="">Pilih Sesi</option>
                                                             <option value="Amali">Amali</option>
                                                             <option value="Ulangkaji">Ulangkaji</option>
                                                             <option value="Perbincangan">Perbincangan</option>
@@ -1456,7 +1490,7 @@
                                         <label className="text-[11px] font-black text-slate-400 uppercase">{(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? 'Nama Aktiviti / Perkara' : 'Tajuk Pembelajaran'}</label>
                                         {(formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') && (
                                             <select 
-                                                className="w-full p-3 mb-2 bg-emerald-50 border-2 border-emerald-400 rounded-xl font-black text-[11px] text-emerald-900 shadow-sm outline-none cursor-pointer animate-none" 
+                                                className="w-full p-3 mb-2 bg-emerald-50 border-2 border-emerald-400 rounded-xl font-black text-[11px] text-emerald-900 shadow-sm outline-none cursor-pointer" 
                                                 onChange={(e) => { if(e.target.value) setFormData({...formData, topic: e.target.value}); e.target.value = ""; }}
                                             >
                                                 <option value="">⬇️ KLIK SINI UNTUK SENARAI TAJUK SILIBUS ⬇️</option>
