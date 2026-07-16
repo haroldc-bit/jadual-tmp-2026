@@ -85,7 +85,6 @@
 <body class="bg-white min-h-screen text-black">
     <div id="root"></div>
 
-    <!-- Firebase Compat SDK Setup -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDoMacsYw5OF7F8kDpTsAB79jwJ3RsqG0s",
@@ -180,7 +179,6 @@
         }
     </script>
 
-    <!-- React Application Code -->
     <script type="text/babel" data-presets="react-classic,env">
         const { useState, useEffect, useMemo, useRef } = React;
 
@@ -796,32 +794,6 @@
                 return "NORMAL";
             }, [selectedWeek, weekStatuses, academicCycle]);
 
-            const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
-                if (weekStatus !== "NORMAL") return;
-                if (isSlotBreak(day, slotIdx)) return;
-
-                const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked);
-                if (!canEdit) return;
-
-                setModalError(""); 
-                if (event) {
-                    setFormData({ 
-                        ...event, 
-                        customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode,
-                        benchTutors: event.benchTutors || '',
-                        align: event.align || 'left',
-                        isBooked: !!event.isBooked,
-                        bookedCourse: event.bookedCourse || '',
-                        bookedPurpose: event.bookedPurpose || 'Amali'
-                    });
-                    setEditingEvent(event);
-                } else {
-                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', benchTutors: '', semester: sem, duration: 1, sessionNumber: '', align: 'left', isBooked: false, bookedCourse: '', bookedPurpose: 'Amali' });
-                    setEditingEvent(null);
-                }
-                setIsModalOpen(true);
-            };
-
             const autoWeekRange = useMemo(() => {
                 const start = new Date(sessionStartDate);
                 start.setDate(start.getDate() + (selectedWeek - 1) * 7);
@@ -905,7 +877,6 @@
                 const unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), (d) => { if(d.exists()) setSaturdayConfigs(d.data()); });
                 const unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), (d) => { if(d.exists()) setHolidays(d.data()); });
                 
-                // PEMBETULAN UTAMA: Menyegerakan status Lock Jadual ke laluan pangkalan data yang betul (jadual_meta_shared/global_lock)
                 const unsubLock = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'global_lock'), (d) => {
                     if (d.exists()) setIsTimetableLocked(!!d.data().locked);
                 });
@@ -918,6 +889,32 @@
 
                 return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); unsubLock(); unsubStartDate(); };
             }, [dbReady, isAuthorized, user, academicCycle]);
+
+            const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
+                if (weekStatus !== "NORMAL") return;
+                if (isSlotBreak(day, slotIdx)) return;
+
+                const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked);
+                if (!canEdit) return;
+
+                setModalError(""); 
+                if (event) {
+                    setFormData({ 
+                        ...event, 
+                        customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode,
+                        benchTutors: event.benchTutors || '',
+                        align: event.align || 'left',
+                        isBooked: !!event.isBooked,
+                        bookedCourse: event.bookedCourse || '',
+                        bookedPurpose: event.bookedPurpose || 'Amali'
+                    });
+                    setEditingEvent(event);
+                } else {
+                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', benchTutors: '', semester: sem, duration: 1, sessionNumber: '', align: 'left', isBooked: false, bookedCourse: '', bookedPurpose: 'Amali' });
+                    setEditingEvent(null);
+                }
+                setIsModalOpen(true);
+            };
 
             if (!isAuthorized) {
                 return (
@@ -1073,13 +1070,14 @@
                             <div className="w-full bg-slate-50 p-1.5 rounded-2xl border-2 border-slate-200 overflow-hidden no-print">
                                 <div className="week-scrollbar flex gap-2 overflow-x-auto pb-1 px-1">
                                     {Array.from({length: 26}, (_, i) => i + 1).map(w => (
-                                        <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[42px] py-1.5 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-400 hover:bg-slate-100'}`}>M{w}</button>
+                                        <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[42px] py-1.5 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 hover:bg-slate-100'}`}>M{w}</button>
                                     ))}
                                 </div>
                             </div>
                         </div>
                     </nav>
 
+                    {}
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
                             <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPLKKM.PK(T)04B/17</div>
@@ -1135,6 +1133,7 @@
                             <div style={{ width: `${tableWidth}px`, height: '1px' }}></div>
                         </div>
 
+                        {}
                         <div ref={tableContainerRef} className="freeze-container table-to-scroll">
                             <div ref={tableElementRef}>
                                 <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full text-black">
@@ -1142,7 +1141,14 @@
                                         <tr className="bg-slate-50 border-b-2 border-black text-[12px] font-black uppercase">
                                             <th className="w-36 p-4 border-r border-black">Hari / Tarikh</th>
                                             <th className="w-16 border-r border-black text-center">Sem</th>
-                                            {timeSlots.map(slot => (<th key={slot} className="p-3 border-r border-black text-center">{slot}</th>))}
+                                            {timeSlots.map(slot => {
+                                                // PEMBETULAN KHAS: Menjadikan lebar lajur Rehat sama lebar dengan lajur SEM (w-16)
+                                                const isNarrowBreakCol = slot === '10.00 - 10.30' || slot === '1.00 - 2.00';
+                                                const colWidthClass = isNarrowBreakCol ? 'w-16' : '';
+                                                return (
+                                                    <th key={slot} className={`${colWidthClass} p-3 border-r border-black text-center`}>{slot}</th>
+                                                );
+                                            })}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1201,12 +1207,10 @@
                                                                             <React.Fragment>
                                                                                 {ev.type === 'IL' && ev.isBooked ? (
                                                                                     <React.Fragment>
-                                                                                        <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0 min-h-[16px]">
+                                                                                        {/* PEMBETULAN KHAS: Hanya memaparkan tajuk INDEPENDENT LEARNING (IL) secara bersih tanpa teks "Slot di-booking" */}
+                                                                                        <div className="font-black uppercase truncate leading-tight shrink-0 min-h-[16px] h-full flex items-center justify-center text-center">
                                                                                             INDEPENDENT LEARNING (IL)
                                                                                             {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
-                                                                                        </div>
-                                                                                        <div className="font-bold text-[10px] leading-tight mb-1 flex-1 overflow-y-auto whitespace-pre-wrap flex items-center justify-center text-center italic opacity-60">
-                                                                                            (Slot di-booking)
                                                                                         </div>
                                                                                         
                                                                                         {/* Floating Tooltip terapung sewaktu cursor digerakkan (hover) */}
@@ -1215,7 +1219,11 @@
                                                                                             <div className="pt-1">Kursus: <span className="text-white font-extrabold">{ev.bookedCourse}</span></div>
                                                                                             <div>Sesi: <span className="text-rose-200 font-extrabold">{ev.bookedPurpose}</span></div>
                                                                                             {ev.topic && <div className="border-t border-white/10 pt-1 mt-1 text-slate-300 font-medium whitespace-pre-wrap">Silibus: {ev.topic}</div>}
-                                                                                            {ev.instructor && <div className="text-[9px] text-slate-400 font-black border-t border-white/10 pt-1 mt-1">Pengajar: {ev.instructor}</div>}
+                                                                                            {(ev.instructor || ev.benchTutors) && (
+                                                                                                <div className="text-[9px] text-slate-400 font-black border-t border-white/10 pt-1 mt-1">
+                                                                                                    Pengajar: {ev.instructor || 'Tiada'} {ev.benchTutors ? `/ ${ev.benchTutors}` : ''}
+                                                                                                </div>
+                                                                                            )}
                                                                                         </div>
                                                                                     </React.Fragment>
                                                                                 ) : (
@@ -1372,7 +1380,7 @@
                         </div>
                     </main>
 
-                    {/* MODAL EDITOR KEMAS KINI SLOT */}
+                    {}
                     {isModalOpen && (
                         <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm no-print animate-in fade-in duration-300 text-black">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[95vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
@@ -1533,7 +1541,8 @@
                                         </select>
                                     </div>
 
-                                    {(formData.type === 'Amali' || formData.type === 'Penyediaan') && (
+                                    {/* PEMBETULAN KHAS: Menampilkan input Bench Tutor jika sesi adalah Amali, Penyediaan atau Slot IL yang Di-booking */}
+                                    {(formData.type === 'Amali' || formData.type === 'Penyediaan' || (formData.type === 'IL' && formData.isBooked)) && (
                                         <div className="space-y-1 text-black mt-4 animate-in slide-in-from-top-2">
                                             <label className="text-[11px] font-black text-slate-400 uppercase">Bench Tutor (Initial)</label>
                                             <input 
