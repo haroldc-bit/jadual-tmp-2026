@@ -214,6 +214,7 @@
             "TERRYIE BIN EDDIE": "TE2026",
             "TERRY ANSLEM RIMPA": "TR2026",
             "MUHAMMAD IQBAL NA'IM BIN ZAMRI": "IZ2026",
+            "MUHAMMAD IQBAL NA’IM BIN ZAMRI": "IZ2026",
             "NURUL NADIAH BINTI MAZLAN": "NM2026",
             "HANNA ATHIRAH BINTI AMREE": "HA2026",
             "RAJA NURUL AMIRAH BINTI RAJA ZAMRI": "RZ2026",
@@ -315,7 +316,7 @@
                 "TUTORIAL: Safe Laboratory Practice", "TUTORIAL: Application of Analytical Techniques", "TUTORIAL: Specimen Collection and Other Pre-Analytical Variables", "TUTORIAL: Diabetes mellitus and hypoglycemia", "TUTORIAL: Glucose tolerance test", "TUTORIAL: Calibration and Standardization Technique in Clinical Biochemistry", "TUTORIAL: Concept and Work Process of Automated System", "TUTORIAL: Clearance"
             ],
             "MTAP 2094": [
-                "KULIAH: Introduction to Histopathology", "KULIAH: Inflammation and Neoplasia", "KULIAH: Normal Histology", "KULIAH: Specimen receiving and specimen cut-up", "KULIAH: Fixation of Tissue", "KULIAH: Tissue Processing: Formalin Fixed-Paraffin Embedding Tissue", "KULIAH: Microtomy: Formalin Fixed Paraffin Embedded Tissue", "KULIAH: Haematoxylin & Eoin Stain (H&E)", "KULIAH: Decalcification", "KULIAH: Frozen Section in Histopathology", "KULIAH: Laboratory Safety in Histopathology Laboratory", "KULIAH: Quality Assurance in Histopathology Laboratory",
+                "KULIAH: Introduction to Histopathology", "KULIAH: Inflammation and Neoplasia", "KULIAH: Normal Histology", "KULIAH: Specimen receiving and specimen cut-up", "KULIAH: Fixation of Tissue", "KULIAH: Tissue Processing: Formalin Fixed-Paraffin Embedding Tissue", "KULIAH: Microtomy: Formalin Fixed Paraffin Embedded Tissue", "KULIAH: Haematoxylin & Eosin Stain (H&E)", "KULIAH: Decalcification", "KULIAH: Frozen Section in Histopathology", "KULIAH: Laboratory Safety in Histopathology Laboratory", "KULIAH: Quality Assurance in Histopathology Laboratory",
                 "TUTORIAL: Inflammation and Neoplasia", "TUTORIAL: Tissue Processing: Formalin Fixed-Paraffin Embedding Tissue", "TUTROMY: Formalin Fixed Paraffin Embedded Tissue", "TUTORIAL: Haematoxylin & Eosin Stain (H&E)", "TUTORIAL: Quality Assurance in Histopathology Laboratory",
                 "AMALI: Normal Histology", "AMALI: Histology of Specific Tissues in Body Systems", "AMALI: Specimen receiving and specimen cut-up", "AMALI: Fixation of Tissue", "AMALI: Tissue Processing: Formalin Fixed-Paraffin Embedding Tissue", "AMALI: Microtomy: FormalIN Fixed Paraffin Embedded Tissue", "AMALI: Haematoxylin & Eosin Stain (H&E)", "AMALI: Decalcification", "AMALI: Frozen Section in Histopathology"
             ],
@@ -375,7 +376,13 @@
             Save: () => <span>💾</span>,
             Lock: () => <span>🔒</span>,
             Trash: () => <span>🗑️</span>,
-            External: () => <span>🚪</span>,
+            External: () => (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            ),
             User: () => <span>👤</span>,
             Chart: () => <span>📊</span>,
             Printer: () => <span>🖨️</span>,
@@ -490,7 +497,7 @@
             // --- 2. STRUCTURE CONSTANTS ---
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
             const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
-            const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA'IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMISHA ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
+            const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA'IM BIN ZAMRI", "MUHAMMAD IQBAL NA’IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMISHA ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
             const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTMM 2153", "MTBC 2032", "MTBC 2114", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTAP 2094", "MTHE 2182", "MTBT 2193", "MTPC 2203", "MTVS 2142", "MTMM 2153", "MTNF 2162", "MTAP 2172", "CCRM 2013", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "GCSF 2013", "CCPS 2022", "CCEH 2012", "GCSP 2033", "Lain-lain"];
             const semesterLabels = { 'T1SI': 'Tahun 1 Semester I', 'T1SII': 'Tahun 1 Semester II', 'T2SI': 'Tahun 2 Semester I', 'T2SII': 'Tahun 2 Semester II' };
             const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
@@ -512,7 +519,15 @@
                 const codeUpper = code.toUpperCase();
                 
                 if (selectedLoginInstructor && selectedLoginInstructor !== "TRAINEE_VIEWER") {
-                    const correctPass = instructorPasswords[selectedLoginInstructor];
+                    // Normalisasi nama pilihan bagi menolak ralat perbezaan aksara apostrof
+                    const normSelected = selectedLoginInstructor.replace(/’/g, "'").trim().toUpperCase();
+                    
+                    // Mencari key pengajar yang sepadan di dalam senarai passwords
+                    const matchingKey = Object.keys(instructorPasswords).find(k => 
+                        k.replace(/’/g, "'").trim().toUpperCase() === normSelected
+                    );
+                    
+                    const correctPass = matchingKey ? instructorPasswords[matchingKey] : null;
                     if (correctPass && codeUpper === correctPass.toUpperCase()) {
                         setIsAuthorized(true);
                         setUserRole('admin');
@@ -576,7 +591,7 @@
             const isSlotBreak = (day, slotIdx) => {
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true; 
-                if (day !== 'Isnin' && slot === '1.00 - 2.00') return true; 
+                if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true; 
                 if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx); 
                 return false;
             };
@@ -916,7 +931,7 @@
 
                 try {
                     unsubSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), (d) => { if(d.exists()) setFooterData(d.data()); }, (err) => console.error(err));
-                } catch(e) { console.error(e); }
+                } catch(e) { console.error(err); }
 
                 try {
                     unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), (d) => { if(d.exists()) setSaturdayConfigs(d.data()); }, (err) => console.error(err));
@@ -1293,7 +1308,7 @@
                                                                                             {ev.instructor} {ev.updatedBy ? `[Ed: ${ev.updatedBy.split(' ')[0]}]` : ''}
                                                                                         </div>
                                                                                         
-                                                                                        {/* Floating Tooltip terapung sewaktu cursor digerakkan (hover) */}
+                                                                                        {/* Floating Tooltip terapung sewaktu kursor diletakkan di atas petak */}
                                                                                         <div className="absolute no-print top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-white p-3 rounded-2xl shadow-2xl z-[200] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none min-w-[220px] border border-rose-500 font-bold text-xs space-y-1 font-sans">
                                                                                             <div className="text-[10px] text-rose-300 font-black uppercase tracking-wider pb-1 border-b border-white/10">Maklumat Tempahan IL</div>
                                                                                             <div className="pt-1">Kursus: <span className="text-white font-extrabold">{ev.bookedCourse}</span></div>
@@ -1725,4 +1740,3 @@
     </script>
 </body>
 </html>
-```
