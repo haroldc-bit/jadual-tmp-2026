@@ -192,7 +192,6 @@
     <script type="text/babel" data-presets="react-classic,env">
         const { useState, useEffect, useMemo, useRef } = React;
 
-        // PEMULIHAN KATA LALUAN ASAL (NAMA PERTAMA + 2026)
         const instructorPasswords = {
             "HAROLD CRISO ANAK AJIN": "HAROLD2026",
             "MAXSION BIN BATUT": "MAXSION2026",
@@ -515,10 +514,7 @@
                 const codeUpper = code.toUpperCase();
                 
                 if (selectedLoginInstructor && selectedLoginInstructor !== "TRAINEE_VIEWER") {
-                    // Normalisasi nama pilihan bagi menolak ralat perbezaan aksara apostrof
                     const normSelected = selectedLoginInstructor.replace(/’/g, "'").trim().toUpperCase();
-                    
-                    // Mencari key pengajar yang sepadan di dalam senarai passwords
                     const matchingKey = Object.keys(instructorPasswords).find(k => 
                         k.replace(/’/g, "'").trim().toUpperCase() === normSelected
                     );
@@ -564,25 +560,6 @@
 
                 setLoginError("Kod Akses Atau Profil Salah.");
             };
-
-            useEffect(() => {
-                try {
-                    const authSaved = safeStorage.getItem('tmp_auth');
-                    const roleSaved = safeStorage.getItem('tmp_role');
-                    const nameSaved = safeStorage.getItem('tmp_user_name');
-                    if (authSaved === 'true' && roleSaved) {
-                        setIsAuthorized(true);
-                        setUserRole(roleSaved);
-                        if (roleSaved === 'admin' && nameSaved) {
-                            setSelectedLoginInstructor(nameSaved);
-                        } else if (roleSaved === 'viewer') {
-                            setSelectedLoginInstructor('TRAINEE_VIEWER');
-                        }
-                    }
-                } catch (e) {
-                    console.error("Gagal memulihkan sesi:", e);
-                }
-            }, []);
 
             const isSlotBreak = (day, slotIdx) => {
                 const slot = timeSlots[slotIdx];
@@ -941,7 +918,7 @@
                     unsubLock = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'global_lock'), (d) => {
                         if (d.exists()) setIsTimetableLocked(!!d.data().locked);
                     }, (err) => console.error(err));
-                } catch(e) { console.error(err); }
+                } catch(e) { console.error(e); }
                 
                 try {
                     unsubStartDate = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'session_start_date'), (d) => {
@@ -997,6 +974,7 @@
                 window.location.reload(); 
             };
 
+            // Reka bentuk dialog log masuk
             if (!isAuthorized) {
                 return (
                     <div className="min-h-screen flex items-center justify-center bg-blue-900 p-6 text-black">
@@ -1157,7 +1135,7 @@
                         </div>
                     </nav>
 
-                    {/* Main Timetable Content */}
+                    {}
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
                             <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPLKKM.PK(T)04B/17</div>
@@ -1213,17 +1191,28 @@
                         <div ref={tableContainerRef} className="freeze-container table-to-scroll">
                             <div>
                                 <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full text-black">
+                                    {/* colgroup yang kukuh untuk menjamin penjajaran lajur mutlak tanpa herotan di kolum 2.00-3.00 */}
+                                    <colgroup>
+                                        <col style={{ width: '8%' }} />
+                                        <col style={{ width: '4%' }} />
+                                        <col style={{ width: '10%' }} />
+                                        <col style={{ width: '10%' }} />
+                                        <col style={{ width: '4%' }} />
+                                        <col style={{ width: '10%' }} />
+                                        <col style={{ width: '10%' }} />
+                                        <col style={{ width: '10%' }} />
+                                        <col style={{ width: '4%' }} />
+                                        <col style={{ width: '10%' }} />
+                                        <col style={{ width: '10%' }} />
+                                        <col style={{ width: '10%' }} />
+                                    </colgroup>
                                     <thead>
                                         <tr className="bg-slate-50 border-b-2 border-black text-[12px] font-black uppercase">
-                                            <th className="w-36 p-4 border border-black">Hari / Tarikh</th>
-                                            <th className="w-16 border border-black text-center">Sem</th>
-                                            {timeSlots.map(slot => {
-                                                const isRehatCol = (slot === '10.00 - 10.30' || slot === '1.00 - 2.00');
-                                                const colWidthClass = isRehatCol ? 'w-16' : 'w-40';
-                                                return (
-                                                    <th key={slot} className={`${colWidthClass} p-3 border border-black text-center`}>{slot}</th>
-                                                );
-                                            })}
+                                            <th className="p-4 border border-black">Hari / Tarikh</th>
+                                            <th className="border border-black text-center">Sem</th>
+                                            {timeSlots.map(slot => (
+                                                <th key={slot} className="p-3 border border-black text-center">{slot}</th>
+                                            ))}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1282,28 +1271,19 @@
 
                                                             return (
                                                                 <td key={slotIdx} colSpan={colSpan} className={`p-1 border border-black h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
-                                                                    <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${bgStyle} ${isMatch ? 'search-match' : ''} ${canEdit ? 'cursor-pointer active:scale-95' : 'cursor-default'}`}>
+                                                                    <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${bgStyle} ${isMatch ? 'search-match' : ''} ${canEdit ? 'cursor-pointer active:scale-95' : 'cursor-default'} relative group`}>
                                                                         {ev && ev.courseCode ? (
                                                                             <React.Fragment>
                                                                                 {ev.type === 'IL' && ev.isBooked ? (
                                                                                     <React.Fragment>
-                                                                                        <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0 min-h-[16px]">
-                                                                                            INDEPENDENT LEARNING (IL)
-                                                                                            {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
-                                                                                        </div>
-                                                                                        <div className="font-bold text-[10px] leading-tight mb-1 flex-1 overflow-y-auto whitespace-pre-wrap flex items-center justify-center text-center italic opacity-65">
-                                                                                            &nbsp;
-                                                                                        </div>
-                                                                                        {ev.benchTutors && (
-                                                                                            <div className="font-bold text-[9px] text-rose-700 bg-rose-200/50 px-1 py-0.5 rounded inline-block w-fit mt-1">
-                                                                                                Tutor: {ev.benchTutors}
-                                                                                            </div>
-                                                                                        )}
-                                                                                        <div className="mt-auto font-black opacity-60 text-[8px] uppercase leading-tight break-words pt-1 shrink-0">
-                                                                                            {ev.instructor} {ev.updatedBy ? `[Ed: ${ev.updatedBy.split(' ')[0]}]` : ''}
+                                                                                        {/* Paparan Grid IL yang ditempah: Hanya memaparkan teks bertulis INDEPENDENT LEARNING (IL) berwarna merah */}
+                                                                                        <div className="h-full w-full flex items-center justify-center text-center">
+                                                                                            <span className="font-black text-red-600 text-[11px] leading-tight uppercase">
+                                                                                                INDEPENDENT LEARNING (IL)
+                                                                                            </span>
                                                                                         </div>
                                                                                         
-                                                                                        {/* Floating Tooltip terapung sewaktu kursor diletakkan di atas petak */}
+                                                                                        {/* Floating Tooltip terapung sewaktu kursor diletakkan di atas petak (hover-over) */}
                                                                                         <div className="absolute no-print top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-white p-3 rounded-2xl shadow-2xl z-[200] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none min-w-[220px] border border-rose-500 font-bold text-xs space-y-1 font-sans">
                                                                                             <div className="text-[10px] text-rose-300 font-black uppercase tracking-wider pb-1 border-b border-white/10">Maklumat Tempahan IL</div>
                                                                                             <div className="pt-1">Kursus: <span className="text-white font-extrabold">{ev.bookedCourse}</span></div>
@@ -1348,6 +1328,7 @@
                                 </table>
                             </div>
                             
+                            {}
                             {/* KEMAS KINI STRUKTUR FOOTER: DINAMIK IKUT KORT SEMESTER */}
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
                                 <div className="space-y-4">
@@ -1472,6 +1453,7 @@
                         </div>
                     </main>
 
+                    {}
                     {/* MODAL EDITOR KEMAS KINI SLOT */}
                     {isModalOpen && (
                         <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm no-print animate-in fade-in duration-300 text-black">
