@@ -498,7 +498,7 @@
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
             const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
             const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA'IM BIN ZAMRI", "MUHAMMAD IQBAL NA’IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMISHA ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
-            const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTMM 2153", "MTBC 2032", "MTBC 2114", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTAP 2094", "MTHE 2182", "MTBT 2193", "MTPC 2203", "MTVS 2142", "MTMM 2153", "MTMM 2153", "MTNF 2162", "MTAP 2172", "CCRM 2013", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "GCSF 2013", "CCPS 2022", "CCEH 2012", "GCSP 2033", "Lain-lain"];
+            const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTMM 2153", "MTBC 2032", "MTBC 2114", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTAP 2094", "MTHE 2182", "MTBT 2193", "MTPC 2203", "MTVS 2142", "MTMM 2153", "MTNF 2162", "MTAP 2172", "CCRM 2013", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "GCSF 2013", "CCPS 2022", "CCEH 2012", "GCSP 2033", "Lain-lain"];
             const semesterLabels = { 'T1SI': 'Tahun 1 Semester I', 'T1SII': 'Tahun 1 Semester II', 'T2SI': 'Tahun 2 Semester I', 'T2SII': 'Tahun 2 Semester II' };
             const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
             
@@ -1159,7 +1159,6 @@
                         </div>
                     </nav>
 
-                    {}
                     {/* Main Timetable Content */}
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
@@ -1213,7 +1212,7 @@
                         </div>
 
                         {/* Pengaktifan skrol native pelayar web sahaja */}
-                        <div ref={tableContainerRef} className="freeze-container table-to-scroll">
+                        <div ref={tableContainerRef} className="freeze-container table-to-scroll mb-6">
                             <div>
                                 <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full text-black">
                                     <colgroup>
@@ -1390,11 +1389,9 @@
                             </div>
                         </div>
                         
-                        {}
-                        {/* PENYUNTINGAN MULTAK FOOTER: Meletakkan footer DI LUAR 'freeze-container' tetapi di dalam 'main printAreaRef'. 
-                            Ini secara mutlak mengelakkan browser daripada menarik herotan sempadan footer ke atas menceroboh kolum jadual. 
-                            Garis pemisah dibuang sepenuhnya (borderless container) mengikut kemahuan anda. */}
-                        <div className="p-10 flex justify-between items-start font-bold text-[11px] bg-white w-full mt-6">
+                        {/* PENYUNTINGAN MULTAK FOOTER: Meletakkan footer DI LUAR 'freeze-container' tetapi di dalam 'main printAreaRef' untuk mengelakkan sebarang herotan garisan */}
+                        {/* Pembetulan Sempurna: Mengembalikan Kedudukan Asal "DISEDIAKAN OLEH" (kiri) & "DISAHKAN OLEH" (kanan) */}
+                        <div className="p-10 flex justify-between items-start font-bold text-[11px] bg-white w-full border-t-2 border-black">
                             
                             {/* KIRI SEKALI: DISEDIAKAN OLEH */}
                             <div className="space-y-4 w-[45%] text-left">
@@ -1408,7 +1405,7 @@
                                         <select 
                                             value={footerSemActive} 
                                             onChange={e => setFooterSemActive(e.target.value)}
-                                            className="bg-white border text-[10px] font-bold p-1 rounded outline-none text-black cursor-pointer"
+                                            className="bg-white border text-[10px] font-bold p-1 rounded outline-none text-black cursor-pointer animate-none"
                                         >
                                             {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
                                         </select>
@@ -1495,19 +1492,18 @@
                                 )}
                             </div>
 
-                            {/* SUDUT KANAN BAWAH TERGOLONG RASMI: DISAHKAN OLEH */}
-                            {/* Diletakkan secara kemas dan sejajar ke kanan bawah untuk mengalirkan semua ralat garisan menegak browser ke sempadan luar lajur 4.00 - 5.00 */}
-                            <div className="space-y-4 w-[45%] text-right flex flex-col items-end">
+                            {/* KANAN SEKALI: DISAHKAN OLEH */}
+                            <div className="space-y-4 w-[45%] text-left flex flex-col items-start">
                                 <p className="uppercase text-slate-800 tracking-wider">DISAHKAN OLEH:</p>
                                 
-                                <div className="mt-8 border-b border-black flex gap-2 pb-1 justify-end w-full max-w-sm">
+                                <div className="mt-8 border-b border-black flex gap-2 pb-1 w-full max-w-sm">
                                     <span>NAMA:</span>
                                     {userRole === 'viewer' ? (
                                         <span className="font-black uppercase text-slate-900">{footerData.verifiedName || 'MAXSION BIN BATUT'}</span>
                                     ) : (
                                         <input 
                                             type="text" 
-                                            className="bg-transparent outline-none font-black uppercase text-right border-none p-0 w-64 text-slate-900" 
+                                            className="bg-transparent outline-none font-black uppercase border-none p-0 w-64 text-slate-900" 
                                             value={footerData.verifiedName !== undefined ? footerData.verifiedName : 'MAXSION BIN BATUT'} 
                                             onChange={e => handleFooterChange('verifiedName', e.target.value)} 
                                         />
@@ -1516,14 +1512,14 @@
                                 
                                 <p className="mt-1 font-bold uppercase text-slate-500">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
                                 
-                                <div className="mt-4 flex gap-2 justify-end w-full max-w-sm">
+                                <div className="mt-4 flex gap-2 w-full max-w-sm">
                                     <span>TARIKH:</span>
                                     {userRole === 'viewer' ? (
                                         <span className="font-bold text-slate-900">{footerData.verifiedDate ? formatDateDisplay(footerData.verifiedDate) : '18/06/2026'}</span>
                                     ) : (
                                         <input 
                                             type="date" 
-                                            className="bg-transparent outline-none font-bold text-right border-none p-0" 
+                                            className="bg-transparent outline-none font-bold border-none p-0" 
                                             value={footerData.verifiedDate || ''} 
                                             onChange={e => handleFooterChange('verifiedDate', e.target.value)} 
                                         />
