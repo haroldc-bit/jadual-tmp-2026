@@ -48,6 +48,7 @@
         @media print {
             .vertical-text { transform: rotate(180deg) !important; }
         }
+        
         @media screen {
             /* Slider pada browser sahaja diaktifkan natively untuk skrol menegak dan melintang */
             body {
@@ -94,7 +95,6 @@
 <body class="bg-white min-h-screen text-black">
     <div id="root"></div>
 
-    <!-- Firebase Compat SDK Configuration -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDoMacsYw5OF7F8kDpTsAB79jwJ3RsqG0s",
@@ -215,7 +215,6 @@
         }
     </script>
 
-    <!-- courseTopics Database Mapping -->
     <script>
         window.courseTopics = {
             "MTIM 2013": [
@@ -354,7 +353,6 @@
         };
     </script>
 
-    <!-- React Application Component Script -->
     <script type="text/babel" data-presets="react-classic,env">
         const { useState, useEffect, useMemo, useRef } = React;
 
@@ -1632,7 +1630,7 @@
                         </div>
                     )}
 
-                    {/* LIMIT MODAL */}
+                    {}
                     {isLimitModalOpen && (
                         <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm no-print animate-in fade-in">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-indigo-600 flex flex-col text-black">
