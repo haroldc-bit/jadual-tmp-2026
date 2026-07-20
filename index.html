@@ -34,9 +34,8 @@
             .no-print { display: none !important; }
             body { background: white !important; padding: 0; margin: 0; font-family: 'Times New Roman', serif; color: black !important; }
             main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-            /* Memaksa kontena mengikut kelebaran halaman cetak */
             .freeze-container { overflow: visible !important; max-height: none !important; border: none !important; display: block !important; width: 100% !important; }
-            table { width: 100% !important; min-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: 1px solid black !important; }
+            table { width: 100% !important; min-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: 2px solid black !important; }
             th, td { border: 1px solid black !important; background: white !important; color: black !important; padding: 4px 2px !important; }
             .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
             input, select, textarea { border: none !important; background: transparent !important; color: black !important; appearance: none; }
@@ -75,7 +74,10 @@
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Penstabilan Skrol native melintang pelayar utama - Tiada skrol berganda dalaman */
+        /* Penstabilan sempadan hitam penuh untuk mengelakkan ralat herotan garisan */
+        table { border-collapse: collapse !important; border: 2px solid black !important; }
+        th, td { border: 1px solid black !important; }
+
         .table-to-scroll thead th { 
             position: sticky; 
             top: 72px; 
@@ -211,7 +213,7 @@
             "WONG SUK CHIE": "WC2026",
             "TERRYIE BIN EDDIE": "TE2026",
             "TERRY ANSLEM RIMPA": "TR2026",
-            "MUHAMMAD IQBAL NA’IM BIN ZAMRI": "IZ2026",
+            "MUHAMMAD IQBAL NA'IM BIN ZAMRI": "IZ2026",
             "NURUL NADIAH BINTI MAZLAN": "NM2026",
             "HANNA ATHIRAH BINTI AMREE": "HA2026",
             "RAJA NURUL AMIRAH BINTI RAJA ZAMRI": "RZ2026",
@@ -313,7 +315,7 @@
                 "TUTORIAL: Safe Laboratory Practice", "TUTORIAL: Application of Analytical Techniques", "TUTORIAL: Specimen Collection and Other Pre-Analytical Variables", "TUTORIAL: Diabetes mellitus and hypoglycemia", "TUTORIAL: Glucose tolerance test", "TUTORIAL: Calibration and Standardization Technique in Clinical Biochemistry", "TUTORIAL: Concept and Work Process of Automated System", "TUTORIAL: Clearance"
             ],
             "MTAP 2094": [
-                "KULIAH: Introduction to Histopathology", "KULIAH: Inflammation and Neoplasia", "KULIAH: Normal Histology", "KULIAH: Specimen receiving and specimen cut-up", "KULIAH: Fixation of Tissue", "KULIAH: Tissue Processing: Formalin Fixed-Paraffin Embedding Tissue", "KULIAH: Microtomy: Formalin Fixed Paraffin Embedded Tissue", "KULIAH: Haematoxylin & Eosin Stain (H&E)", "KULIAH: Decalcification", "KULIAH: Frozen Section in Histopathology", "KULIAH: Laboratory Safety in Histopathology Laboratory", "KULIAH: Quality Assurance in Histopathology Laboratory",
+                "KULIAH: Introduction to Histopathology", "KULIAH: Inflammation and Neoplasia", "KULIAH: Normal Histology", "KULIAH: Specimen receiving and specimen cut-up", "KULIAH: Fixation of Tissue", "KULIAH: Tissue Processing: Formalin Fixed-Paraffin Embedding Tissue", "KULIAH: Microtomy: Formalin Fixed Paraffin Embedded Tissue", "KULIAH: Haematoxylin & Eoin Stain (H&E)", "KULIAH: Decalcification", "KULIAH: Frozen Section in Histopathology", "KULIAH: Laboratory Safety in Histopathology Laboratory", "KULIAH: Quality Assurance in Histopathology Laboratory",
                 "TUTORIAL: Inflammation and Neoplasia", "TUTORIAL: Tissue Processing: Formalin Fixed-Paraffin Embedding Tissue", "TUTROMY: Formalin Fixed Paraffin Embedded Tissue", "TUTORIAL: Haematoxylin & Eosin Stain (H&E)", "TUTORIAL: Quality Assurance in Histopathology Laboratory",
                 "AMALI: Normal Histology", "AMALI: Histology of Specific Tissues in Body Systems", "AMALI: Specimen receiving and specimen cut-up", "AMALI: Fixation of Tissue", "AMALI: Tissue Processing: Formalin Fixed-Paraffin Embedding Tissue", "AMALI: Microtomy: FormalIN Fixed Paraffin Embedded Tissue", "AMALI: Haematoxylin & Eosin Stain (H&E)", "AMALI: Decalcification", "AMALI: Frozen Section in Histopathology"
             ],
@@ -488,7 +490,7 @@
             // --- 2. STRUCTURE CONSTANTS ---
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
             const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
-            const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA’IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMISHA ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
+            const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA'IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMISHA ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
             const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTMM 2153", "MTBC 2032", "MTBC 2114", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTAP 2094", "MTHE 2182", "MTBT 2193", "MTPC 2203", "MTVS 2142", "MTMM 2153", "MTNF 2162", "MTAP 2172", "CCRM 2013", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "GCSF 2013", "CCPS 2022", "CCEH 2012", "GCSP 2033", "Lain-lain"];
             const semesterLabels = { 'T1SI': 'Tahun 1 Semester I', 'T1SII': 'Tahun 1 Semester II', 'T2SI': 'Tahun 2 Semester I', 'T2SII': 'Tahun 2 Semester II' };
             const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
@@ -1144,6 +1146,7 @@
                         </div>
                     </nav>
 
+                    {}
                     {/* Main Timetable Content */}
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
@@ -1196,7 +1199,7 @@
                             </div>
                         </div>
 
-                        {}
+                        {/* Pengaktifan slider natively pada pelayar web sahaja */}
                         <div ref={tableContainerRef} className="freeze-container table-to-scroll">
                             <div>
                                 <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full text-black">
@@ -1219,7 +1222,7 @@
                                             return vSems.map((sem, sIdx) => {
                                                 const skips = [];
                                                 return (
-                                                    <tr key={`${day}-${sem}`} className={`border border-black/20 ${sIdx === vSems.length - 1 ? 'border-b-2 border-black' : ''}`}>
+                                                    <tr key={`${day}-${sem}`} className="border border-black">
                                                         {sIdx === 0 && (
                                                             <td rowSpan={vSems.length} className="p-4 bg-white border border-black text-center align-middle font-sans">
                                                                 <div className="font-black uppercase text-xs">{day}</div>
@@ -1244,7 +1247,13 @@
                                                             }
 
                                                             let colSpan = 1;
-                                                            if (ev && ev.duration > 1) { for(let i=1; i<ev.duration; i++) { if(!isSlotBreak(day, slotIdx+i)) { colSpan++; skips.push(slotIdx+i); } else break; } }
+                                                            if (ev && ev.duration > 1) { 
+                                                                for(let i=1; i<ev.duration; i++) { 
+                                                                    if(slotIdx + i < timeSlots.length && !isSlotBreak(day, slotIdx+i)) { 
+                                                                        colSpan++; skips.push(slotIdx+i); 
+                                                                    } else break; 
+                                                                } 
+                                                            }
                                                             
                                                             const isMatch = searchTerm && searchTerm.trim() !== "" && ev && ev.courseCode && (
                                                                 ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -1252,7 +1261,7 @@
 
                                                             const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked);
 
-                                                            let bgStyle = "border-2 border-dashed border-slate-100 flex items-center justify-center text-slate-200";
+                                                            let bgStyle = "border border-dashed border-slate-200 flex items-center justify-center text-slate-200";
                                                             if (ev && ev.courseCode) {
                                                                 if (ev.type === 'IL' && ev.isBooked) {
                                                                     bgStyle = "bg-rose-100 border-rose-500 text-rose-800 border-l-4 group relative flex flex-col";
@@ -1262,7 +1271,7 @@
                                                             }
 
                                                             return (
-                                                                <td key={slotIdx} colSpan={colSpan} className={`p-1 border border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
+                                                                <td key={slotIdx} colSpan={colSpan} className={`p-1 border border-black h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
                                                                     <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${bgStyle} ${isMatch ? 'search-match' : ''} ${canEdit ? 'cursor-pointer active:scale-95' : 'cursor-default'}`}>
                                                                         {ev && ev.courseCode ? (
                                                                             <React.Fragment>
@@ -1272,8 +1281,8 @@
                                                                                             INDEPENDENT LEARNING (IL)
                                                                                             {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
                                                                                         </div>
-                                                                                        <div className="font-bold text-[10px] leading-tight mb-1 flex-1 overflow-y-auto whitespace-pre-wrap" style={{ textAlign: ev.align || 'left' }}>
-                                                                                            {ev.topic}
+                                                                                        <div className="font-bold text-[10px] leading-tight mb-1 flex-1 overflow-y-auto whitespace-pre-wrap flex items-center justify-center text-center italic opacity-65">
+                                                                                            &nbsp;
                                                                                         </div>
                                                                                         {ev.benchTutors && (
                                                                                             <div className="font-bold text-[9px] text-rose-700 bg-rose-200/50 px-1 py-0.5 rounded inline-block w-fit mt-1">
@@ -1329,7 +1338,8 @@
                                 </table>
                             </div>
                             
-                            {/* KEMAS KINI STRUKTUR FOOTER: DINAMIK IKUT KORT SEMESTER (Bebas Lag & Mempunyai Butang Clear/Simpan) */}
+                            {}
+                            {/* KEMAS KINI STRUKTUR FOOTER: DINAMIK IKUT KORT SEMESTER */}
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
                                 <div className="space-y-4">
                                     <p className="uppercase text-slate-800 tracking-wider">
@@ -1453,6 +1463,7 @@
                         </div>
                     </main>
 
+                    {}
                     {/* MODAL EDITOR KEMAS KINI SLOT */}
                     {isModalOpen && (
                         <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm no-print animate-in fade-in duration-300 text-black">
@@ -1499,7 +1510,7 @@
                                         </div>
                                     </div>
 
-                                    {/* Pembetulan Ciri IL Booking: Memapar borang penalaan status tempahan jika jenis sesi bertukar kepada IL */}
+                                    {/* Borang Penalaan Status Tempahan Jenis Sesi */}
                                     <div className="pt-1 space-y-2">
                                         <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Lain-lain' ? 'bg-slate-800 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Lain-lain' ? 'AKTIVITI LAIN-LAIN (LL) AKTIF' : 'KLIK UNTUK PENGISIAN LAIN-LAIN (LL)'}</button>
                                         <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Taklimat' ? 'Kuliah' : 'Taklimat' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Taklimat' ? 'bg-indigo-800 border-indigo-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Taklimat' ? 'AKTIVITI TAKLIMAT AKTIF' : 'KLIK UNTUK PENGISIAN TAKLIMAT'}</button>
@@ -1635,6 +1646,7 @@
                         </div>
                     )}
 
+                    {}
                     {/* DASHBOARD ANALITIK MODAL */}
                     {isDashboardOpen && (
                         <div className="fixed inset-0 z-[700] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in text-black">
@@ -1713,3 +1725,4 @@
     </script>
 </body>
 </html>
+```
