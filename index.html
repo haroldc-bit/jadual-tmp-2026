@@ -73,9 +73,9 @@
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Penstabilan sempadan hitam seragam bagi menyelesaikan ralat herotan garisan */
+        /* Penstabilan sempadan hitam penuh 1px seragam bagi menyelesaikan ralat herotan garisan */
         table { border-collapse: collapse !important; border: 2px solid black !important; }
-        th, td { border: 1px solid black !important; box-sizing: border-box; }
+        th, td { border: 1px solid black !important; }
 
         .table-to-scroll thead th { 
             position: sticky; 
@@ -412,7 +412,7 @@
             return initial;
         };
 
-        /* Sistem Storan Kebal Keselamatan Tinggi */
+        /* Sistem Storan Kebal Keselamatan Tinggi (Mencegah Blank Screen Akibat Sekatan Pelayar) */
         const safeStorage = {
             getItem: (key) => {
                 try { return sessionStorage.getItem(key); } catch (e) { return null; }
@@ -501,15 +501,14 @@
             const semesterLabels = { 'T1SI': 'Tahun 1 Semester I', 'T1SII': 'Tahun 1 Semester II', 'T2SI': 'Tahun 2 Semester I', 'T2SII': 'Tahun 2 Semester II' };
             const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
             
-            // Pengemaskinian Sempadan Visual Kedudukan Jenis Sesi (Buang border-l-4 Tailwind Asal)
             const sessionTypes = [
-                { label: 'Kuliah (L)', value: 'Kuliah', color: 'bg-blue-50 text-blue-700 border-l-[6px] border-l-blue-600' },
-                { label: 'Amali (P)', value: 'Amali', color: 'bg-emerald-50 text-emerald-700 border-l-[6px] border-l-emerald-600' },
-                { label: 'INDEPENDENT LEARNING (IL)', value: 'IL', color: 'bg-yellow-50 text-yellow-800 border-l-[6px] border-l-yellow-500' }, 
-                { label: 'Tutorial (T)', value: 'Tutorial', color: 'bg-purple-50 text-purple-700 border-l-[6px] border-l-purple-500' },
-                { label: 'CA (Assessment)', value: 'CA', color: 'bg-red-50 text-red-700 border-l-[6px] border-l-red-500' },
-                { label: 'Ulangkaji', value: 'Ulangkaji', color: 'bg-orange-50 text-orange-700 border-l-[6px] border-l-orange-500' },
-                { label: 'Others (O)', value: 'Others', color: 'bg-teal-50 text-teal-700 border-l-[6px] border-l-teal-600' }
+                { label: 'Kuliah (L)', value: 'Kuliah', color: 'bg-blue-50 border-blue-500 text-blue-700' },
+                { label: 'Amali (P)', value: 'Amali', color: 'bg-emerald-50 border-emerald-500 text-emerald-700' },
+                { label: 'INDEPENDENT LEARNING (IL)', value: 'IL', color: 'bg-yellow-50 border-yellow-500 text-yellow-700' }, 
+                { label: 'Tutorial (T)', value: 'Tutorial', color: 'bg-purple-50 border-purple-400 text-purple-700' },
+                { label: 'CA (Assessment)', value: 'CA', color: 'bg-red-50 border-red-400 text-red-700' },
+                { label: 'Ulangkaji', value: 'Ulangkaji', color: 'bg-orange-50 border-orange-400 text-orange-700' },
+                { label: 'Others (O)', value: 'Others', color: 'bg-teal-50 border-teal-500 text-teal-700' }
             ];
 
             const handleLogin = (e) => {
@@ -1268,7 +1267,6 @@
                                                                 return null;
                                                             }
 
-                                                            /* Penstabilan Sempadan: Pilihan gaya selamat yang menyelesaikan isu ralat garisan hitam sepenuhnya */
                                                             let isBreakProcessed = isSlotBreak(day, slotIdx);
 
                                                             if (isBreakProcessed) {
@@ -1315,13 +1313,12 @@
 
                                                             const isBookedIL = ev && ev.type === 'IL' && ev.isBooked;
 
-                                                            /* PERBAIKAN: Memasang border-l-[6px] secara spesifik tanpa bertindih border td asas */
-                                                            let bgStyle = "border border-dashed border-slate-300 flex items-center justify-center text-slate-300";
+                                                            let bgStyle = "border border-dashed border-slate-200 flex items-center justify-center text-slate-200";
                                                             if (ev && ev.courseCode) {
                                                                 if (isBookedIL) {
-                                                                    bgStyle = "bg-rose-100 text-rose-800 border-l-[6px] border-l-rose-600 group relative flex flex-col";
+                                                                    bgStyle = "bg-rose-100 border-rose-500 text-rose-800 border-l-4 group relative flex flex-col";
                                                                 } else {
-                                                                    bgStyle = `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-[6px] border-l-slate-400'}`;
+                                                                    bgStyle = `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4 border-slate-300'}`;
                                                                 }
                                                             }
 
@@ -1346,7 +1343,8 @@
                                                                                 </div>
                                                                             ) : (
                                                                                 <React.Fragment>
-                                                                                    <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0 min-h-[16px]">
+                                                                                    {/* PERBAIKAN: Penukaran border-b border-black/5 ke border-b border-slate-200 bagi menghapuskan garisan hitam tengah */}
+                                                                                    <div className="font-black uppercase truncate border-b border-slate-200 pb-1 mb-1 leading-tight shrink-0 min-h-[16px]">
                                                                                         {ev.type === 'IL' ? (
                                                                                             "INDEPENDENT LEARNING (IL)"
                                                                                         ) : !(ev.type === 'Lain-lain' || ev.type === 'Taklimat' || ev.type === 'Penyediaan' || ev.courseCode.toUpperCase() === 'LAIN-LAIN') ? (
