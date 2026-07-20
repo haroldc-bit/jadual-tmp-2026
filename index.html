@@ -74,7 +74,7 @@
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Penstabilan sempadan hitam penuh 1px seragam bagi menyelesaikan isu garisan tebal */
+        /* Penstabilan sempadan hitam penuh 1px seragam bagi menyelesaikan ralat herotan garisan */
         table { border-collapse: collapse !important; border: 2px solid black !important; }
         th, td { border: 1px solid black !important; }
 
@@ -258,7 +258,7 @@
                 "AMALI: Effective Communication Skills", "AMALI: Effective Teaming Skills", "AMALI: Problem Solving and Critical Thinking in Healthcare"
             ],
             "MTIB 2022": [
-                "KULIAH: Introduction and Basic Concept of Immunology", "KULIAH: Components of the Immune System", "KULIAH: Antigen", "KULIAH: Principle and Mechanisms of the Immune Response", "KULIAH: Fundamental of Antigen-Antibody Interactions", "KULIAH: Principle and Application of Antigen-Antibody Interaction Assays", "KULIAH: Hypersensitivity", "KULIAH: Immunological Tolerance and Autoimmune Disease", "KULGE: Immune Deficiency", "KULIAH: Introduction and Basic Concept of Molecular Genetic", "KULIAH: Genomes and Genetic Structure", "KULIAH: Fundamental of Genetic Disorder", "KULIAH: HLA and Transplantation Immunology", "KULIAH: Principle and Application of Molecular Genetic Testing",
+                "KULIAH: Introduction and Basic Concept of Immunology", "KULIAH: Components of the Immune System", "KULIAH: Antigen", "KULIAH: Principle and Mechanisms of the Immune Response", "KULIAH: Fundamental of Antigen-Antibody Interactions", "KULIAH: Principle and Application of Antigen-Antibody Interaction Assays", "KULGE: Hypersensitivity", "KULIAH: Immunological Tolerance and Autoimmune Disease", "KULGE: Immune Deficiency", "KULIAH: Introduction and Basic Concept of Molecular Genetic", "KULIAH: Genomes and Genetic Structure", "KULIAH: Fundamental of Genetic Disorder", "KULIAH: HLA and Transplantation Immunology", "KULIAH: Principle and Application of Molecular Genetic Testing",
                 "TUTORIAL: Components of the Immune System", "TUTORIAL: Principle and Mechanisms of the Immune Response", "TUTORIAL: Principle and Application of Antigen-Antibody Interaction Assays", "TUTORIAL: Fundamental of Genetic Disorder", "TUTORIAL: Principle and Application of Molecular Genetic Testing",
                 "AMALI: Principle and Application of Antigen-Antibody Interaction Assays"
             ],
@@ -498,7 +498,7 @@
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
             const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
             const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA'IM BIN ZAMRI", "MUHAMMAD IQBAL NA’IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMISHA ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
-            const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTMM 2153", "MTBC 2032", "MTBC 2114", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTAP 2094", "MTHE 2182", "MTBT 2193", "MTPC 2203", "MTVS 2142", "MTMM 2153", "MTNF 2162", "MTAP 2172", "CCRM 2013", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "GCSF 2013", "CCPS 2022", "CCEH 2012", "GCSP 2033", "Lain-lain"];
+            const courseCodes = ["MTBT 2114", "MTIM 2013", "MTIB 2022", "MTPE 2064", "MTMM 2043", "MTMM 2053", "MTMM 2153", "MTBC 2032", "MTBC 2114", "MTGC 2074", "MTHE 2103", "MTMS 2082", "MTPC 2133", "MTPC 2122", "MTAP 2094", "MTHE 2182", "MTBT 2193", "MTPC 2203", "MTVS 2142", "MTMM 2153", "MTMM 2153", "MTNF 2162", "MTAP 2172", "CCRM 2013", "GCLE 2042", "CCPS 2012", "CCEH 2022", "GCMP 2022", "GCSF 2013", "CCPS 2022", "CCEH 2012", "GCSP 2033", "Lain-lain"];
             const semesterLabels = { 'T1SI': 'Tahun 1 Semester I', 'T1SII': 'Tahun 1 Semester II', 'T2SI': 'Tahun 2 Semester I', 'T2SII': 'Tahun 2 Semester II' };
             const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
             
@@ -1159,6 +1159,7 @@
                         </div>
                     </nav>
 
+                    {}
                     {/* Main Timetable Content */}
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
@@ -1387,129 +1388,151 @@
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+                        
+                        {}
+                        {/* PENYUNTINGAN MULTAK FOOTER: Meletakkan footer DI LUAR 'freeze-container' tetapi di dalam 'main printAreaRef'. 
+                            Ini secara mutlak mengelakkan browser daripada menarik herotan sempadan footer ke atas menceroboh kolum jadual. 
+                            Garis pemisah dibuang sepenuhnya (borderless container) mengikut kemahuan anda. */}
+                        <div className="p-10 flex justify-between items-start font-bold text-[11px] bg-white w-full mt-6">
                             
-                            {/* KEMAS KINI STRUKTUR FOOTER: DINAMIK IKUT KORT SEMESTER */}
-                            <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
-                                <div className="space-y-4">
-                                    <p className="uppercase text-slate-800 tracking-wider">
-                                        DISEDIAKAN OLEH: <span className="text-blue-600 font-black">({semesterLabels[footerSemActive]})</span>
-                                    </p>
-                                    
-                                    {filterSemester === 'SEMUA' && userRole !== 'viewer' && (
-                                        <div className="flex items-center gap-2 no-print bg-slate-50 p-2 rounded-xl border border-slate-100">
-                                            <span className="text-[10px] text-slate-400 uppercase font-black">Kohort Kemasukan:</span>
-                                            <select 
-                                                value={footerSemActive} 
-                                                onChange={e => setFooterSemActive(e.target.value)}
-                                                className="bg-white border text-[10px] font-bold p-1 rounded outline-none text-black animate-none"
-                                            >
-                                                {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
-                                            </select>
-                                        </div>
-                                    )}
-
-                                    {userRole !== 'viewer' && (
-                                        <div className="flex items-center gap-2 no-print bg-slate-50 p-2 rounded-xl border border-slate-100">
-                                            <span className="text-[10px] text-slate-400 uppercase font-black">Pilih Nama Cepat:</span>
-                                            <select 
-                                                value={instructorList.includes(tempPreparedName) ? tempPreparedName : ''}
-                                                onChange={e => setTempPreparedName(e.target.value)}
-                                                className="bg-white border text-[10px] font-bold p-1 rounded outline-none w-full max-w-[220px] text-black"
-                                                disabled={userRole === 'viewer'}
-                                            >
-                                                <option value="">-- Tiada / Taip Manual --</option>
-                                                {instructorList.filter(inst => inst !== 'Lain-lain').map(inst => (
-                                                    <option key={inst} value={inst}>{inst}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    )}
-
-                                    <div className="border-b border-black pb-1 space-y-1">
-                                        <div className="flex items-center justify-between w-full">
-                                            <div className="w-full flex items-center">
-                                                <span className="shrink-0 mr-2">NAMA:</span>
-                                                {userRole === 'viewer' ? (
-                                                    <span className="font-black uppercase text-blue-800">{tempPreparedName || 'TIADA REKOD PENYELARAS'}</span>
-                                                ) : (
-                                                    <input 
-                                                        type="text" 
-                                                        className="bg-transparent outline-none w-full font-black uppercase text-blue-800 animate-none" 
-                                                        value={tempPreparedName} 
-                                                        onChange={e => setTempPreparedName(e.target.value)}
-                                                        placeholder="SILA PILIH NAMA ATAU TAIP MANUAL DI SINI"
-                                                    />
-                                                )}
-                                            </div>
-                                        </div>
+                            {/* KIRI SEKALI: DISEDIAKAN OLEH */}
+                            <div className="space-y-4 w-[45%] text-left">
+                                <p className="uppercase text-slate-800 tracking-wider">
+                                    DISEDIAKAN OLEH: <span className="text-blue-600 font-black">({semesterLabels[footerSemActive]})</span>
+                                </p>
+                                
+                                {filterSemester === 'SEMUA' && userRole !== 'viewer' && (
+                                    <div className="flex items-center gap-2 no-print bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                        <span className="text-[10px] text-slate-400 uppercase font-black">Kohort Kemasukan:</span>
+                                        <select 
+                                            value={footerSemActive} 
+                                            onChange={e => setFooterSemActive(e.target.value)}
+                                            className="bg-white border text-[10px] font-bold p-1 rounded outline-none text-black cursor-pointer"
+                                        >
+                                            {semesters.map(s => <option key={s} value={s}>{semesterLabels[s]}</option>)}
+                                        </select>
                                     </div>
+                                )}
 
-                                    <p className="mt-1 font-bold uppercase text-slate-500">PENGAJAR PENYELARAS</p>
-                                    
-                                    <div className="border-b border-black pb-1">
-                                        <div className="flex items-center w-full">
-                                            <span className="shrink-0 mr-2">TARIKH:</span>
+                                {userRole !== 'viewer' && (
+                                    <div className="flex items-center gap-2 no-print bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                        <span className="text-[10px] text-slate-400 uppercase font-black">Pilih Nama Cepat:</span>
+                                        <select 
+                                            value={instructorList.includes(tempPreparedName) ? tempPreparedName : ''}
+                                            onChange={e => setTempPreparedName(e.target.value)}
+                                            className="bg-white border text-[10px] font-bold p-1 rounded outline-none w-full max-w-[220px] text-black cursor-pointer"
+                                            disabled={userRole === 'viewer'}
+                                        >
+                                            <option value="">-- Tiada / Taip Manual --</option>
+                                            {instructorList.filter(inst => inst !== 'Lain-lain').map(inst => (
+                                                <option key={inst} value={inst}>{inst}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+
+                                <div className="border-b border-black pb-1 space-y-1">
+                                    <div className="flex items-center justify-between w-full">
+                                        <div className="w-full flex items-center">
+                                            <span className="shrink-0 mr-2">NAMA:</span>
                                             {userRole === 'viewer' ? (
-                                                <span className="font-bold text-blue-800">{tempPreparedDate ? formatDateDisplay(tempPreparedDate) : ''}</span>
+                                                <span className="font-black uppercase text-blue-800">{tempPreparedName || 'TIADA REKOD PENYELARAS'}</span>
                                             ) : (
                                                 <input 
-                                                    type="date" 
-                                                    className="bg-transparent outline-none font-bold text-blue-800 animate-none" 
-                                                    value={tempPreparedDate} 
-                                                    onChange={e => setTempPreparedDate(e.target.value)}
+                                                    type="text" 
+                                                    className="bg-transparent outline-none w-full font-black uppercase text-blue-800 border-none p-0" 
+                                                    value={tempPreparedName} 
+                                                    onChange={e => setTempPreparedName(e.target.value)}
+                                                    placeholder="SILA PILIH NAMA ATAU TAIP MANUAL DI SINI"
                                                 />
                                             )}
                                         </div>
                                     </div>
+                                </div>
 
-                                    {userRole !== 'viewer' && (
-                                        <div className="flex gap-2 pt-2 no-print">
-                                            <button 
-                                                onClick={(e) => { e.preventDefault(); savePenyelaras(footerSemActive, tempPreparedName, tempPreparedDate); }}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white font-black text-[9px] uppercase px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1"
-                                            >
-                                                💾 Simpan Penyelaras
-                                            </button>
-                                            <button 
-                                                onClick={handleClearPenyelaras}
-                                                className="bg-red-50 hover:bg-red-100 text-red-600 font-black text-[9px] uppercase px-3 py-2.5 rounded-xl border border-red-200 transition-all active:scale-95"
-                                                title="Padam input semasa"
-                                            >
-                                                🗑️ Clear
-                                            </button>
-                                            <button 
-                                                onClick={handleUndoPenyelaras}
-                                                className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-[9px] uppercase px-3 py-2.5 rounded-xl border transition-all active:scale-95"
-                                                title="Kembali ke rekod terakhir"
-                                            >
-                                                ↩️ Undo
-                                            </button>
-                                        </div>
+                                <p className="mt-1 font-bold uppercase text-slate-500">PENGAJAR PENYELARAS</p>
+                                
+                                <div className="border-b border-black pb-1">
+                                    <div className="flex items-center w-full">
+                                        <span className="shrink-0 mr-2">TARIKH:</span>
+                                        {userRole === 'viewer' ? (
+                                            <span className="font-bold text-blue-800">{tempPreparedDate ? formatDateDisplay(tempPreparedDate) : ''}</span>
+                                        ) : (
+                                            <input 
+                                                type="date" 
+                                                className="bg-transparent outline-none font-bold text-blue-800 border-none p-0" 
+                                                value={tempPreparedDate} 
+                                                onChange={e => setTempPreparedDate(e.target.value)}
+                                            />
+                                        )}
+                                    </div>
+                                </div>
+
+                                {userRole !== 'viewer' && (
+                                    <div className="flex gap-2 pt-2 no-print">
+                                        <button 
+                                            onClick={(e) => { e.preventDefault(); savePenyelaras(footerSemActive, tempPreparedName, tempPreparedDate); }}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white font-black text-[9px] uppercase px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1"
+                                        >
+                                            💾 Simpan Penyelaras
+                                        </button>
+                                        <button 
+                                            onClick={handleClearPenyelaras}
+                                            className="bg-red-50 hover:bg-red-100 text-red-600 font-black text-[9px] uppercase px-3 py-2.5 rounded-xl border border-red-200 transition-all active:scale-95"
+                                            title="Padam input semasa"
+                                        >
+                                            🗑️ Clear
+                                        </button>
+                                        <button 
+                                            onClick={handleUndoPenyelaras}
+                                            className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-[9px] uppercase px-3 py-2.5 rounded-xl border transition-all active:scale-95"
+                                            title="Kembali ke rekod terakhir"
+                                        >
+                                            ↩️ Undo
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* SUDUT KANAN BAWAH TERGOLONG RASMI: DISAHKAN OLEH */}
+                            {/* Diletakkan secara kemas dan sejajar ke kanan bawah untuk mengalirkan semua ralat garisan menegak browser ke sempadan luar lajur 4.00 - 5.00 */}
+                            <div className="space-y-4 w-[45%] text-right flex flex-col items-end">
+                                <p className="uppercase text-slate-800 tracking-wider">DISAHKAN OLEH:</p>
+                                
+                                <div className="mt-8 border-b border-black flex gap-2 pb-1 justify-end w-full max-w-sm">
+                                    <span>NAMA:</span>
+                                    {userRole === 'viewer' ? (
+                                        <span className="font-black uppercase text-slate-900">{footerData.verifiedName || 'MAXSION BIN BATUT'}</span>
+                                    ) : (
+                                        <input 
+                                            type="text" 
+                                            className="bg-transparent outline-none font-black uppercase text-right border-none p-0 w-64 text-slate-900" 
+                                            value={footerData.verifiedName !== undefined ? footerData.verifiedName : 'MAXSION BIN BATUT'} 
+                                            onChange={e => handleFooterChange('verifiedName', e.target.value)} 
+                                        />
                                     )}
                                 </div>
-
-                                <div>
-                                    <p className="uppercase text-slate-800 tracking-wider">DISAHKAN OLEH:</p>
-                                    <div className="mt-8 border-b border-black flex gap-2">
-                                        NAMA: {userRole === 'viewer' ? (
-                                            <span className="font-black uppercase">{footerData.verifiedName || ''}</span>
-                                        ) : (
-                                            <input type="text" className="bg-transparent outline-none w-full font-black uppercase" value={footerData.verifiedName || ''} onChange={e => handleFooterChange('verifiedName', e.target.value)} />
-                                        )}
-                                    </div>
-                                    <p className="mt-1 font-bold uppercase text-slate-500">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
-                                    
-                                    <div className="mt-4 flex gap-2">
-                                        TARIKH: {userRole === 'viewer' ? (
-                                            <span className="font-bold">{footerData.verifiedDate ? formatDateDisplay(footerData.verifiedDate) : ''}</span>
-                                        ) : (
-                                            <input type="date" className="bg-transparent outline-none font-bold" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} />
-                                        )}
-                                    </div>
+                                
+                                <p className="mt-1 font-bold uppercase text-slate-500">TIMBALAN PENGARAH AKADEMIK / KETUA PROGRAM</p>
+                                
+                                <div className="mt-4 flex gap-2 justify-end w-full max-w-sm">
+                                    <span>TARIKH:</span>
+                                    {userRole === 'viewer' ? (
+                                        <span className="font-bold text-slate-900">{footerData.verifiedDate ? formatDateDisplay(footerData.verifiedDate) : '18/06/2026'}</span>
+                                    ) : (
+                                        <input 
+                                            type="date" 
+                                            className="bg-transparent outline-none font-bold text-right border-none p-0" 
+                                            value={footerData.verifiedDate || ''} 
+                                            onChange={e => handleFooterChange('verifiedDate', e.target.value)} 
+                                        />
+                                    )}
                                 </div>
-                                <div className="col-span-2 text-center pt-8 opacity-40 text-[9px] italic">** Harold Criso Anak Ajin **</div>
                             </div>
                         </div>
+                        
+                        <div className="text-center pt-8 opacity-40 text-[9px] italic w-full">** Harold Criso Anak Ajin **</div>
                     </main>
 
                     {/* MODAL EDITOR KEMAS KINI SLOT */}
