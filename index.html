@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
@@ -408,7 +408,6 @@
         };
 
         const App = () => {
-            // --- CONFIG: DRIVE FILE ID JATA NEGARA ---
             const JATA_NEGARA_FILE_ID = "1ZqpkDsIF_OsgLW8zvLePk6HKlwMX8WMM";
 
             // --- 1. STATES ---
@@ -1097,6 +1096,7 @@
                         </div>
                     </nav>
 
+                    {}
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
                             <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPLKKM.PK(T)04B/17</div>
@@ -1148,7 +1148,7 @@
                             </div>
                         </div>
 
-                        {/* Kontena Utama Jadual yang Menyokong Native Browser Scroll (Tanpa Skrol Dalaman) */}
+                        {}
                         <div ref={tableContainerRef} className="freeze-container table-to-scroll">
                             <div>
                                 <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full text-black">
@@ -1157,7 +1157,6 @@
                                             <th className="w-36 p-4 border-r border-black">Hari / Tarikh</th>
                                             <th className="w-16 border-r border-black text-center">Sem</th>
                                             {timeSlots.map(slot => {
-                                                // Kolum Rehat Jam 10.00-10.30 & 1.00-2.00 dilaraskan kelebaran fizikalnya sama saiz dengan SEM (w-16)
                                                 const isRehatCol = (slot === '10.00 - 10.30' || slot === '1.00 - 2.00');
                                                 const colWidthClass = isRehatCol ? 'w-16' : 'w-40';
                                                 return (
@@ -1214,7 +1213,6 @@
                                                                 }
                                                             }
 
-                                                            // Merender sel data atau slot kosong jadual waktu
                                                             return (
                                                                 <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
                                                                     <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${bgStyle} ${isMatch ? 'search-match' : ''} ${canEdit ? 'cursor-pointer active:scale-95' : 'cursor-default'}`}>
@@ -1222,7 +1220,6 @@
                                                                             <React.Fragment>
                                                                                 {ev.type === 'IL' && ev.isBooked ? (
                                                                                     <React.Fragment>
-                                                                                        {/* Paparan Bersih: Tiada lagi perkataan "(Slot di-booking)" mengikut arahan anda */}
                                                                                         <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0 min-h-[16px]">
                                                                                             INDEPENDENT LEARNING (IL)
                                                                                             {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
@@ -1231,7 +1228,6 @@
                                                                                             
                                                                                         </div>
                                                                                         
-                                                                                        {/* Kesan Hover Terapung (Tooltip) Maklumat Booking */}
                                                                                         <div className="absolute no-print top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-white p-3 rounded-2xl shadow-2xl z-[200] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none min-w-[220px] border border-rose-500 font-bold text-xs space-y-1">
                                                                                             <div className="text-[10px] text-rose-300 font-black uppercase tracking-wider pb-1 border-b border-white/10">Maklumat Tempahan IL</div>
                                                                                             <div className="pt-1">Kursus: <span className="text-white font-extrabold">{ev.bookedCourse}</span></div>
@@ -1268,10 +1264,10 @@
                                             });
                                         })}
                                     </tbody>
-                                </table>
+                                table>
                             </div>
                             
-                            {/* KEMAS KINI STRUKTUR FOOTER: DINAMIK IKUT KORT SEMESTER (Bebas Lag & Mempunyai Butang Clear/Simpan) */}
+                            {}
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
                                 <div className="space-y-4">
                                     <p className="uppercase text-slate-800 tracking-wider">
@@ -1395,7 +1391,7 @@
                         </div>
                     </main>
 
-                    {/* MODAL EDITOR KEMAS KINI SLOT */}
+                    {}
                     {isModalOpen && (
                         <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm no-print animate-in fade-in duration-300 text-black">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[95vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
@@ -1441,7 +1437,6 @@
                                         </div>
                                     </div>
 
-                                    {/* Pilihan Menukar Sesi dengan Cepat */}
                                     <div className="pt-1 space-y-2">
                                         <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Lain-lain' ? 'bg-slate-800 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Lain-lain' ? 'AKTIVITI LAIN-LAIN (LL) AKTIF' : 'KLIK UNTUK PENGISIAN LAIN-LAIN (LL)'}</button>
                                         <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Taklimat' ? 'Kuliah' : 'Taklimat' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Taklimat' ? 'bg-indigo-800 border-indigo-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Taklimat' ? 'AKTIVITI TAKLIMAT AKTIF' : 'KLIK UNTUK PENGISIAN TAKLIMAT'}</button>
@@ -1467,7 +1462,6 @@
                                         </div>
                                     )}
 
-                                    {/* Borang Tempahan IL Berwarna Merah Muda */}
                                     {formData.type === 'IL' && (
                                         <div className="bg-rose-50 p-4 rounded-2xl border-2 border-rose-100 space-y-3 mt-2 animate-in fade-in">
                                             <label className="flex items-center gap-2 font-black text-xs text-rose-900 cursor-pointer">
@@ -1556,7 +1550,6 @@
                                         </select>
                                     </div>
 
-                                    {/* Ciri Khas: Input "Bench Tutor" dipaparkan juga bagi slot IL yang bertanda booking */}
                                     {(formData.type === 'Amali' || formData.type === 'Penyediaan' || (formData.type === 'IL' && formData.isBooked)) && (
                                         <div className="space-y-1 text-black mt-4 animate-in slide-in-from-top-2">
                                             <label className="text-[11px] font-black text-slate-400 uppercase">Bench Tutor (Initial)</label>
@@ -1579,7 +1572,7 @@
                         </div>
                     )}
 
-                    {/* DASHBOARD MODAL */}
+                    {}
                     {isDashboardOpen && (
                         <div className="fixed inset-0 z-[700] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in text-black">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden border-4 border-green-600 flex flex-col text-black">
@@ -1657,3 +1650,5 @@
     </script>
 </body>
 </html>
+```
+eof
