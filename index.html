@@ -590,7 +590,7 @@
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true; 
                 if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true; 
-                if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx); 
+                if (day === 'Jumaat') return [5, 6, 7].includes(slotIdx); // Rehat Jumaat dialihkan ke jam 12.30 - 3.00 petang (Membetulkan ralat garisan menegak)
                 return false;
             };
 
@@ -1255,8 +1255,6 @@
                                                         <td className="p-2 bg-white text-center font-black text-[11px] border border-black">{sem}</td>
                                                         {timeSlots.map((slot, slotIdx) => {
                                                             if (skips.includes(slotIdx)) return null;
-                                                            const key = `${academicSession}-${selectedWeek}-${day}-${sem}-${slotIdx}`;
-                                                            const ev = events[key];
                                                             const isHoliday = holidays[`${academicCycle}-${selectedWeek}-${day}`];
                                                             
                                                             if (isHoliday) {
@@ -1264,26 +1262,26 @@
                                                                 return null;
                                                             }
 
-                                                            // Penyelesaian Sempadan Isnin & Jumaat: Memproses logik REHAT berpusat
-                                                            let isBreak = false;
+                                                            // Penyelarian Jumaat Rehat secara mutlak: Menggabungkan slot 5, 6, 7
+                                                            let isBreakProcessed = isBreak;
                                                             let breakColSpan = 1;
 
                                                             if (slot === '10.00 - 10.30') {
-                                                                isBreak = true;
+                                                                isBreakProcessed = true;
                                                             } else if (day === 'Jumaat') {
-                                                                if (slotIdx === 4) {
-                                                                    isBreak = true;
-                                                                    breakColSpan = 3; // Menggabungkan slot 4, 5, 6 bagi Jumaat secara mutlak
-                                                                } else if (slotIdx === 5 || slotIdx === 6) {
-                                                                    return null; // Elak render berulang untuk lajur yang telah disatukan
+                                                                if (slotIdx === 5) {
+                                                                    isBreakProcessed = true;
+                                                                    breakColSpan = 3; // Menggabungkan slot 5, 6, 7 bagi Jumaat secara mutlak
+                                                                } else if (slotIdx === 6 || slotIdx === 7) {
+                                                                    return null; // Elak render sel berulang bagi lajur yang telah disatukan
                                                                 }
                                                             } else {
                                                                 if (slot === '1.00 - 2.00') {
-                                                                    isBreak = true;
+                                                                    isBreakProcessed = true;
                                                                 }
                                                             }
 
-                                                            if (isBreak) {
+                                                            if (isBreakProcessed) {
                                                                 if (sIdx === 0) {
                                                                     return (
                                                                         <td 
@@ -1308,7 +1306,7 @@
                                                                     const nextSlot = timeSlots[nextSlotIdx];
                                                                     let isNextBreak = false;
                                                                     if (nextSlot === '10.00 - 10.30') isNextBreak = true;
-                                                                    else if (day === 'Jumaat' && [4, 5, 6].includes(nextSlotIdx)) isNextBreak = true;
+                                                                    else if (day === 'Jumaat' && [5, 6, 7].includes(nextSlotIdx)) isNextBreak = true;
                                                                     else if (day !== 'Jumaat' && nextSlot === '1.00 - 2.00') isNextBreak = true;
 
                                                                     if(nextSlotIdx < timeSlots.length && !isNextBreak) { 
