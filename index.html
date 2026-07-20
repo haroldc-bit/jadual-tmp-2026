@@ -52,8 +52,8 @@
         @media screen {
             /* Slider pada browser sahaja diaktifkan natively untuk skrol menegak dan melintang */
             body {
-                overflow-x: auto;
-                overflow-y: auto;
+                overflow-x: auto !important;
+                overflow-y: auto !important;
             }
         }
         @keyframes high-visibility-flash { 0% { background-color: #3b82f6; color: white; } 100% { background-color: transparent; } }
@@ -88,7 +88,8 @@
         .freeze-container { 
             border: 2px solid black; 
             background: white; 
-            overflow: visible; 
+            overflow: visible !important; 
+            max-height: none !important;
         }
     </style>
 </head>
@@ -104,32 +105,6 @@
             messagingSenderId: "352749857072",
             appId: "1:352749857072:web:5759b14c81a0f9771080f5",
             measurementId: "G-Z302L4B2GH"
-        };
-
-        const instructorPasswords = {
-            "HAROLD CRISO ANAK AJIN": "HC2026",
-            "MAXSION BIN BATUT": "MB2026",
-            "ADELINE BONG HUI FEN": "AB2026",
-            "MOHD SYAHID HARRIS ABDULLAH": "SH2026",
-            "INDRAWATI BINTI AMBO": "IA2026",
-            "HAZLIANA BINTI HAZALI": "HH2026",
-            "HARNIYATIE BINTI MOHAMAD": "HM2026",
-            "AHMAD FAIZAL BIN OTHMAN": "FO2026",
-            "ISSYATUL SOFEA ABDULLAH": "SA2026",
-            "JOCELYN CHAN YUNN NING": "JC2026",
-            "NOOR AYUNIE BINTI MOHAMAD": "AM2026",
-            "LING SIEW LING": "LL2026",
-            "WONG SUK CHIE": "WC2026",
-            "TERRYIE BIN EDDIE": "TE2026",
-            "TERRY ANSLEM RIMPA": "TR2026",
-            "MUHAMMAD IQBAL NA’IM BIN ZAMRI": "IZ2026",
-            "NURUL NADIAH BINTI MAZLAN": "NM2026",
-            "HANNA ATHIRAH BINTI AMREE": "HA2026",
-            "RAJA NURUL AMIRAH BINTI RAJA ZAMRI": "RZ2026",
-            "NUR AMISHA ABDULLAH": "NA2026",
-            "NURHIDATUN BINTI ANNUAR RIGOS": "AR2026",
-            "LESAH BINTI ISMAIL LEE GIAP BENG": "LG2026",
-            "JAYANTHI A/P MARIMUTHU": "JM2026"
         };
 
         try {
@@ -215,8 +190,37 @@
         }
     </script>
 
-    <script>
-        window.courseTopics = {
+    <!-- React Application Logic -->
+    <script type="text/babel" data-presets="react-classic,env">
+        const { useState, useEffect, useMemo, useRef } = React;
+
+        const instructorPasswords = {
+            "HAROLD CRISO ANAK AJIN": "HC2026",
+            "MAXSION BIN BATUT": "MB2026",
+            "ADELINE BONG HUI FEN": "AB2026",
+            "MOHD SYAHID HARRIS ABDULLAH": "SH2026",
+            "INDRAWATI BINTI AMBO": "IA2026",
+            "HAZLIANA BINTI HAZALI": "HH2026",
+            "HARNIYATIE BINTI MOHAMAD": "HM2026",
+            "AHMAD FAIZAL BIN OTHMAN": "FO2026",
+            "ISSYATUL SOFEA ABDULLAH": "SA2026",
+            "JOCELYN CHAN YUNN NING": "JC2026",
+            "NOOR AYUNIE BINTI MOHAMAD": "AM2026",
+            "LING SIEW LING": "LL2026",
+            "WONG SUK CHIE": "WC2026",
+            "TERRYIE BIN EDDIE": "TE2026",
+            "TERRY ANSLEM RIMPA": "TR2026",
+            "MUHAMMAD IQBAL NA’IM BIN ZAMRI": "IZ2026",
+            "NURUL NADIAH BINTI MAZLAN": "NM2026",
+            "HANNA ATHIRAH BINTI AMREE": "HA2026",
+            "RAJA NURUL AMIRAH BINTI RAJA ZAMRI": "RZ2026",
+            "NUR AMISHA ABDULLAH": "NA2026",
+            "NURHIDATUN BINTI ANNUAR RIGOS": "AR2026",
+            "LESAH BINTI ISMAIL LEE GIAP BENG": "LG2026",
+            "JAYANTHI A/P MARIMUTHU": "JM2026"
+        };
+
+        const courseTopics = {
             "MTIM 2013": [
                 "KULIAH: Laboratory Hazards and Personnel Protective Equipment", "KULIAH: Glassware and Pipettes", "KULIAH: Balances", "KULIAH: Distiller & Deionizer", "KULIAH: Oven, Water Bath and Incubator", "KULIAH: Autoclave", "KULIAH: Centrifuge", "KULIAH: pH Meter", "KULIAH: Chromatography and Electrophoresis System", "KULIAH: Microscope: Components and Application", "KULIAH: The Concept and Application of Photometry", "KULIAH: Atom Structures and Periodic Tables", "KULIAH: Concept of Ion, Electrolyte, Oxidation and Reduction Reaction", "KULIAH: Acid, Base and Buffer", "KULIAH: Composition in Chemical Reagent", "KULIAH: Application of Conversion Measurement Unit", "KULIAH: Preparation of Reagent and Solution",
                 "TUTORIAL: Laboratory Hazards and Personnel Protective Equipment", "TUTORIAL: Centrifuge", "TUTORIAL: Microscope: Components and Application", "TUTORIAL: The Concept and Application of Photometry",
@@ -345,18 +349,82 @@
                 "TUTORIAL: Immunohistochemical Test",
                 "AMALI: Carbohydrate Stains", "AMALI: Connective Tissues and Amyloid", "AMALI: Microorganisms", "AMALI: Pigments and Minerals", "AMALI: Immunohistochemical Test"
             ],
+            "CCEH 2022": [
+                "KULIAH: Live a Stress Free Life", "KULIAH: Maintaining a Healthy Lifestyle", "KULIAH: Benefits of Exercise", "KULIAH: My Beautiful Eyes",
+                "TUTORIAL: Live a Stress Free Life", "TUTORIAL: Maintaining a Healthy Lifestyle", "TUTORIAL: Benefits of Exercise", "TUTORIAL: My Beautiful Eyes",
+                "AMALI: Live a Stress Free Life", "AMALI: Maintaining a Healthy Lifestyle", "AMALI: Benefits of Exercise", "AMALI: My Beautiful Eyes"
+            ],
+            "CCPS 2022": [
+                "KULIAH: Knowledge and Understanding of Leadership Theories and Models", "KULIAH: Effective Leadership Skills", "KULIAH: Entrepreneurial Skill – Concepts and Characteristics", "KULIAH: Entrepreneurial Abilities and Skills in Healthcare Working Environment", "KULIAH: Information Management and Digital Literacy", "KULIAH: Lifelong Learning: Concept", "KULIAH: Learning to Learn", "KULIAH: Caring Behaviour", "KULIAH: Caring of Patient in Diverse Population", "KULIAH: Professional Ethics in Caring",
+                "TUTORIAL: Effective Leadership Skills", "TUTORIAL: Entrepreneurial Skill – Concepts and Characteristics", "TUTORIAL: Information Management and Digital Literacy", "TUTORIAL: Learning to Learn", "TUTORIAL: Professional Ethics in Caring",
+                "AMALI: Effective Leadership Skills", "AMALI: Entrepreneurial Abilities and Skills in Healthcare Working Environment", "AMALI: Learning to Learn", "AMALI: Professional Ethics in Caring"
+            ],
+            "MTBT 2114": [
+                "KULIAH: Introduction to Blood Transfusion", "KULIAH: Procurement of blood", "KULIAH: Blood component processing", "KULIAH: Transfusion Microbiology Laboratory", "KULIAH: ABO Blood Group system, Subgroup and Bombay", "KULIAH: ABO Discrepancies", "KULIAH: Rh system", "KULIAH: Other blood group system", "KULIAH: Antiglobulin Testing", "KULIAH: Pre-Transfusion Testing", "KULIAH: Serologic Testing in Pre Transfusion Test", "KULIAH: Identification of antibody", "KULIAH: Group, Screen and Hold (GSH)", "KULIAH: Emergency O and safe O",
+                "TUTORIAL: Blood component processing", "TUTROOM: Transfusion Microbiology Laboratory", "TUTORIAL: ABO Blood Group system, Subgroup and Bombay", "TUTORIAL: ABO Discrepancies", "TUTORIAL: Rh system", "TUTORIAL: Other blood group system", "TUTORIAL: Pre-Transfusion Testing", "TUTORIAL: Serologic Testing in Pre Transfusion Test", "TUTORIAL: Identification of antibody",
+                "AMALI: Introduction to Blood Transfusion", "AMALI: Procurement of blood", "AMALI: Blood component processing", "AMALI: ABO Blood Group system, Subgroup and Bombay", "AMALI: ABO Discrepancies", "Rh system", "AMALI: Other blood group system", "AMALI: Antiglobulin Testing", "AMALI: Serologic Testing in Pre Transfusion Test", "AMALI: Identification of antibody", "AMALI: Group, Screen and Hold (GSH)", "AMALI: Emergency O and safe O"
+            ],
+            "MTPC 2133": [
+                "AMALI: Laboratory Safety in biochemistry laboratory", "AMALI: Specimen collection, preparation, handling and other pre analytical variables in biochemistry", "AMALI: Oral glucose tolerance test wet & dry and routine glucose urine test", "AMALI: Calibration and Standard graph glucose, creatinine and protein", "AMALI: Point Of Care Testing (POCT)", "AMALI: Lab instrument log, min and SD and plot LJ graph", "AMALI: Uric acid test", "AMALI: Creatinine and urea clearance wet & dry", "AMALI: UFEME and calculi", "AMALI: Determination of ALP enzyme activity using multiple point assay method", "AMALI: Biochemical test on CSF glucose, total protein and globulin"
+            ],
+            "MTHE 2103": [
+                "KULIAH: Introduction to Haematology and Haematopoiesis", "KULIAH: Safety Practices and Quality in Haematology Laboratory", "KULIAH: Principles of Blood Collection", "KULIAH: Overview of Basic Haematology Testing", "KULIAH: Erythrocyte morphology and Inclusions", "KULIAH: Basic Concept And Classification Of Anaemia", "KULIAH: Hypochromic Microcytic Anaemia", "KULIAH: Normochromic Macrocytic Anaemia", "KULIAH: Normochromic Normocytic Anaemia", "KULIAH: Thalassaemia Syndrome and Laboratory Investigation", "KULIAH: Abnormal and Unstable Haemoglobin and Laboratory Investigation", "KULIAH: Leucocytes Maturation, Morphology and Measurement Methods", "KULIAH: French American British FAB and World Health Organization WHO Categories: AML and ALL", "KULIAH: Mature B-Cell Neoplasms: Chronic Lymphocytic Leukemia, Hairy Cells Leukemia, Prolymphocytic Leukemia, Multiple Myeloma and other Related Diseases", "KULIAH: Myeloproliferative Neoplasm MPN", "KULIAH: Myelodysplastic Syndromes and Myelodysplastic Neoplasisms",
+                "TUTORIAL: Introduction to Haematology and Haematopoiesis", "TUTORIAL: Overview of Basic Haematology Testing", "TUTORIAL: Hypochromic Microcytic Anaemia", "TUTORIAL: Normochromic Macrocytic Anaemia", "TUTORIAL: Leucocytes Maturation, Morphology and Measurement Methods",
+                "AMALI: Introduction to Haematology and Haematopoiesis", "AMALI: Overview of Basic Haematology Testing", "AMALI: Erythrocyte morphology and Inclusions", "AMALI: Hypochromic Microcytic Anaemia", "AMALI: Normochromic Macrocytic Anaemia", "AMALI: Normochromic Normocytic Anaemia", "AMALI: Thalassaemia Syndrome and Laboratory Investigation", "AMALI: Abnormal and Unstable Haemoglobin and Laboratory Investigation", "AMALI: Leucocytes Maturation, Morphology and Measurement Methods", "AMALI: French American British FAB and World Health Organization WHO Categories: AML and ALL", "AMALI: Mature B-Cell Neoplasms: Chronic Lymphocytic Leukemia, Hairy Cells Leukemia, Prolymphocytic Leukemia, Multiple Myeloma and other Related Diseases", "AMALI: Myeloproliferative Neoplasm MPN", "AMALI: Myelodysplastic Syndromes and Myelodysplastic Neoplasisms"
+            ],
+            "MTMS 2082": [
+                "KULIAH: Introduction to Occupational Safety and Health", "KULIAH: Management of Chemical Store", "KULIAH: Fire Prevention Programme", "KULIAH: Chemical Hazards", "KULIAH: Biological Hazards", "KULIAH: Physical & Ergonomic Hazards", "KULIAH: Assets Management in Medical Laboratory", "KULIAH: Management of Specimens – Pre-Analytical Phase", "KULIAH: Basic Concept of Procurement", "KULIAH: Quality Management in Medical Laboratory", "KULIAH: Medico Legal", "KULIAH: Management of Documents & Medical Records",
+                "TUTORIAL: Introduction to Occupational Safety and Health", "TUTORIAL: Fire Prevention Programme", "TUTORIAL: Chemical Hazards", "TUTORIAL: Physical & Ergonomic Hazards", "TUTORIAL: Assets Management in Medical Laboratory", "TUTORIAL: Management of Specimens – Pre-Analytical Phase", "TUTORIAL: Quality Management in Medical Laboratory", "TUTORIAL: Management of Documents & Medical Records"
+            ],
+            "MTPC 2122": [
+                "KULIAH: Specimen Collection and Other Pre-Analytical Variables", "KULIAH: Glucose method for blood and urine", "KULIAH: Diabetes mellitus and hypoglycemia", "KULIAH: Glucose tolerance test", "KULIAH: Quality control", "KULIAH: Quality Assurance and Total Quality Management", "KULIAH: Calibration and Standardization Technique in Clinical Biochemistry", "KULIAH: Renal function test", "KULIAH: Clearance", "KULIAH: UFEME", "KULIAH: Renal calculi", "KULIAH: Enzymology Measurement: Principles and Applications", "KULIAH: Cerebrospinal Fluid Biochemistry", "KULIAH: Serum Electrolytes", "KULIAH: Blood Gases",
+                "TUTORIAL: Safe Laboratory Practice", "TUTORIAL: Application of Analytical Techniques", "TUTORIAL: Specimen Collection and Other Pre-Analytical Variables", "TUTORIAL: Diabetes mellitus and hypoglycemia", "TUTORIAL: Glucose tolerance test", "TUTORIAL: Calibration and Standardization Technique in Clinical Biochemistry", "TUTORIAL: Concept and Work Process of Automated System", "TUTORIAL: Clearance"
+            ],
+            "MTAP 2094": [
+                "KULIAH: Introduction to Histopathology", "KULIAH: Inflammation and Neoplasia", "KULIAH: Normal Histology", "KULIAH: Specimen receiving and specimen cut-up", "KULIAH: Fixation of Tissue", "KULIAH: Tissue Processing: Formalin Fixed-Paraffin Embedding Tissue", "KULIAH: Microtomy: Formalin Fixed Paraffin Embedded Tissue", "KULIAH: Haematoxylin & Eoin Stain (H&E)", "KULIAH: Decalcification", "KULIAH: Frozen Section in Histopathology", "KULIAH: Laboratory Safety in Histopathology Laboratory", "KULIAH: Quality Assurance in Histopathology Laboratory",
+                "TUTORIAL: Inflammation and Neoplasia", "TUTORIAL: Tissue Processing: Formalin Fixed-Paraffin Embedding Tissue", "TUTROMY: Formalin Fixed Paraffin Embedded Tissue", "TUTORIAL: Haematoxylin & Eosin Stain (H&E)", "TUTORIAL: Quality Assurance in Histopathology Laboratory",
+                "AMALI: Normal Histology", "AMALI: Histology of Specific Tissues in Body Systems", "AMALI: Specimen receiving and specimen cut-up", "AMALI: Fixation of Tissue", "AMALI: Tissue Processing: Formalin Fixed-Paraffin Embedding Tissue", "AMALI: Microtomy: FormalIN Fixed Paraffin Embedded Tissue", "AMALI: Haematoxylin & Eosin Stain (H&E)", "AMALI: Decalcification", "AMALI: Frozen Section in Histopathology"
+            ],
+            "MTHE 2182": [
+                "KULIAH: Basic Concept of Hemostasis", "KULIAH: Introduction to Thrombosis", "KULIAH: Platelet Production and Function in Hemostasis", "KULIAH: Platelet Disorders: Disorders of Primary Hemostasis", "KULIAH: Hemostasis Disorders: Disorders of Secondary Hemostasis", "KULIAH: Specimen Handling and Variable Factors Affecting Hemostasis Testing", "KULIAH: Coagulation",
+                "TUTORIAL: Basic Concept of Hemostasis", "TUTORIAL: Platelet Production and Function in Hemostasis", "TUTORIAL: Platelet Disorders: Disorders of Primary Hemostasis", "TUTORIAL: Hemostasis Disorders: Disorders of Secondary Hemostasis", "TUTORIAL: Hemostasis Testing: Screening and Further Testing",
+                "AMALI: Platelet Disorders: Disorders of Primary Hemostasis", "AMALI: Hemostasis Disorders: Disorders of Secondary Hemostasis", "AMALI: Specimen Handling and Variable Factors Affecting Hemostasis Testing", "AMALI: Hemostasis Testing: Screening and Further Testing", "AMALI: Automation and Quality Aspects in Coagulation"
+            ],
+            "MTBT 2193": [
+                "KULIAH: Transfusion Dependent Patient (TDP)", "KULIAH: Transfusion in Case of Life-Threatening Bleeding and Massive Transfusion", "KULIAH: Investigation of Adverse Transfusion Reaction", "KULIAH: Haemolytic Disease of the Newborn (HDN)", "KULIAH: Special Immunohaematology Technique", "KULIAH: Recent Concept and Recent Techniques in Blood Banking", "KULIAH: Quality in Blood Transfusion Services", "KULIAH: Management in Blood Transfusion Service", "KULIAH: Safety in Blood Transfusion Service", "KULIAH: Problem Based Learning",
+                "TUTORIAL: Transfusion in case of life threatening bleeding and massive transfusion", "TUTORIAL: Investigation of adverse transfusion reaction", "TUTORIAL: Haemolytic Disease Of The Newborn", "TUTORIAL: Special Immunohaematology Technique", "TUTORIAL: Recent Concept And Techniques In Blood Banking", "TUTORIAL: Quality Assurance in blood transfusion", "TUTORIAL: Management in Blood transfusion service", "TUTORIAL: Safety in Blood transfusion service",
+                "AMALI: Pre-transfusion testing in life-threatening bleeding / massive transfusion", "AMALI: Investigation of adverse transfusion reaction", "AMALI: Haemolytic Disease Of The Newborn", "AMALI: Special Immunohaematology Technique", "AMALI: Problem Based Learning"
+            ],
+            "MTPC 2203": [
+                "KULIAH: Bilirubin", "KULIAH: Liver Function Test", "KULIAH: Lipid Profile", "KULIAH: Hyperlipidemia", "KULIAH: Cardiac Marker", "KULIAH: Pancreatic Function", "KULIAH: Gastrointestinal Function", "KULIAH: Determination of Calcium and Phosphorus", "KULIAH: Determination of Serum Iron, TIBC and Transferrin Saturation", "KULIAH: Introduction to Inborn Error of Metabolism", "KULIAH: Drug Abuse, Screening and Confirmation Test", "KULIAH: Basic Endocrinology",
+                "TUTORIAL: Liver Function Test", "TUTORIAL: Lipid profile", "TUTORIAL: Hyperlipidemia", "TUTORIAL: Pancreatic function", "TUTORIAL: Determination Calcium and phosphorus", "TUTORIAL: Determination of serum iron, TIBC and transferrin saturation", "TUTORIAL: Inborn Error of Metabolism",
+                "AMALI: Bilirubin", "AMALI: Liver Function Test", "AMALI: Lipid profile", "AMALI: Determination Calcium and phosphorus", "AMALI: Drug abuse, screening and confirmation test"
+            ],
+            "MTVS 2142": [
+                "KULIAH: Safety in Medical Virology and Serology Laboratory", "KULIAH: Instrumentation in Medical Virology and Serology Laboratory", "KULIAH: Specimen Collections and Transportations in Virology and Serology Laboratory", "KULIAH: Virus Isolation and Identification Techniques", "KULIAH: RPR / VDRL / TPPA / TPHA", "KULIAH: ANA / ASOT / IIP", "KULIAH: Dengue and Leptospiral Antibody", "KULIAH: HIV Antigen Antibody and Confirmatory Test", "KULRubella and TORCHES", "KULIAH: Serological Test for Parasitic Infection", "KULIAH: Respiratory Viral Infection", "KULIAH: GIT Viral Infection", "KULIAH: Central Nervous System Viral Infection", "KULIAH: Skin Viral Infection", "KULIAH: Sexually Transmitted Viral Infection", "KULIAH: Hemorrhagic Fever",
+                "TUTORIAL: Safety in Medical Virology and Serology Laboratory", "TUTORIAL: Virus Isolation and Identification Techniques", "TUTORIAL: RPR / VDRL / TPPA / TPHA", "TUTORIAL: ANA / ASOT / IIP", "TUTORIAL: Dengue and Leptospiral - Antibody", "TUTORIAL: HIV Antigen Antibody and Confirmatory Test", "TUTORIAL: Rubella and TORCHES", "TUTORIAL: Serological Test for Parasitic Infection", "TUTORIAL: Respiratory Viral Infection", "TUTORIAL: GIT Viral Infection", "TUTORIAL: Central Nervous System Viral Infection", "TUTORIAL: Skin Viral Infection", "TUTORIAL: Sexually Transmitted Viral Infection", "TUTORIAL: Hemorrhagic Fever"
+            ],
+            "MTMM 2153": [
+                "KULIAH: Anaerobic Infections", "KULIAH: Upper Respiratory Tract Infections (URTI)", "KULIAH: Lower Respiratory Tract Infections (LRTI)", "KULIAH: Skin & Soft Tissue Infections", "KULIAH: Nosocomial Infections", "KULIAH: Shigellosis and Enteric Fever Infection", "KULIAH: Cholera and Food Poisoning Infection", "KULIAH: Central Nervous System Infections", "KULIAH: Bacteraemia and Sepsis", "KULIAH: Urinary Tract Infections", "KULIAH: Sexual Transmitted Diseases", "KULIAH: Quality Assurance Programme", "KULIAH: Quality Control", "KULIAH: Emerging & Re-emerging Micro-organism", "KULIAH: Latest Equipment, Technique and Test in Microbiology",
+                "TUTORIAL: Anaerobic Infections", "TUTORIAL: Upper Respiratory Tract Infections (URTI)", "TUTORIAL: Lower Respiratory Tract Infections (LRTI)", "TUTORIAL: Skin & Soft Tissue Infections", "TUTORIAL: Nosocomial Infections", "TUTORIAL: Shigellosis and Enteric Fever Infection", "TUTORIAL: Cholera and Food Poisoning Infection", "TUTORIAL: Central Nervous System Infections", "TUTORIAL: Bacteraemia and Sepsis", "TUTORIAL: Urinary Tract Infections", "TUTORIAL: Sexual Transmitted Diseases", "TUTORIAL: Quality Assurance Programme", "TUTORIAL: Emerging & Re-emerging Micro-organism"
+            ],
+            "MTNF 2162": [
+                "KULIAH: Introduction to Non-Gynaecological Cytology", "KULIAH: Processing and Staining of Non-Gynaecological Specimen", "KULIAH: Cytology of Body Fluid (Pleural, Peritoneal, Pericardial)", "KULIAH: Cytology of Cerebrospinal Fluids (CSF)", "KULIAH: Cytology of Respiratory Tract", "KULINE: Urine Cytology", "KULIAH: Reporting of Non-Gynaecological Cytology", "KULIAH: Troubleshooting in Non-Gynaecological Cytology", "KULIAH: Introduction to Fine Needle Aspiration Cytology (FNAC)", "KULIAH: Accreditation and Standards in Cytopathology Laboratory",
+                "TUTORIAL: Cytology of Body Fluid (Pleural, Peritoneal, Pericardial)", "TUTORIAL: Cytology of Respiratory Tract",
+                "AMALI: Processing and Staining of Non-Gynaecological Specimen", "AMALI: Cytology of Body Fluid (Pleural, Peritoneal, Pericardial)", "AMALI: Cytology of Cerebrospinal Fluids (CSF)", "AMALI: Cytology of Respiratory Tract", "AMALI: Urine Cytology", "AMALI: Reporting of Non-Gynaecological Cytology"
+            ],
+            "MTAP 2172": [
+                "KULIAH: Carbohydrate Stains", "KULIAH: Connective Tissues and Amyloid", "KULIAH: Microorganisms", "KULIAH: Pigments and Minerals", "KULIAH: Enzyme Histochemistry", "KULIAH: Tissue Biopsies in Histopathology", "KULIAH: Immunohistochemical Test", "KULIAH: Immunofluorescence Test", "KULIAH: In-situ Hybridisation", "KULIAH: Recent Techniques in Histopathology Laboratory",
+                "TUTORIAL: Immunohistochemical Test",
+                "AMALI: Carbohydrate Stains", "AMALI: Connective Tissues and Amyloid", "AMALI: Microorganisms", "AMALI: Pigments and Minerals", "AMALI: Immunohistochemical Test"
+            ],
             "CCRM 2013": [
                 "KULIAH: Introduction to Basic Research Methodology", "KULIAH: Research Problem Research Question and Hypothesis", "KULIAH: Literature Review", "Research Design", "KULIAH: Data Analysis", "KULIAH: Report Writing Technique", "KULIAH: Introduction To Statistics", "KULIAH: Descriptive Statistics", "KULIAH: Computer software Application",
                 "TUTORIAL: Research Problem Research Question and Hypothesis", "TUTORIAL: Literature Review", "TUTORIAL: Research Design", "TUTORIAL: Descriptive Statistics",
                 "AMALI: Literature Review", "AMALI: Computer software Application"
             ]
         };
-    </script>
 
-    <script type="text/babel" data-presets="react-classic,env">
-        const { useState, useEffect, useMemo, useRef } = React;
-
-        // Global Date Formatting Helper (Mencegah Blank Screen)
         const formatDateDisplay = (dateString) => {
             if (!dateString) return '';
             const parts = dateString.split('-');
@@ -366,29 +434,6 @@
             return dateString;
         };
 
-        // Global Session Label Helper (Kalis Ralat)
-        const getSessionLabel = (ev) => {
-            if (!ev) return "";
-            const sessionInitials = { 
-                'Kuliah': '(L)', 
-                'Amali': '(P)', 
-                'IL': '(IL)', 
-                'Tutorial': '(T)', 
-                'CA': '(CA)', 
-                'Ulangkaji': '(UK)', 
-                'Lain-lain': '(LL)', 
-                'Others': '(O)', 
-                'Taklimat': '(Taklimat)', 
-                'Penyediaan': '(Penyediaan)' 
-            };
-            const initial = sessionInitials[ev.type] || '(L)';
-            if (ev.sessionNumber) {
-                return initial.replace(')', ev.sessionNumber + ')');
-            }
-            return initial;
-        };
-
-        // Unicode based Icons (Ultra-safe & Kalis ReferenceError)
         const Icons = {
             Plus: () => <span>＋</span>,
             X: () => <span style={{ fontWeight: 'bold' }}>✕</span>,
@@ -403,6 +448,28 @@
             Search: () => <span>🔍</span>,
             Settings: () => <span>⚙️</span>,
             FileText: () => <span>📄</span>
+        };
+
+        const sessionInitials = { 
+            'Kuliah': '(L)', 
+            'Amali': '(P)', 
+            'IL': '(IL)', 
+            'Tutorial': '(T)', 
+            'CA': '(CA)', 
+            'Ulangkaji': '(UK)', 
+            'Lain-lain': '(LL)', 
+            'Others': '(O)', 
+            'Taklimat': '(Taklimat)', 
+            'Penyediaan': '(Penyediaan)' 
+        };
+
+        window.getSessionLabel = (ev) => {
+            if (!ev) return '';
+            const initial = sessionInitials[ev.type] || '(L)';
+            if (ev.sessionNumber) {
+                return initial.replace(')', ev.sessionNumber + ')');
+            }
+            return initial;
         };
 
         const App = () => {
@@ -439,6 +506,7 @@
             const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
             const [editingEvent, setEditingEvent] = useState(null);
             const [lastUpdatedKey, setLastUpdatedKey] = useState(null);
+            
             const [formData, setFormData] = useState({ 
                 id: '', 
                 day: '', 
@@ -463,7 +531,7 @@
             const tableElementRef = useRef(null);
             const printAreaRef = useRef(null);
 
-            // --- 2. CONSTANTS ---
+            // --- 2. STRUCTURE CONSTANTS ---
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
             const semesters = ['T1SI', 'T1SII', 'T2SI', 'T2SII'];
             const instructorList = ["HAROLD CRISO ANAK AJIN", "MAXSION BIN BATUT", "ADELINE BONG HUI FEN", "MOHD SYAHID HARRIS ABDULLAH", "INDRAWATI BINTI AMBO", "HAZLIANA BINTI HAZALI", "HARNIYATIE BINTI MOHAMAD", "AHMAD FAIZAL BIN OTHMAN", "ISSYATUL SOFEA ABDULLAH", "JOCELYN CHAN YUNN NING", "NOOR AYUNIE BINTI MOHAMAD", "LING SIEW LING", "WONG SUK CHIE", "TERRYIE BIN EDDIE", "TERRY ANSLEM RIMPA", "MUHAMMAD IQBAL NA’IM BIN ZAMRI", "NURUL NADIAH BINTI MAZLAN", "HANNA ATHIRAH BINTI AMREE", "RAJA NURUL AMIRAH BINTI RAJA ZAMRI", "NUR AMISHA ABDULLAH", "NURHIDATUN BINTI ANNUAR RIGOS", "LESAH BINTI ISMAIL LEE GIAP BENG", "JAYANTHI A/P MARIMUTHU", "Lain-lain"];
@@ -489,7 +557,7 @@
                 
                 if (selectedLoginInstructor && selectedLoginInstructor !== "TRAINEE_VIEWER") {
                     const correctPass = instructorPasswords[selectedLoginInstructor];
-                    if (codeUpper === correctPass.toUpperCase()) {
+                    if (correctPass && codeUpper === correctPass.toUpperCase()) {
                         setIsAuthorized(true);
                         setUserRole('admin');
                         sessionStorage.setItem('tmp_auth', 'true');
@@ -513,7 +581,7 @@
                     }
                 }
 
-                if (selectedLoginInstructor === "TRAINEE_VIEWER") {
+                if (selectedLoginInstructor === "TRAINEE_VIEWER" || codeUpper === "JTMP2026") {
                     if (codeUpper === "JTMP2026") {
                         setIsAuthorized(true); 
                         setUserRole('viewer'); 
@@ -525,15 +593,6 @@
                         setLoginError("Kata Laluan Pelatih Salah.");
                         return;
                     }
-                }
-
-                if (!selectedLoginInstructor && codeUpper === "JTMP2026") {
-                    setIsAuthorized(true); 
-                    setUserRole('viewer'); 
-                    sessionStorage.setItem('tmp_auth', 'true'); 
-                    sessionStorage.setItem('tmp_role', 'viewer');
-                    sessionStorage.setItem('tmp_user_name', 'TRAINEE/VIEWER');
-                    return;
                 }
 
                 setLoginError("Kod Akses Atau Profil Salah.");
@@ -561,7 +620,7 @@
             const isSlotBreak = (day, slotIdx) => {
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true; 
-                if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true; 
+                if (day !== 'Isnin' && slot === '1.00 - 2.00') return true; 
                 if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx); 
                 return false;
             };
@@ -823,32 +882,6 @@
                 return "NORMAL";
             }, [selectedWeek, weekStatuses, academicCycle]);
 
-            const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
-                if (weekStatus !== "NORMAL") return;
-                if (isSlotBreak(day, slotIdx)) return;
-
-                const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked);
-                if (!canEdit) return;
-
-                setModalError(""); 
-                if (event) {
-                    setFormData({ 
-                        ...event, 
-                        customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode,
-                        benchTutors: event.benchTutors || '',
-                        align: event.align || 'left',
-                        isBooked: !!event.isBooked,
-                        bookedCourse: event.bookedCourse || '',
-                        bookedPurpose: event.bookedPurpose || 'Amali'
-                    });
-                    setEditingEvent(event);
-                } else {
-                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', benchTutors: '', semester: sem, duration: 1, sessionNumber: '', align: 'left', isBooked: false, bookedCourse: '', bookedPurpose: 'Amali' });
-                    setEditingEvent(null);
-                }
-                setIsModalOpen(true);
-            };
-
             const autoWeekRange = useMemo(() => {
                 const start = new Date(sessionStartDate);
                 start.setDate(start.getDate() + (selectedWeek - 1) * 7);
@@ -913,26 +946,80 @@
                 if (!dbReady || !isAuthorized || !window.TMP_DB || !user) return;
                 const { db, appId, collection, onSnapshot, doc } = window.TMP_DB;
                 
-                const unsubEv = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`), (s) => {
-                    const d = {}; s.forEach(doc => { d[doc.id] = doc.data(); }); setEvents(d);
-                });
-                const unsubLim = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), (d) => { if(d.exists()) setCourseLimits(d.data()); });
-                const unsubSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), (d) => { if(d.exists()) setFooterData(d.data()); });
-                const unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), (d) => { if(d.exists()) setSaturdayConfigs(d.data()); });
-                const unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), (d) => { if(d.exists()) setHolidays(d.data()); });
-                
-                const unsubLock = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'global_lock'), (d) => {
-                    if (d.exists()) setIsTimetableLocked(!!d.data().locked);
-                });
-                
-                const unsubStartDate = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'session_start_date'), (d) => {
-                    if (d.exists() && d.data().date) {
-                        setSessionStartDate(d.data().date);
-                    }
-                });
+                let unsubEv, unsubLim, unsubSig, unsubSat, unsubHol, unsubLock, unsubStartDate;
 
-                return () => { unsubEv(); unsubLim(); unsubSig(); unsubSat(); unsubHol(); unsubLock(); unsubStartDate(); };
+                try {
+                    unsubEv = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`), (s) => {
+                        const d = {}; s.forEach(docSnap => { d[docSnap.id] = docSnap.data(); }); setEvents(d);
+                    }, (err) => console.error("Firestore loading error (events):", err));
+                } catch(e) { console.error(e); }
+
+                try {
+                    unsubLim = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'course_limits'), (d) => { if(d.exists()) setCourseLimits(d.data()); }, (err) => console.error(err));
+                } catch(e) { console.error(e); }
+
+                try {
+                    unsubSig = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', `jadual_meta_${academicCycle}`, 'signatures'), (d) => { if(d.exists()) setFooterData(d.data()); }, (err) => console.error(err));
+                } catch(e) { console.error(e); }
+
+                try {
+                    unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), (d) => { if(d.exists()) setSaturdayConfigs(d.data()); }, (err) => console.error(err));
+                } catch(e) { console.error(e); }
+
+                try {
+                    unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), (d) => { if(d.exists()) setHolidays(d.data()); }, (err) => console.error(err));
+                } catch(e) { console.error(e); }
+                
+                try {
+                    unsubLock = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'global_lock'), (d) => {
+                        if (d.exists()) setIsTimetableLocked(!!d.data().locked);
+                    }, (err) => console.error(err));
+                } catch(e) { console.error(e); }
+                
+                try {
+                    unsubStartDate = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'session_start_date'), (d) => {
+                        if (d.exists() && d.data().date) {
+                            setSessionStartDate(d.data().date);
+                        }
+                    }, (err) => console.error(err));
+                } catch(e) { console.error(e); }
+
+                return () => { 
+                    if(unsubEv) unsubEv(); 
+                    if(unsubLim) unsubLim(); 
+                    if(unsubSig) unsubSig(); 
+                    if(unsubSat) unsubSat(); 
+                    if(unsubHol) unsubHol(); 
+                    if(unsubLock) unsubLock(); 
+                    if(unsubStartDate) unsubStartDate(); 
+                };
             }, [dbReady, isAuthorized, user, academicCycle]);
+
+            const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
+                if (weekStatus !== "NORMAL") return;
+                if (isSlotBreak(day, slotIdx)) return;
+
+                const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked);
+                if (!canEdit) return;
+
+                setModalError(""); 
+                if (event) {
+                    setFormData({ 
+                        ...event, 
+                        customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode,
+                        benchTutors: event.benchTutors || '',
+                        align: event.align || 'left',
+                        isBooked: !!event.isBooked,
+                        bookedCourse: event.bookedCourse || '',
+                        bookedPurpose: event.bookedPurpose || 'Amali'
+                    });
+                    setEditingEvent(event);
+                } else {
+                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', benchTutors: '', semester: sem, duration: 1, sessionNumber: '', align: 'left', isBooked: false, bookedCourse: '', bookedPurpose: 'Amali' });
+                    setEditingEvent(null);
+                }
+                setIsModalOpen(true);
+            };
 
             if (!isAuthorized) {
                 return (
@@ -1019,7 +1106,7 @@
                                                     }} 
                                                     className={`ml-2 px-2 py-0.5 rounded text-[8px] font-black uppercase flex items-center gap-1 shadow-sm transition-all text-white ${isTimetableLocked ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-500 hover:bg-slate-600'}`}
                                                 >
-                                                    {isTimetableLocked ? '🔒 Lock Jadual: ON' : '🔓 Lock Jadual: OFF'}
+                                                    {isTimetableLocked ? '🔒 Lock: ON' : '🔓 Lock: OFF'}
                                                 </button>
                                             )}
                                         </div>
@@ -1094,7 +1181,7 @@
                         </div>
                     </nav>
 
-                    {}
+                    {/* Main Timetable Content */}
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
                             <div className="absolute top-0 right-0 text-[10px] md:text-[12px] font-bold text-black uppercase tracking-tighter">BPLKKM.PK(T)04B/17</div>
@@ -1152,13 +1239,13 @@
                                 <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full text-black">
                                     <thead>
                                         <tr className="bg-slate-50 border-b-2 border-black text-[12px] font-black uppercase">
-                                            <th className="w-36 p-4 border-r border-black">Hari / Tarikh</th>
-                                            <th className="w-16 border-r border-black text-center">Sem</th>
+                                            <th className="w-36 p-4 border border-black">Hari / Tarikh</th>
+                                            <th className="w-16 border border-black text-center">Sem</th>
                                             {timeSlots.map(slot => {
                                                 const isRehatCol = (slot === '10.00 - 10.30' || slot === '1.00 - 2.00');
                                                 const colWidthClass = isRehatCol ? 'w-16' : 'w-40';
                                                 return (
-                                                    <th key={slot} className={`${colWidthClass} p-3 border-r border-black text-center`}>{slot}</th>
+                                                    <th key={slot} className={`${colWidthClass} p-3 border border-black text-center`}>{slot}</th>
                                                 );
                                             })}
                                         </tr>
@@ -1169,14 +1256,14 @@
                                             return vSems.map((sem, sIdx) => {
                                                 const skips = [];
                                                 return (
-                                                    <tr key={`${day}-${sem}`} className={`border-b border-black/20 ${sIdx === vSems.length - 1 ? 'border-b-2 border-black' : ''}`}>
+                                                    <tr key={`${day}-${sem}`} className={`border border-black/20 ${sIdx === vSems.length - 1 ? 'border-b-2 border-black' : ''}`}>
                                                         {sIdx === 0 && (
-                                                            <td rowSpan={vSems.length} className="p-4 bg-white border-r border-black text-center align-middle font-sans">
+                                                            <td rowSpan={vSems.length} className="p-4 bg-white border border-black text-center align-middle font-sans">
                                                                 <div className="font-black uppercase text-xs">{day}</div>
                                                                 <div className="text-[10px] font-black text-blue-700 bg-blue-50 px-2 py-1 rounded inline-block mt-1">{getDisplayDateForDay(dIdx)}</div>
                                                             </td>
                                                         )}
-                                                        <td className="p-2 bg-white text-center font-black text-[11px] border-r border-black">{sem}</td>
+                                                        <td className="p-2 bg-white text-center font-black text-[11px] border border-black">{sem}</td>
                                                         {timeSlots.map((slot, slotIdx) => {
                                                             if (skips.includes(slotIdx)) return null;
                                                             const key = `${academicSession}-${selectedWeek}-${day}-${sem}-${slotIdx}`;
@@ -1185,11 +1272,11 @@
                                                             const isHoliday = holidays[`${academicCycle}-${selectedWeek}-${day}`];
                                                             
                                                             if (isHoliday) {
-                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-rose-50/60 border-r border-black p-2 text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] text-rose-500 opacity-80">CUTI (HKA / CT)</span> </td>);
+                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-rose-50/60 border border-black p-2 text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] text-rose-500 opacity-80">CUTI (HKA / CT)</span> </td>);
                                                                 return null;
                                                             }
                                                             if (isBreak) {
-                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border-r border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">REHAT</span> </td>);
+                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-slate-100 border border-black text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] opacity-30">REHAT</span> </td>);
                                                                 return null;
                                                             }
 
@@ -1212,7 +1299,7 @@
                                                             }
 
                                                             return (
-                                                                <td key={slotIdx} colSpan={colSpan} className={`p-1 border-r border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
+                                                                <td key={slotIdx} colSpan={colSpan} className={`p-1 border border-black/20 h-32 align-top ${key === lastUpdatedKey ? 'highlight-new' : ''}`}>
                                                                     <div onClick={() => handleOpenModalInternal(day, sem, slotIdx, ev)} className={`h-full w-full rounded-xl p-2 text-[10px] overflow-hidden transition-all ${bgStyle} ${isMatch ? 'search-match' : ''} ${canEdit ? 'cursor-pointer active:scale-95' : 'cursor-default'}`}>
                                                                         {ev && ev.courseCode ? (
                                                                             <React.Fragment>
@@ -1222,7 +1309,7 @@
                                                                                             INDEPENDENT LEARNING (IL)
                                                                                             {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
                                                                                         </div>
-                                                                                        <div className="font-bold text-[10px] leading-tight mb-1 flex-1 overflow-y-auto whitespace-pre-wrap" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', textAlign: ev.align || 'left' }}>
+                                                                                        <div className="font-bold text-[10px] leading-tight mb-1 flex-1 overflow-y-auto whitespace-pre-wrap" style={{ textAlign: ev.align || 'left' }}>
                                                                                             {ev.topic}
                                                                                         </div>
                                                                                         {ev.benchTutors && (
@@ -1234,6 +1321,7 @@
                                                                                             {ev.instructor} {ev.updatedBy ? `[Ed: ${ev.updatedBy.split(' ')[0]}]` : ''}
                                                                                         </div>
                                                                                         
+                                                                                        {/* Hover Tooltip Info Tempahan IL */}
                                                                                         <div className="absolute no-print top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 text-white p-3 rounded-2xl shadow-2xl z-[200] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none min-w-[220px] border border-rose-500 font-bold text-xs space-y-1 font-sans">
                                                                                             <div className="text-[10px] text-rose-300 font-black uppercase tracking-wider pb-1 border-b border-white/10">Maklumat Tempahan IL</div>
                                                                                             <div className="pt-1">Kursus: <span className="text-white font-extrabold">{ev.bookedCourse}</span></div>
@@ -1249,7 +1337,7 @@
                                                                                             {ev.type === 'IL' ? (
                                                                                                 "INDEPENDENT LEARNING (IL)"
                                                                                             ) : !(ev.type === 'Lain-lain' || ev.type === 'Taklimat' || ev.type === 'Penyediaan' || ev.courseCode.toUpperCase() === 'LAIN-LAIN') ? (
-                                                                                                `${ev.courseCode} ${getSessionLabel(ev)}`
+                                                                                                `${ev.courseCode} ${window.getSessionLabel(ev)}`
                                                                                             ) : ""}
                                                                                             {isLocked(ev) && <span className="ml-1 text-red-500"><Icons.Lock /></span>}
                                                                                         </div>
@@ -1278,7 +1366,7 @@
                                 </table>
                             </div>
                             
-                            {}
+                            {/* Signature Footer */}
                             <div className="p-10 border-t-2 border-black grid grid-cols-2 gap-40 font-bold text-[11px]">
                                 <div className="space-y-4">
                                     <p className="uppercase text-slate-800 tracking-wider">
@@ -1324,7 +1412,7 @@
                                                 ) : (
                                                     <input 
                                                         type="text" 
-                                                        className="bg-transparent outline-none w-full font-black uppercase text-blue-800 animate-none" 
+                                                        className="bg-transparent outline-none w-full font-black uppercase text-blue-800" 
                                                         value={tempPreparedName} 
                                                         onChange={e => setTempPreparedName(e.target.value)}
                                                         placeholder="SILA PILIH NAMA ATAU TAIP MANUAL DI SINI"
@@ -1393,7 +1481,7 @@
                                         TARIKH: {userRole === 'viewer' ? (
                                             <span className="font-bold">{footerData.verifiedDate ? formatDateDisplay(footerData.verifiedDate) : ''}</span>
                                         ) : (
-                                            <input type="date" className="bg-transparent outline-none font-bold" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} />
+                                            <input type="date" className="bg-transparent outline-none font-bold animate-none" value={footerData.verifiedDate || ''} onChange={e => handleFooterChange('verifiedDate', e.target.value)} />
                                         )}
                                     </div>
                                 </div>
@@ -1522,7 +1610,7 @@
                                                 onChange={(e) => { if(e.target.value) setFormData({...formData, topic: e.target.value}); e.target.value = ""; }}
                                             >
                                                 <option value="">⬇️ KLIK SINI UNTUK SENARAI TAJUK SILIBUS ⬇️</option>
-                                                {formData.courseCode && window.courseTopics[formData.courseCode] && window.courseTopics[formData.courseCode].map((tajuk, idx) => (
+                                                {formData.courseCode && courseTopics[formData.courseCode] && courseTopics[formData.courseCode].map((tajuk, idx) => (
                                                     <option key={idx} value={tajuk}>{tajuk}</option>
                                                 ))}
                                             </select>
@@ -1561,6 +1649,7 @@
                                         </select>
                                     </div>
 
+                                    {/* Bench Tutor (Initial) khas untuk Amali, Penyediaan, dan IL yang di-booking */}
                                     {(formData.type === 'Amali' || formData.type === 'Penyediaan' || (formData.type === 'IL' && formData.isBooked)) && (
                                         <div className="space-y-1 text-black mt-4 animate-in slide-in-from-top-2">
                                             <label className="text-[11px] font-black text-slate-400 uppercase">Bench Tutor (Initial)</label>
@@ -1630,7 +1719,7 @@
                         </div>
                     )}
 
-                    {}
+                    {/* Had Agihan Modal */}
                     {isLimitModalOpen && (
                         <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm no-print animate-in fade-in">
                             <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden border-4 border-indigo-600 flex flex-col text-black">
@@ -1660,4 +1749,4 @@
         root.render(<App />);
     </script>
 </body>
-</html>
+</html>  
