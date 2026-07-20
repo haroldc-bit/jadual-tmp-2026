@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
@@ -35,8 +35,10 @@
             body { background: white !important; padding: 0; margin: 0; font-family: 'Times New Roman', serif; color: black !important; }
             main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
             .freeze-container { overflow: visible !important; max-height: none !important; border: none !important; display: block !important; width: 100% !important; }
-            table { width: 100% !important; min-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: 2px solid black !important; }
-            th, td { border: 1px solid black !important; background: white !important; color: black !important; padding: 4px 2px !important; }
+            table { width: 100% !important; min-width: 100% !important; table-layout: fixed !important; border-collapse: separate !important; border-spacing: 0 !important; border: 2px solid black !important; }
+            th, td { border-right: 1px solid black !important; border-bottom: 1px solid black !important; background: white !important; color: black !important; padding: 4px 2px !important; }
+            th:first-child, td:first-child { border-left: 1px solid black !important; }
+            thead tr:first-child th { border-top: 1px solid black !important; }
             .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
             input, select, textarea { border: none !important; background: transparent !important; color: black !important; appearance: none; }
             thead, .table-to-scroll thead th { position: static !important; }
@@ -73,9 +75,23 @@
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Penstabilan sempadan hitam penuh 1px seragam bagi menyelesaikan ralat herotan garisan */
-        table { border-collapse: collapse !important; border: 2px solid black !important; }
-        th, td { border: 1px solid black !important; }
+        /* PEMBETULAN CSS: Menukar kepada border-collapse: separate untuk membuang ralat garis phantom */
+        table { 
+            border-collapse: separate !important; 
+            border-spacing: 0 !important; 
+            border: 2px solid black !important; 
+        }
+        th, td { 
+            border-right: 1px solid black !important; 
+            border-bottom: 1px solid black !important; 
+            box-sizing: border-box;
+        }
+        th:first-child, td:first-child { 
+            border-left: 1px solid black !important; 
+        }
+        thead tr:first-child th { 
+            border-top: 1px solid black !important; 
+        }
 
         .table-to-scroll thead th { 
             position: sticky; 
@@ -1313,7 +1329,8 @@
 
                                                             const isBookedIL = ev && ev.type === 'IL' && ev.isBooked;
 
-                                                            let bgStyle = "border border-dashed border-slate-200 flex items-center justify-center text-slate-200";
+                                                            /* PEMBETULAN REACT: Menukar bgStyle slot kosong kepada bg-slate-50/50 bagi mengelakkan pertindihan border */
+                                                            let bgStyle = "bg-slate-50/50 flex items-center justify-center text-slate-300";
                                                             if (ev && ev.courseCode) {
                                                                 if (isBookedIL) {
                                                                     bgStyle = "bg-rose-100 border-rose-500 text-rose-800 border-l-4 group relative flex flex-col";
@@ -1343,8 +1360,7 @@
                                                                                 </div>
                                                                             ) : (
                                                                                 <React.Fragment>
-                                                                                    {/* PERBAIKAN: Penukaran border-b border-black/5 ke border-b border-slate-200 bagi menghapuskan garisan hitam tengah */}
-                                                                                    <div className="font-black uppercase truncate border-b border-slate-200 pb-1 mb-1 leading-tight shrink-0 min-h-[16px]">
+                                                                                    <div className="font-black uppercase truncate border-b border-black/5 pb-1 mb-1 leading-tight shrink-0 min-h-[16px]">
                                                                                         {ev.type === 'IL' ? (
                                                                                             "INDEPENDENT LEARNING (IL)"
                                                                                         ) : !(ev.type === 'Lain-lain' || ev.type === 'Taklimat' || ev.type === 'Penyediaan' || ev.courseCode.toUpperCase() === 'LAIN-LAIN') ? (
