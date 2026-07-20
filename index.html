@@ -590,7 +590,7 @@
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true; 
                 if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true; 
-                if (day === 'Jumaat') return [5, 6, 7].includes(slotIdx); // Rehat Jumaat dialihkan ke jam 12.30 - 3.00 petang
+                if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx); // Rehat Jumaat dialihkan ke jam 11.30 - 2.00 (SlotIdx 4, 5, 6)
                 return false;
             };
 
@@ -964,6 +964,32 @@
                 };
             }, [dbReady, isAuthorized, user, academicCycle]);
 
+            const handleOpenModalInternal = (day, sem, slotIdx, event = null) => {
+                if (weekStatus !== "NORMAL") return;
+                if (isSlotBreak(day, slotIdx)) return;
+
+                const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked);
+                if (!canEdit) return;
+
+                setModalError(""); 
+                if (event) {
+                    setFormData({ 
+                        ...event, 
+                        customCourseCode: courseCodes.includes(event.courseCode) ? '' : event.courseCode,
+                        benchTutors: event.benchTutors || '',
+                        align: event.align || 'left',
+                        isBooked: !!event.isBooked,
+                        bookedCourse: event.bookedCourse || '',
+                        bookedPurpose: event.bookedPurpose || 'Amali'
+                    });
+                    setEditingEvent(event);
+                } else {
+                    setFormData({ id: Math.random().toString(36).substr(2, 9), day, semester: sem, timeSlotIndex: slotIdx, courseCode: courseCodes[0], customCourseCode: '', topic: '', type: 'Kuliah', instructor: '', benchTutors: '', semester: sem, duration: 1, sessionNumber: '', align: 'left', isBooked: false, bookedCourse: '', bookedPurpose: 'Amali' });
+                    setEditingEvent(null);
+                }
+                setIsModalOpen(true);
+            };
+
             const handleLogout = () => {
                 safeStorage.clear();
                 safeStorage.localClear();
@@ -1230,18 +1256,24 @@
                                                             if (skips.includes(slotIdx)) return null;
                                                             const key = `${academicSession}-${selectedWeek}-${day}-${sem}-${slotIdx}`;
                                                             const ev = events[key];
+                                                            const isHoliday = holidays[`${academicCycle}-${selectedWeek}-${day}`];
                                                             
-                                                            // Penstabilan Semesta Sempadan Jumaat: Menyatukan Rehat Jumaat (Slot 12.30 - 3.00, Indeks 5, 6, dan 7)
+                                                            if (isHoliday) {
+                                                                if (sIdx === 0) return (<td key={slotIdx} rowSpan={vSems.length} className="bg-rose-50/60 border border-black p-2 text-center align-middle"> <span className="text-[10px] font-black uppercase vertical-text tracking-[0.4em] text-rose-500 opacity-80">CUTI (HKA / CT)</span> </td>);
+                                                                return null;
+                                                            }
+
+                                                            // Penstabilan Sempadan Jumaat: Menyatukan Rehat Jumaat (Slot 11.30 - 2.00, Indeks 4, 5, dan 6)
                                                             let isBreakProcessed = isSlotBreak(day, slotIdx);
                                                             let breakColSpan = 1;
 
                                                             if (slot === '10.00 - 10.30') {
                                                                 isBreakProcessed = true;
                                                             } else if (day === 'Jumaat') {
-                                                                if (slotIdx === 5) {
+                                                                if (slotIdx === 4) {
                                                                     isBreakProcessed = true;
-                                                                    breakColSpan = 3; // Menggabungkan slot 5, 6, 7 (12.30 - 3.00) secara mutlak
-                                                                } else if (slotIdx === 6 || slotIdx === 7) {
+                                                                    breakColSpan = 3; // Menggabungkan slot 4, 5, 6 (11.30 - 2.00) secara sempurna
+                                                                } else if (slotIdx === 5 || slotIdx === 6) {
                                                                     return null; // Elak paparan sel berulang untuk lajur yang digabungkan
                                                                 }
                                                             } else {
@@ -1275,7 +1307,7 @@
                                                                     const nextSlot = timeSlots[nextSlotIdx];
                                                                     let isNextBreak = false;
                                                                     if (nextSlot === '10.00 - 10.30') isNextBreak = true;
-                                                                    else if (day === 'Jumaat' && [5, 6, 7].includes(nextSlotIdx)) isNextBreak = true;
+                                                                    else if (day === 'Jumaat' && [4, 5, 6].includes(nextSlotIdx)) isNextBreak = true;
                                                                     else if (day !== 'Jumaat' && nextSlot === '1.00 - 2.00') isNextBreak = true;
 
                                                                     if(nextSlotIdx < timeSlots.length && !isNextBreak) { 
