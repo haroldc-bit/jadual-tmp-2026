@@ -344,7 +344,7 @@
                 "TUTORIAL: Anaerobic Infections", "TUTORIAL: Upper Respiratory Tract Infections (URTI)", "TUTORIAL: Lower Respiratory Tract Infections (LRTI)", "TUTORIAL: Skin & Soft Tissue Infections", "TUTORIAL: Nosocomial Infections", "TUTORIAL: Shigellosis and Enteric Fever Infection", "TUTORIAL: Cholera and Food Poisoning Infection", "TUTORIAL: Central Nervous System Infections", "TUTORIAL: Bacteraemia and Sepsis", "TUTORIAL: Urinary Tract Infections", "TUTORIAL: Sexual Transmitted Diseases", "TUTORIAL: Quality Assurance Programme", "TUTORIAL: Emerging & Re-emerging Micro-organism"
             ],
             "MTNF 2162": [
-                "KULIAH: Introduction to Non-Gynaecological Cytology", "KULIAH: Processing and Staining of Non-Gynaecological Specimen", "KULIAH: Cytology of Body Fluid (Pleural, Peritoneal, Pericardial)", "KULIAH: Cytology of Cerebrospinal Fluids (CSF)", "KULIAH: Cytology of Respiratory Tract", "KULINE: Urine Cytology", "KULIAH: Reporting of Non-Gynaecological Cytology", "KULIAH: Troubleshooting in Non-Gynaecological Cytology", "KULIAH: Introduction to Fine Needle Aspiration Cytology (FNAC)", "KULIAH: Accreditation and Standards in Cytopathology Laboratory",
+                "KULIAH: Introduction to Non-Gynaecological Cytology", "KULIAH: Processing and Staining of Non-Gynaecological Specimen", "KULIAH: Cytology of Body Fluid (Pleural, Peritoneal, Pericardial)", "KULIAH: Cytology of Cerebrospinal Fluids (CSF)", "KULIAY: Urine Cytology", "KULIAH: Reporting of Non-Gynaecological Cytology", "KULIAH: Troubleshooting in Non-Gynaecological Cytology", "KULIAH: Introduction to Fine Needle Aspiration Cytology (FNAC)", "KULIAH: Accreditation and Standards in Cytopathology Laboratory",
                 "TUTORIAL: Cytology of Body Fluid (Pleural, Peritoneal, Pericardial)", "TUTORIAL: Cytology of Respiratory Tract",
                 "AMALI: Processing and Staining of Non-Gynaecological Specimen", "AMALI: Cytology of Body Fluid (Pleural, Peritoneal, Pericardial)", "AMALI: Cytology of Cerebrospinal Fluids (CSF)", "AMALI: Cytology of Respiratory Tract", "AMALI: Urine Cytology", "AMALI: Reporting of Non-Gynaecological Cytology"
             ],
@@ -590,7 +590,7 @@
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true; 
                 if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true; 
-                if (day === 'Jumaat') return [5, 6, 7].includes(slotIdx); // Rehat Jumaat dialihkan ke jam 12.30 - 3.00 petang (Membetulkan ralat garisan menegak)
+                if (day === 'Jumaat') return [5, 6, 7].includes(slotIdx); // Rehat Jumaat dialihkan ke jam 12.30 - 3.00 petang
                 return false;
             };
 
@@ -933,11 +933,11 @@
 
                 try {
                     unsubSat = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'saturday_configs'), (d) => { if(d.exists()) setSaturdayConfigs(d.data()); }, (err) => console.error(err));
-                } catch(e) { console.error(e); }
+                } catch(e) { console.error(err); }
 
                 try {
                     unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), (d) => { if(d.exists()) setHolidays(d.data()); }, (err) => console.error(err));
-                } catch(e) { console.error(e); }
+                } catch(e) { console.error(err); }
                 
                 try {
                     unsubLock = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'global_lock'), (d) => {
@@ -951,7 +951,7 @@
                             setSessionStartDate(d.data().date);
                         }
                     }, (err) => console.error(err));
-                } catch(e) { console.error(e); }
+                } catch(e) { console.error(err); }
 
                 return () => { 
                     if(unsubEv) unsubEv(); 
@@ -1212,7 +1212,7 @@
                             </div>
                         </div>
 
-                        {/* Pengaktifan slider natively pada pelayar web sahaja */}
+                        {/* Pengaktifan skrol native pelayar web sahaja */}
                         <div ref={tableContainerRef} className="freeze-container table-to-scroll">
                             <div>
                                 <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full text-black">
@@ -1221,11 +1221,11 @@
                                         <col style={{ width: '4%' }} />
                                         <col style={{ width: '10%' }} />
                                         <col style={{ width: '10%' }} />
-                                        <col style={{ width: '4%' }} />
+                                        <col style={{ width: '4%' }} /> {/* 10.00 - 10.30 REHAT */}
                                         <col style={{ width: '10%' }} />
                                         <col style={{ width: '10%' }} />
                                         <col style={{ width: '10%' }} />
-                                        <col style={{ width: '4%' }} />
+                                        <col style={{ width: '4%' }} />  {/* 1.00 - 2.00 REHAT */}
                                         <col style={{ width: '10%' }} />
                                         <col style={{ width: '10%' }} />
                                         <col style={{ width: '10%' }} />
@@ -1262,7 +1262,7 @@
                                                                 return null;
                                                             }
 
-                                                            // Penyelarian Jumaat Rehat secara mutlak: Menggabungkan slot 5, 6, 7
+                                                            // Penyelarian Jumaat Rehat secara mutlak: Menggabungkan slot 5, 6, 7 (Mengatasi ralat garis menegak terputus)
                                                             let isBreakProcessed = isBreak;
                                                             let breakColSpan = 1;
 
