@@ -73,15 +73,9 @@
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Penstabilan Sempadan & Tukar kepada table-layout: auto !important */
-        table { 
-            border-collapse: collapse !important; 
-            border: 2px solid black !important; 
-            table-layout: auto !important;
-        }
-        th, td { 
-            border: 1px solid black !important; 
-        }
+        /* Penstabilan sempadan hitam penuh 1px seragam dengan table-layout auto */
+        table { border-collapse: collapse !important; border: 2px solid black !important; table-layout: auto !important; }
+        th, td { border: 1px solid black !important; }
 
         .table-to-scroll thead th { 
             position: sticky; 
@@ -1224,28 +1218,14 @@
                         {/* Pengaktifan skrol native pelayar web sahaja */}
                         <div ref={tableContainerRef} className="freeze-container table-to-scroll">
                             <div>
-                                {/* PEMBETULAN MUKTAMAD: Menukar table-fixed kepada table-auto */}
-                                <table className="w-full border-collapse table-auto min-w-[1500px] print:min-w-full text-black">
-                                    <colgroup>
-                                        <col style={{ width: '8%' }} />  {/* Hari / Tarikh */}
-                                        <col style={{ width: '4%' }} />  {/* Sem */}
-                                        <col style={{ width: '10%' }} /> {/* 8.00 - 9.00 */}
-                                        <col style={{ width: '10%' }} /> {/* 9.00 - 10.00 */}
-                                        <col style={{ width: '4%' }} />  {/* 10.00 - 10.30 (REHAT) */}
-                                        <col style={{ width: '10%' }} /> {/* 10.30 - 11.30 */}
-                                        <col style={{ width: '10%' }} /> {/* 11.30 - 12.30 */}
-                                        <col style={{ width: '10%' }} /> {/* 12.30 - 1.00 */}
-                                        <col style={{ width: '4%' }} />  {/* 1.00 - 2.00 (REHAT) */}
-                                        <col style={{ width: '10%' }} /> {/* 2.00 - 3.00 */}
-                                        <col style={{ width: '10%' }} /> {/* 3.00 - 4.00 */}
-                                        <col style={{ width: '10%' }} /> {/* 4.00 - 5.00 */}
-                                    </colgroup>
+                                {/* DIBETULKAN: Membuang table-fixed dan menggunakan susun atur automatik tulen */}
+                                <table className="w-full border-collapse min-w-[1500px] print:min-w-full text-black">
                                     <thead>
                                         <tr className="bg-slate-50 border-b-2 border-black text-[12px] font-black uppercase">
-                                            <th className="p-4 border border-black">Hari / Tarikh</th>
-                                            <th className="border border-black text-center">Sem</th>
+                                            <th className="p-4 border border-black min-w-[100px]">Hari / Tarikh</th>
+                                            <th className="border border-black text-center min-w-[50px]">Sem</th>
                                             {timeSlots.map(slot => (
-                                                <th key={slot} className="p-3 border border-black text-center">{slot}</th>
+                                                <th key={slot} className="p-3 border border-black text-center min-w-[120px]">{slot}</th>
                                             ))}
                                         </tr>
                                     </thead>
