@@ -73,9 +73,21 @@
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Penstabilan sempadan hitam seragam & tepat tanpa perpuluhan piksel */
-        table { border-collapse: collapse !important; border: 2px solid black !important; table-layout: fixed !important; }
-        th, td { border: 1px solid black !important; box-sizing: border-box !important; }
+        /* Penstabilan Sempadan & Pemecutan GPU bagi menghapuskan Ralat Sub-Pixel Chrome */
+        table { 
+            border-collapse: collapse !important; 
+            border: 2px solid black !important; 
+            table-layout: fixed !important;
+            /* Tetapan Pemecutan GPU untuk memaksa pengiraan piksel tepat oleh kad grafik */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            backface-visibility: hidden;
+            will-change: transform;
+        }
+        th, td { 
+            border: 1px solid black !important; 
+            box-sizing: border-box !important; 
+        }
 
         .table-to-scroll thead th { 
             position: sticky; 
@@ -949,7 +961,7 @@
                             setSessionStartDate(d.data().date);
                         }
                     }, (err) => console.error(err));
-                } catch(e) { console.error(err); }
+                } catch(e) { console.error(e); }
 
                 return () => { 
                     if(unsubEv) unsubEv(); 
@@ -1218,21 +1230,20 @@
                         {/* Pengaktifan skrol native pelayar web sahaja */}
                         <div ref={tableContainerRef} className="freeze-container table-to-scroll">
                             <div>
-                                <table className="w-full border-collapse table-fixed min-w-[1580px] print:min-w-full text-black">
-                                    {/* PEMBETULAN MUKTAMAD: Menukar unit % kepada saiz piksel genap (px) untuk menghapuskan ralat pembundaran sub-pixel sepenuhnya */}
+                                <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full text-black">
                                     <colgroup>
-                                        <col style={{ width: '120px' }} /> {/* Hari / Tarikh */}
-                                        <col style={{ width: '60px' }} />  {/* Sem */}
-                                        <col style={{ width: '150px' }} /> {/* 8.00 - 9.00 */}
-                                        <col style={{ width: '150px' }} /> {/* 9.00 - 10.00 */}
-                                        <col style={{ width: '70px' }} />  {/* 10.00 - 10.30 (REHAT) */}
-                                        <col style={{ width: '150px' }} /> {/* 10.30 - 11.30 */}
-                                        <col style={{ width: '150px' }} /> {/* 11.30 - 12.30 */}
-                                        <col style={{ width: '150px' }} /> {/* 12.30 - 1.00 */}
-                                        <col style={{ width: '70px' }} />  {/* 1.00 - 2.00 (REHAT) */}
-                                        <col style={{ width: '150px' }} /> {/* 2.00 - 3.00 */}
-                                        <col style={{ width: '150px' }} /> {/* 3.00 - 4.00 */}
-                                        <col style={{ width: '150px' }} /> {/* 4.00 - 5.00 */}
+                                        <col style={{ width: '8%' }} />  {/* Hari / Tarikh */}
+                                        <col style={{ width: '4%' }} />  {/* Sem */}
+                                        <col style={{ width: '10%' }} /> {/* 8.00 - 9.00 */}
+                                        <col style={{ width: '10%' }} /> {/* 9.00 - 10.00 */}
+                                        <col style={{ width: '4%' }} />  {/* 10.00 - 10.30 (REHAT) */}
+                                        <col style={{ width: '10%' }} /> {/* 10.30 - 11.30 */}
+                                        <col style={{ width: '10%' }} /> {/* 11.30 - 12.30 */}
+                                        <col style={{ width: '10%' }} /> {/* 12.30 - 1.00 */}
+                                        <col style={{ width: '4%' }} />  {/* 1.00 - 2.00 (REHAT) */}
+                                        <col style={{ width: '10%' }} /> {/* 2.00 - 3.00 */}
+                                        <col style={{ width: '10%' }} /> {/* 3.00 - 4.00 */}
+                                        <col style={{ width: '10%' }} /> {/* 4.00 - 5.00 */}
                                     </colgroup>
                                     <thead>
                                         <tr className="bg-slate-50 border-b-2 border-black text-[12px] font-black uppercase">
