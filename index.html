@@ -35,7 +35,7 @@
             body { background: white !important; padding: 0; margin: 0; font-family: 'Times New Roman', serif; color: black !important; }
             main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
             .freeze-container { overflow: visible !important; max-height: none !important; border: none !important; display: block !important; width: 100% !important; }
-            table { width: 100% !important; min-width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; border: 2px solid black !important; }
+            table { width: 100% !important; min-width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; border: 2px solid black !important; }
             th, td { border: 1px solid black !important; background: white !important; color: black !important; padding: 4px 2px !important; }
             .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
             input, select, textarea { border: none !important; background: transparent !important; color: black !important; appearance: none; }
@@ -73,20 +73,14 @@
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Penstabilan Sempadan & Pemecutan GPU bagi menghapuskan Ralat Sub-Pixel Chrome */
+        /* Penstabilan Sempadan & Tukar kepada table-layout: auto !important */
         table { 
             border-collapse: collapse !important; 
             border: 2px solid black !important; 
-            table-layout: fixed !important;
-            /* Tetapan Pemecutan GPU untuk memaksa pengiraan piksel tepat oleh kad grafik */
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
-            backface-visibility: hidden;
-            will-change: transform;
+            table-layout: auto !important;
         }
         th, td { 
             border: 1px solid black !important; 
-            box-sizing: border-box !important; 
         }
 
         .table-to-scroll thead th { 
@@ -961,7 +955,7 @@
                             setSessionStartDate(d.data().date);
                         }
                     }, (err) => console.error(err));
-                } catch(e) { console.error(e); }
+                } catch(e) { console.error(err); }
 
                 return () => { 
                     if(unsubEv) unsubEv(); 
@@ -1230,7 +1224,8 @@
                         {/* Pengaktifan skrol native pelayar web sahaja */}
                         <div ref={tableContainerRef} className="freeze-container table-to-scroll">
                             <div>
-                                <table className="w-full border-collapse table-fixed min-w-[1500px] print:min-w-full text-black">
+                                {/* PEMBETULAN MUKTAMAD: Menukar table-fixed kepada table-auto */}
+                                <table className="w-full border-collapse table-auto min-w-[1500px] print:min-w-full text-black">
                                     <colgroup>
                                         <col style={{ width: '8%' }} />  {/* Hari / Tarikh */}
                                         <col style={{ width: '4%' }} />  {/* Sem */}
