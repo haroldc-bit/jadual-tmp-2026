@@ -681,16 +681,18 @@
                     instructor: formData.instructor || '',
                     benchTutors: formData.benchTutors || '',
 
-                    // Data Teras (Dilindungi/Dibekukan daripada Pengajar jika dikunci oleh Superuser)
+                    // Data Teras (Kod Kursus dan Tempoh dikekalkan sekiranya dikunci oleh Superuser)
                     courseCode: effectiveCourseCode || '',
-                    topic: isRestrictedForAdmin ? editingEvent.topic : (formData.topic || ''),
-                    type: isRestrictedForAdmin ? editingEvent.type : (formData.type || 'Kuliah'),
                     duration: effectiveDuration,
-                    sessionNumber: isRestrictedForAdmin ? editingEvent.sessionNumber : (formData.sessionNumber || ''),
-                    align: isRestrictedForAdmin ? editingEvent.align : (formData.align || 'left'),
-                    isBooked: isRestrictedForAdmin ? editingEvent.isBooked : !!formData.isBooked,
-                    bookedCourse: isRestrictedForAdmin ? editingEvent.bookedCourse : (formData.bookedCourse || ''),
-                    bookedPurpose: isRestrictedForAdmin ? editingEvent.bookedPurpose : (formData.bookedPurpose || 'Amali'),
+                    
+                    // Data Bebas (Kini dibenarkan ubah walau dikunci oleh Superuser)
+                    topic: formData.topic || '',
+                    type: formData.type || 'Kuliah',
+                    sessionNumber: formData.sessionNumber || '',
+                    align: formData.align || 'left',
+                    isBooked: !!formData.isBooked,
+                    bookedCourse: formData.bookedCourse || '',
+                    bookedPurpose: formData.bookedPurpose || 'Amali',
                 };
 
                 const localKey = `tmp_events_cycle_${academicCycle}`;
@@ -1597,7 +1599,7 @@
                                         {isCoreRestricted && (
                                             <div className="bg-amber-100 p-4 rounded-2xl border-2 border-amber-300 text-amber-900 text-xs font-bold flex items-center gap-3">
                                                 <span className="text-amber-600"><Icons.Lock /></span> 
-                                                <span>Maklumat asas slot ini telah ditetapkan oleh Superuser. Anda hanya dibenarkan menyunting dan mengisi <b>Nama Pengajar</b> atau <b>Bench Tutor</b> sahaja.</span>
+                                                <span>Maklumat asas slot ini telah ditetapkan oleh Superuser. Anda <b>tidak dibenarkan</b> menukar Kod Kursus atau memadam slot ini. Anda <b>bebas mengedit</b> Nama Pengajar, Jenis Sesi, dan Tajuk Pembelajaran.</span>
                                             </div>
                                         )}
 
@@ -1637,10 +1639,10 @@
                                         </div>
 
                                         <div className="pt-1 space-y-2">
-                                            <button onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData(prev => ({ ...prev, type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${formData.type === 'Lain-lain' ? 'bg-slate-800 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>AKTIVITI LAIN-LAIN (LL)</button>
-                                            <button onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData(prev => ({ ...prev, type: prev.type === 'Taklimat' ? 'Kuliah' : 'Taklimat' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${formData.type === 'Taklimat' ? 'bg-indigo-800 border-indigo-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>TAKLIMAT</button>
-                                            <button onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData(prev => ({ ...prev, type: prev.type === 'Penyediaan' ? 'Kuliah' : 'Penyediaan' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${formData.type === 'Penyediaan' ? 'bg-pink-800 border-pink-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>PENYEDIAAN</button>
-                                            <button onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData(prev => ({ ...prev, type: prev.type === 'IL' ? 'Kuliah' : 'IL' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${formData.type === 'IL' ? 'bg-yellow-500 border-yellow-600 text-white shadow-lg font-black' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>INDEPENDENT LEARNING (IL)</button>
+                                            <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Lain-lain' ? 'bg-slate-800 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>AKTIVITI LAIN-LAIN (LL)</button>
+                                            <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Taklimat' ? 'Kuliah' : 'Taklimat' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Taklimat' ? 'bg-indigo-800 border-indigo-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>TAKLIMAT</button>
+                                            <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Penyediaan' ? 'Kuliah' : 'Penyediaan' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Penyediaan' ? 'bg-pink-800 border-pink-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>PENYEDIAAN</button>
+                                            <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'IL' ? 'Kuliah' : 'IL' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'IL' ? 'bg-yellow-500 border-yellow-600 text-white shadow-lg font-black' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>INDEPENDENT LEARNING (IL)</button>
                                         </div>
                                         
                                         {(formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') && (
@@ -1648,7 +1650,7 @@
                                                 <label className="text-[11px] font-black text-slate-400 uppercase">Jenis Sesi</label>
                                                 <div className="flex flex-wrap gap-2 text-black">
                                                     {sessionTypes.filter(t => t.value !== 'IL').map(t => (
-                                                        <button key={t.value} onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData({...formData, type: t.value}); }} className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all border-2 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${formData.type === t.value ? t.color + ' border-blue-600 shadow-md scale-105' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'}`}>{t.label}</button>
+                                                        <button key={t.value} onClick={(e) => { e.preventDefault(); setFormData({...formData, type: t.value}); }} className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all border-2 ${formData.type === t.value ? t.color + ' border-blue-600 shadow-md scale-105' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'}`}>{t.label}</button>
                                                     ))}
                                                 </div>
                                             </div>
@@ -1657,7 +1659,7 @@
                                         {(formData.type === 'Kuliah' || formData.type === 'Amali') && (
                                             <div className="space-y-1 animate-in slide-in-from-top-2">
                                                 <label className="text-[11px] font-black text-slate-400 uppercase">Bilangan {formData.type}</label>
-                                                <input type="number" min="1" className={`w-full p-4 border-2 rounded-2xl font-black text-sm text-black focus:border-blue-600 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed bg-slate-100' : 'bg-blue-50 border-blue-100'}`} placeholder="Cth: 1" value={formData.sessionNumber || ''} onChange={(e) => setFormData({...formData, sessionNumber: e.target.value})} disabled={isCoreRestricted} />
+                                                <input type="number" min="1" className="w-full p-4 border-2 rounded-2xl font-black text-sm text-black focus:border-blue-600 bg-blue-50 border-blue-100" placeholder="Cth: 1" value={formData.sessionNumber || ''} onChange={(e) => setFormData({...formData, sessionNumber: e.target.value})} />
                                             </div>
                                         )}
 
@@ -1668,8 +1670,7 @@
                                                         type="checkbox" 
                                                         checked={!!formData.isBooked} 
                                                         onChange={(e) => setFormData({...formData, isBooked: e.target.checked})} 
-                                                        className={`w-4 h-4 rounded border-rose-300 text-rose-600 focus:ring-rose-500 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                        disabled={isCoreRestricted}
+                                                        className="w-4 h-4 rounded border-rose-300 text-rose-600 focus:ring-rose-500"
                                                     />
                                                     Tanda jika slot IL ini di-booking oleh Kursus
                                                 </label>
@@ -1680,8 +1681,7 @@
                                                             <select 
                                                                 value={formData.bookedCourse || ''} 
                                                                 onChange={(e) => setFormData({...formData, bookedCourse: e.target.value})} 
-                                                                className={`w-full p-2 border rounded-xl font-bold text-xs ${isCoreRestricted ? 'opacity-50 cursor-not-allowed bg-slate-100 border-slate-300' : 'bg-white border-rose-300'}`}
-                                                                disabled={isCoreRestricted}
+                                                                className="w-full p-2 border rounded-xl font-bold text-xs bg-white border-rose-300"
                                                             >
                                                                 <option value="">Pilih Kursus</option>
                                                                 {courseCodes.filter(c => c !== 'Lain-lain').map(c => <option key={c} value={c}>{c}</option>)}
@@ -1692,8 +1692,7 @@
                                                             <select 
                                                                 value={formData.bookedPurpose || 'Amali'} 
                                                                 onChange={(e) => setFormData({...formData, bookedPurpose: e.target.value})} 
-                                                                className={`w-full p-2 border rounded-xl font-bold text-xs ${isCoreRestricted ? 'opacity-50 cursor-not-allowed bg-slate-100 border-slate-300' : 'bg-white border-rose-300'}`}
-                                                                disabled={isCoreRestricted}
+                                                                className="w-full p-2 border rounded-xl font-bold text-xs bg-white border-rose-300"
                                                             >
                                                                 <option value="Amali">Amali</option>
                                                                 <option value="Ulangkaji">Ulangkaji</option>
@@ -1709,9 +1708,8 @@
                                             <label className="text-[11px] font-black text-slate-400 uppercase">{(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? 'Nama Aktiviti / Perkara' : 'Tajuk Pembelajaran'}</label>
                                             {(formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') && (
                                                 <select 
-                                                    className={`w-full p-3 mb-2 border-2 rounded-xl font-black text-[11px] shadow-sm outline-none cursor-pointer ${isCoreRestricted ? 'opacity-50 cursor-not-allowed bg-slate-100 text-slate-600' : 'bg-emerald-50 border-emerald-400 text-emerald-900'}`} 
+                                                    className="w-full p-3 mb-2 border-2 rounded-xl font-black text-[11px] shadow-sm outline-none cursor-pointer bg-emerald-50 border-emerald-400 text-emerald-900" 
                                                     onChange={(e) => { if(e.target.value) setFormData({...formData, topic: e.target.value}); e.target.value = ""; }}
-                                                    disabled={isCoreRestricted}
                                                 >
                                                     <option value="">⬇️ KLIK SINI UNTUK SENARAI TAJUK SILIBUS ⬇️</option>
                                                     {formData.courseCode && courseTopics[formData.courseCode] && courseTopics[formData.courseCode].map((tajuk, idx) => (
@@ -1721,11 +1719,10 @@
                                             )}
                                             <textarea 
                                                 rows="3" 
-                                                className={`w-full p-4 border-2 rounded-2xl outline-none font-bold text-sm text-black shadow-sm ${isCoreRestricted ? 'opacity-50 cursor-not-allowed bg-slate-100' : 'bg-slate-50'}`} 
+                                                className="w-full p-4 border-2 rounded-2xl outline-none font-bold text-sm text-black shadow-sm bg-slate-50" 
                                                 placeholder={(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? "Sila catat maklumat aktiviti..." : "Taip secara manual..."} 
                                                 value={formData.topic || ''} 
                                                 onChange={(e) => setFormData({...formData, topic: e.target.value})}
-                                                disabled={isCoreRestricted}
                                             ></textarea>
                                         </div>
                                         
@@ -1736,8 +1733,8 @@
                                                     <button
                                                         key={alignMode}
                                                         type="button"
-                                                        onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData({ ...formData, align: alignMode }); }}
-                                                        className={`flex-1 py-3 px-2 rounded-2xl text-[11px] font-black uppercase border-2 transition-all active:scale-95 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${(formData.align || 'left') === alignMode ? 'bg-blue-600 border-blue-600 text-white shadow-md' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+                                                        onClick={(e) => { e.preventDefault(); setFormData({ ...formData, align: alignMode }); }}
+                                                        className={`flex-1 py-3 px-2 rounded-2xl text-[11px] font-black uppercase border-2 transition-all active:scale-95 ${(formData.align || 'left') === alignMode ? 'bg-blue-600 border-blue-600 text-white shadow-md' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}
                                                     >
                                                         {alignMode === 'left' && '⬅️ Kiri'}
                                                         {alignMode === 'center' && '⬜ Tengah'}
