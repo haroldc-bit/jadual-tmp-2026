@@ -35,7 +35,7 @@
             body { background: white !important; padding: 0; margin: 0; font-family: 'Times New Roman', serif; color: black !important; }
             main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
             .freeze-container { overflow: visible !important; max-height: none !important; border: none !important; display: block !important; width: 100% !important; }
-            table { width: 100% !important; min-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: 2px solid black !important; }
+            table { width: 100% !important; min-width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; border: 2px solid black !important; }
             th, td { border: 1px solid black !important; background: white !important; color: black !important; padding: 4px 2px !important; }
             .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
             input, select, textarea { border: none !important; background: transparent !important; color: black !important; appearance: none; }
@@ -49,7 +49,6 @@
         }
         
         @media screen {
-            /* Slider pada browser diaktifkan natively untuk skrol menegak dan melintang */
             body {
                 overflow-x: auto !important;
                 overflow-y: auto !important;
@@ -74,8 +73,8 @@
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Penstabilan sempadan hitam penuh 1px seragam bagi menyelesaikan ralat herotan garisan */
-        table { border-collapse: collapse !important; border: 2px solid black !important; }
+        /* Penstabilan sempadan hitam penuh 1px seragam dengan table-layout auto */
+        table { border-collapse: collapse !important; border: 2px solid black !important; table-layout: auto !important; }
         th, td { border: 1px solid black !important; }
 
         .table-to-scroll thead th { 
@@ -258,7 +257,7 @@
                 "AMALI: Effective Communication Skills", "AMALI: Effective Teaming Skills", "AMALI: Problem Solving and Critical Thinking in Healthcare"
             ],
             "MTIB 2022": [
-                "KULIAH: Introduction and Basic Concept of Immunology", "KULIAH: Components of the Immune System", "KULIAH: Antigen", "KULIAH: Principle and Mechanisms of the Immune Response", "KULIAH: Fundamental of Antigen-Antibody Interactions", "KULIAH: Principle and Application of Antigen-Antibody Interaction Assays", "KULGE: Hypersensitivity", "KULIAH: Immunological Tolerance and Autoimmune Disease", "KULGE: Immune Deficiency", "KULIAH: Introduction and Basic Concept of Molecular Genetic", "KULIAH: Genomes and Genetic Structure", "KULIAH: Fundamental of Genetic Disorder", "KULIAH: HLA and Transplantation Immunology", "KULIAH: Principle and Application of Molecular Genetic Testing",
+                "KULIAH: Introduction and Basic Concept of Immunology", "KULIAH: Components of the Immune System", "KULIAH: Antigen", "KULIAH: Principle and Mechanisms of the Immune Response", "KULIAH: Fundamental of Antigen-Antibody Interactions", "KULIAH: Principle and Application of Antigen-Antibody Interaction Assays", "KULIAH: Hypersensitivity", "KULIAH: Immunological Tolerance and Autoimmune Disease", "KULIAH: Immune Deficiency", "KULIAH: Introduction and Basic Concept of Molecular Genetic", "KULIAH: Genomes and Genetic Structure", "KULIAH: Fundamental of Genetic Disorder", "KULIAH: HLA and Transplantation Immunology", "KULIAH: Principle and Application of Molecular Genetic Testing",
                 "TUTORIAL: Components of the Immune System", "TUTORIAL: Principle and Mechanisms of the Immune Response", "TUTORIAL: Principle and Application of Antigen-Antibody Interaction Assays", "TUTORIAL: Fundamental of Genetic Disorder", "TUTORIAL: Principle and Application of Molecular Genetic Testing",
                 "AMALI: Principle and Application of Antigen-Antibody Interaction Assays"
             ],
@@ -268,7 +267,7 @@
                 "AMALI: Introduction to Urine Analysis"
             ],
             "MTMM 2043": [
-                "KULIAH: Universal Precautions & Safety in Medical Microbiology Laboratory", "KULIAH: Instrumentation in Medical Microbiology Laboratory", "KULIAH: Disinfection and Sterilization", "KULIAH: Specimen Collection and Transportations", "KULIAH: Bacteria Growth and Nutrition", "KULIAH: Culture Media", "KULIAH: Basic Technique in Microbiology", "KULIAH: Colony Morphology Characteristics of Microorganism on Media Culture", "KULIAH: Staining and Microscopic Examination", "KULIAH: Biochemical Test for Gram Positive Bacteria", "KULIAH: Biochemical Test for Gram Negative Bacteria", "KULIAH: Antimicrobial Susceptibility Test", "KULIAH: Bacteria Count", "KULIAH: Normal Flora Microorganism", "KULIAH: Staphylococcus spp", "KULIAH: Streptococcus spp", "KULIAH: Corynebacterium spp", "KULIAH: Bacillus spp", "KULIAH: Clostridium spp", "KULIAH: Listeria spp", "KULIAH: Escherichia coli", "KULIAH: Klebsiella border", "KULIAH: Enterobacter spp", "KULIAH: Salmonelal spp", "KULIAH: Shigella spp", "KULIAH: Tribe Protea (Proteus spp, Providencia spp, Morganella spp)", "KULIAH: Pseudomonas spp", "KULIAH: Vibrio spp", "KULIAH: Neisseria spp", "KULIAH: Haemophilus spp & Bordetella spp", "KULIAH: Acinetobacter spp", "KULIAH: Mycobacterium tuberculosis", "KULIAH: Mycobacterium leprae", "KULIAH: Atypical Mycobacterium", "KULIAH: Candida spp", "KULIAH: Cryptococcus spp", "KULIAH: Other Important Fungi (Aspergillus sp, Fusarium sp & Pneumocystitis carinii)",
+                "KULIAH: Universal Precautions & Safety in Medical Microbiology Laboratory", "KULIAH: Instrumentation in Medical Microbiology Laboratory", "KULIAH: Disinfection and Sterilization", "KULIAH: Specimen Collection and Transportations", "KULIAH: Bacteria Growth and Nutrition", "KULIAH: Culture Media", "KULIAH: Basic Technique in Microbiology", "KULIAH: Colony Morphology Characteristics of Microorganism on Media Culture", "KULIAH: Staining and Microscopic Examination", "KULIAH: Biochemical Test for Gram Positive Bacteria", "KULIAH: Biochemical Test for Gram Negative Bacteria", "KULIAH: Antimicrobial Susceptibility Test", "KULIAH: Bacteria Count", "KULIAH: Normal Flora Microorganism", "KULIAH: Staphylococcus spp", "KULIAH: Streptococcus spp", "KULIAH: Corynebacterium spp", "KULIAH: Bacillus spp", "KULIAH: Clostridium spp", "KULIAH: Listeria spp", "KULIAH: Escherichia coli", "KULIAH: Klebsiella border", "KULIAH: Enterobacter spp", "KULIAH: Salmonella spp", "KULIAH: Shigella spp", "KULIAH: Tribe Protea (Proteus spp, Providencia spp, Morganella spp)", "KULIAH: Pseudomonas spp", "KULIAH: Vibrio spp", "KULIAH: Neisseria spp", "KULIAH: Haemophilus spp & Bordetella spp", "KULIAH: Acinetobacter spp", "KULIAH: Mycobacterium tuberculosis", "KULIAH: Mycobacterium leprae", "KULIAH: Atypical Mycobacterium", "KULIAH: Candida spp", "KULIAH: Cryptococcus spp", "KULIAH: Other Important Fungi (Aspergillus sp, Fusarium sp & Pneumocystitis carinii)",
                 "TUTORIAL: Biochemical Test for Gram Positive Bacteria", "TUTORIAL: Biochemical Test for Gram Negative Bacteria", "TUTORIAL: Staphylococcus spp", "TUTORIAL: Escherichia coli", "TUTORIAL: Tribe Protea (Proteus spp, Providencia spp, Morganella spp)", "TUTORIAL: Mycobacterium tuberculosis"
             ],
             "MTGC 2074": [
@@ -452,7 +451,6 @@
             const [events, setEvents] = useState({});
             const [courseLimits, setCourseLimits] = useState({}); 
             const [isTimetableLocked, setIsTimetableLocked] = useState(false);
-            const [weekLocks, setWeekLocks] = useState({}); // STATE KHAS KUNCI MINGGU
             const [selectedLoginInstructor, setSelectedLoginInstructor] = useState(""); 
             
             const [footerData, setFooterData] = useState({});
@@ -590,7 +588,7 @@
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true; 
                 if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true; 
-                if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx); // Rehat Jumaat dialihkan ke jam 11.30 - 2.00 (SlotIdx 4, 5, 6)
+                if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx); 
                 return false;
             };
 
@@ -619,16 +617,23 @@
 
                 const finalCode = (formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? 'Lain-Lain' : formData.courseCode;
                 
+                // PENAMBAHBAIKAN CIRI: Superuser Lock Validation
+                // Jika slot telah dikunci oleh Superuser, pastikan kod akhir dikekalkan sebagai kod asal
+                const effectiveCourseCode = (userRole === 'admin' && editingEvent && editingEvent.lockedBySuperuser) ? editingEvent.courseCode : finalCode;
+                const effectiveDuration = (userRole === 'admin' && editingEvent && editingEvent.lockedBySuperuser) ? editingEvent.duration : (parseInt(formData.duration) || 1);
+
                 if (userRole === 'admin' && formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') {
-                    let currentCount = getCourseSemesterCount(finalCode);
-                    if (editingEvent && editingEvent.courseCode === finalCode) {
-                        currentCount -= (parseInt(editingEvent.duration) || 1); 
-                    }
-                    const newDuration = parseInt(formData.duration) || 1;
-                    const limit = courseLimits[finalCode] || 999;
-                    if ((currentCount + newDuration) > limit) {
-                        setModalError(`Ralat: Had agihan (${limit} jam) semester bagi kursus ${finalCode} telah dicapai.`);
-                        return;
+                    // Semak had agihan hanya jika Admin menukar atau menetapkan subjek yang tidak dikunci
+                    if (!editingEvent || !editingEvent.lockedBySuperuser) {
+                        let currentCount = getCourseSemesterCount(effectiveCourseCode);
+                        if (editingEvent && editingEvent.courseCode === effectiveCourseCode) {
+                            currentCount -= (parseInt(editingEvent.duration) || 1); 
+                        }
+                        const limit = courseLimits[effectiveCourseCode] || 999;
+                        if ((currentCount + effectiveDuration) > limit) {
+                            setModalError(`Ralat: Had agihan (${limit} jam) semester bagi kursus ${effectiveCourseCode} telah dicapai.`);
+                            return;
+                        }
                     }
                 }
 
@@ -641,7 +646,7 @@
                         const exStart = parseInt(ev.timeSlotIndex);
                         const exEnd = exStart + parseInt(ev.duration) - 1;
                         const newStart = parseInt(formData.timeSlotIndex);
-                        const newEnd = newStart + parseInt(formData.duration) - 1;
+                        const newEnd = newStart + effectiveDuration - 1;
 
                         return (newStart <= exEnd && newEnd >= exStart);
                     });
@@ -655,27 +660,37 @@
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
                 const currentUserSavedName = sessionStorage.getItem('tmp_user_name') || 'Admin / Pengajar';
                 
+                // Jika ia Admin yang menyunting slot milik Superuser, pastikan data teras kekal asal
+                const isRestrictedForAdmin = (userRole === 'admin' && editingEvent && editingEvent.lockedBySuperuser);
+
                 const dataToSave = {
                     id: formData.id || Math.random().toString(36).substr(2, 9),
                     day: formData.day,
                     timeSlotIndex: formData.timeSlotIndex,
-                    courseCode: finalCode || '',
-                    topic: formData.topic || '',
-                    type: formData.type || 'Kuliah',
-                    instructor: formData.instructor || '',
-                    benchTutors: formData.benchTutors || '',
                     semester: formData.semester,
-                    duration: parseInt(formData.duration) || 1,
-                    sessionNumber: formData.sessionNumber || '',
-                    align: formData.align || 'left',
-                    isBooked: !!formData.isBooked,
-                    bookedCourse: formData.bookedCourse || '',
-                    bookedPurpose: formData.bookedPurpose || 'Amali',
                     cycle: academicCycle,
                     session: academicSession,
                     lastUpdate: Date.now(),
                     selectedWeek: selectedWeek,
-                    updatedBy: currentUserSavedName
+                    updatedBy: currentUserSavedName,
+                    
+                    // PENETAPAN PENANDA (FLAG) SUPERUSER
+                    lockedBySuperuser: userRole === 'superuser' ? true : (editingEvent ? editingEvent.lockedBySuperuser : false),
+
+                    // Data Fleksibel (Yang boleh diubah oleh Pengajar / Admin)
+                    instructor: formData.instructor || '',
+                    benchTutors: formData.benchTutors || '',
+
+                    // Data Teras (Dilindungi daripada perubahan Pengajar jika lockedBySuperuser = true)
+                    courseCode: isRestrictedForAdmin ? editingEvent.courseCode : effectiveCourseCode,
+                    topic: isRestrictedForAdmin ? editingEvent.topic : (formData.topic || ''),
+                    type: isRestrictedForAdmin ? editingEvent.type : (formData.type || 'Kuliah'),
+                    duration: isRestrictedForAdmin ? editingEvent.duration : effectiveDuration,
+                    sessionNumber: isRestrictedForAdmin ? editingEvent.sessionNumber : (formData.sessionNumber || ''),
+                    align: isRestrictedForAdmin ? editingEvent.align : (formData.align || 'left'),
+                    isBooked: isRestrictedForAdmin ? editingEvent.isBooked : !!formData.isBooked,
+                    bookedCourse: isRestrictedForAdmin ? editingEvent.bookedCourse : (formData.bookedCourse || ''),
+                    bookedPurpose: isRestrictedForAdmin ? editingEvent.bookedPurpose : (formData.bookedPurpose || 'Amali'),
                 };
 
                 const localKey = `tmp_events_cycle_${academicCycle}`;
@@ -915,7 +930,7 @@
                 if (!dbReady || !isAuthorized || !window.TMP_DB || !user) return;
                 const { db, appId, collection, onSnapshot, doc } = window.TMP_DB;
                 
-                let unsubEv, unsubLim, unsubSig, unsubSat, unsubHol, unsubLock, unsubStartDate, unsubWeekLocks;
+                let unsubEv, unsubLim, unsubSig, unsubSat, unsubHol, unsubLock, unsubStartDate;
 
                 try {
                     unsubEv = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', `jadual_cycle_${academicCycle}`), (s) => {
@@ -937,7 +952,7 @@
 
                 try {
                     unsubHol = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'holidays'), (d) => { if(d.exists()) setHolidays(d.data()); }, (err) => console.error(err));
-                } catch(e) { console.error(err); }
+                } catch(e) { console.error(e); }
                 
                 try {
                     unsubLock = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'global_lock'), (d) => {
@@ -953,12 +968,6 @@
                     }, (err) => console.error(err));
                 } catch(e) { console.error(err); }
 
-                try {
-                    unsubWeekLocks = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'week_locks'), (d) => {
-                        if (d.exists()) setWeekLocks(d.data());
-                    }, (err) => console.error(err));
-                } catch(e) { console.error(e); }
-
                 return () => { 
                     if(unsubEv) unsubEv(); 
                     if(unsubLim) unsubLim(); 
@@ -967,7 +976,6 @@
                     if(unsubHol) unsubHol(); 
                     if(unsubLock) unsubLock(); 
                     if(unsubStartDate) unsubStartDate(); 
-                    if(unsubWeekLocks) unsubWeekLocks();
                 };
             }, [dbReady, isAuthorized, user, academicCycle]);
 
@@ -975,10 +983,7 @@
                 if (weekStatus !== "NORMAL") return;
                 if (isSlotBreak(day, slotIdx)) return;
 
-                // Logik Sekatan Kunci Minggu & Kunci Jadual Keseluruhan
-                const isCurrentWeekLocked = weekLocks[`${academicCycle}-${selectedWeek}`];
-                const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked && !isCurrentWeekLocked);
-                
+                const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked);
                 if (!canEdit) return;
 
                 setModalError(""); 
@@ -1097,26 +1102,6 @@
                                                     {isTimetableLocked ? '🔒 Lock: ON' : '🔓 Lock: OFF'}
                                                 </button>
                                             )}
-
-                                            {/* BUTANG KUNCI MINGGU KHUSUS SUPERUSER */}
-                                            {userRole === 'superuser' && (
-                                                <button 
-                                                    onClick={async () => {
-                                                        const key = `${academicCycle}-${selectedWeek}`;
-                                                        const nextLock = !weekLocks[key];
-                                                        setWeekLocks(prev => ({...prev, [key]: nextLock}));
-                                                        if (window.TMP_DB) {
-                                                            try {
-                                                                const { db, appId, doc, setDoc } = window.TMP_DB;
-                                                                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jadual_meta_shared', 'week_locks'), { ...weekLocks, [key]: nextLock });
-                                                            } catch (err) { console.error(err); }
-                                                        }
-                                                    }} 
-                                                    className={`ml-2 px-2 py-0.5 rounded text-[8px] font-black uppercase flex items-center gap-1 shadow-sm transition-all text-white ${weekLocks[`${academicCycle}-${selectedWeek}`] ? 'bg-orange-600 hover:bg-orange-700' : 'bg-slate-500 hover:bg-slate-600'}`}
-                                                >
-                                                    {weekLocks[`${academicCycle}-${selectedWeek}`] ? `🔒 Kunci M${selectedWeek}: ON` : `🔓 Buka M${selectedWeek}`}
-                                                </button>
-                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -1181,14 +1166,9 @@
 
                             <div className="w-full bg-slate-50 p-1.5 rounded-2xl border-2 border-slate-200 overflow-hidden no-print">
                                 <div className="week-scrollbar flex gap-2 overflow-x-auto pb-1 px-1">
-                                    {Array.from({length: 26}, (_, i) => i + 1).map(w => {
-                                        const isWkLocked = weekLocks[`${academicCycle}-${w}`];
-                                        return (
-                                            <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[42px] py-1.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1 ${selectedWeek === w ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-400 hover:bg-slate-100'}`}>
-                                                M{w} {isWkLocked && <span className="text-[10px]">🔒</span>}
-                                            </button>
-                                        );
-                                    })}
+                                    {Array.from({length: 26}, (_, i) => i + 1).map(w => (
+                                        <button key={w} onClick={() => setSelectedWeek(w)} className={`shrink-0 min-w-[42px] py-1.5 rounded-xl font-black text-xs transition-all ${selectedWeek === w ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-400 hover:bg-slate-100'}`}>M{w}</button>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -1299,7 +1279,6 @@
                                                                 return null;
                                                             }
 
-                                                            // Penstabilan Sempadan Jumaat: Menyatukan Rehat Jumaat (Slot 11.30 - 2.00, Indeks 4, 5, dan 6)
                                                             let isBreakProcessed = isSlotBreak(day, slotIdx);
                                                             let breakColSpan = 1;
 
@@ -1308,9 +1287,9 @@
                                                             } else if (day === 'Jumaat') {
                                                                 if (slotIdx === 4) {
                                                                     isBreakProcessed = true;
-                                                                    breakColSpan = 3; // Menggabungkan slot 4, 5, 6 (11.30 - 2.00) secara sempurna
+                                                                    breakColSpan = 3; 
                                                                 } else if (slotIdx === 5 || slotIdx === 6) {
-                                                                    return null; // Elak paparan sel berulang untuk lajur yang digabungkan
+                                                                    return null; 
                                                                 }
                                                             } else {
                                                                 if (slot === '1.00 - 2.00') {
@@ -1356,15 +1335,14 @@
                                                                 ev.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) || (ev.instructor && ev.instructor.toLowerCase().includes(searchTerm.toLowerCase()))
                                                             );
 
-                                                            const isCurrentWeekLocked = weekLocks[`${academicCycle}-${selectedWeek}`];
-                                                            const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked && !isCurrentWeekLocked);
+                                                            const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked);
 
                                                             const isBookedIL = ev && ev.type === 'IL' && ev.isBooked;
 
                                                             let bgStyle = "border border-dashed border-slate-200 flex items-center justify-center text-slate-200";
                                                             if (ev && ev.courseCode) {
                                                                 if (isBookedIL) {
-                                                                    bgStyle = "bg-rose-100 border-rose-500 text-rose-800 border-l-4 group relative flex flex-col font-sans";
+                                                                    bgStyle = "bg-rose-100 border-rose-500 text-rose-800 border-l-4 group relative flex flex-col";
                                                                 } else {
                                                                     bgStyle = `flex flex-col ${sessionTypes.find(t => t.value === ev.type)?.color || 'bg-white border-l-4 border-slate-300'}`;
                                                                 }
@@ -1397,7 +1375,8 @@
                                                                                         ) : !(ev.type === 'Lain-lain' || ev.type === 'Taklimat' || ev.type === 'Penyediaan' || ev.courseCode.toUpperCase() === 'LAIN-LAIN') ? (
                                                                                             `${ev.courseCode} ${getSessionLabel(ev)}`
                                                                                         ) : ""}
-                                                                                        {isLocked(ev) && <span className="ml-1 text-red-500" title="Dikunci"><Icons.Lock /></span>}
+                                                                                        {/* PENUNJUK VISUAL: Memaparkan mangga sekiranya Superuser telah kunci slot ini */}
+                                                                                        {ev.lockedBySuperuser && <span className="ml-1 text-amber-500" title="Dikunci Khas Oleh Superuser"><Icons.Lock /></span>}
                                                                                     </div>
                                                                                     <div className="font-bold text-[10px] leading-tight mb-1 flex-1 overflow-y-auto whitespace-pre-wrap" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', textAlign: ev.align || 'left' }}>{ev.topic}</div>
                                                                                     {ev.benchTutors && (
@@ -1426,7 +1405,6 @@
                             {}
                             <div className="p-10 border-t-2 border-black flex justify-between items-start font-bold text-[11px] bg-white w-full">
                                 
-                                {/* KIRI SEKALI: DISEDIAKAN OLEH */}
                                 <div className="space-y-4 w-[45%] text-left">
                                     <p className="uppercase text-slate-800 tracking-wider">
                                         DISEDIAKAN OLEH: <span className="text-blue-600 font-black">({semesterLabels[footerSemActive]})</span>
@@ -1525,7 +1503,6 @@
                                     )}
                                 </div>
 
-                                {/* KANAN SEKALI: DISAHKAN OLEH */}
                                 <div className="space-y-4 w-[45%] text-left flex flex-col items-start">
                                     <p className="uppercase text-slate-800 tracking-wider">DISAHKAN OLEH:</p>
                                     
@@ -1567,188 +1544,212 @@
 
                     {}
                     {/* MODAL EDITOR KEMAS KINI SLOT */}
-                    {isModalOpen && (
-                        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm no-print animate-in fade-in duration-300 text-black">
-                            <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[95vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
-                                <div className="bg-slate-50 px-10 py-6 border-b-2 flex justify-between items-center text-black">
-                                    <h3 className="font-black text-lg uppercase">Kemas Kini Slot</h3>
-                                    <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-2 rounded-xl shadow-lg hover:rotate-90 transition-all"><Icons.X /></button>
-                                </div>
-                                <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white text-black">
-                                    {modalError && <div className="bg-red-100 p-4 rounded-2xl border-2 border-red-300 text-red-800 text-xs font-bold flex items-center gap-3">⚠️ {modalError}</div>}
-                                    {userRole === 'admin' && editingEvent && (
-                                        <div className="bg-blue-50 p-4 rounded-2xl border-2 border-blue-200 text-blue-800 text-xs font-bold flex items-center gap-3">
-                                            <Icons.Lock /> Slot ini telah disimpan. Anda boleh mengedit tetapi hanya Supervisor sahaja boleh memadam slot ini secara kekal.
-                                        </div>
-                                    )}
-                                    
-                                    {editingEvent && editingEvent.updatedBy && (
-                                        <div className="bg-slate-100 p-3 rounded-xl border border-slate-200 text-slate-700 text-[10px] font-black uppercase">
-                                            👤 Dikemas kini terakhir oleh: <span className="text-blue-700">{editingEvent.updatedBy}</span>
-                                        </div>
-                                    )}
+                    {isModalOpen && (() => {
+                        // PENAMBAHBAIKAN CIRI: Semak jika maklumat asas slot ini telah dikunci oleh Superuser untuk tatapan Pengajar Biasa (Admin)
+                        const isCoreRestricted = userRole === 'admin' && editingEvent && editingEvent.lockedBySuperuser;
 
-                                    <div className="grid grid-cols-2 gap-6">
-                                        <div className="space-y-1">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase">Kod Kursus</label>
-                                            <select 
-                                                className={`w-full p-4 bg-slate-50 border-2 rounded-2xl font-black text-sm text-black ${(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? 'opacity-50 cursor-not-allowed' : ''}`} 
-                                                value={(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? '' : formData.courseCode} 
-                                                onChange={(e) => setFormData({...formData, courseCode: e.target.value})}
-                                                disabled={formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL'}
-                                            >
-                                                {(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') && <option value="">- Aktiviti Berasingan -</option>}
-                                                {courseCodes.filter(c => c !== 'Lain-lain').map(c => <option key={c} value={c}>{c}</option>)}
-                                            </select>
+                        return (
+                            <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm no-print animate-in fade-in duration-300 text-black">
+                                <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-xl max-h-[95vh] overflow-hidden border-4 border-blue-600 flex flex-col scale-100">
+                                    <div className="bg-slate-50 px-10 py-6 border-b-2 flex justify-between items-center text-black">
+                                        <h3 className="font-black text-lg uppercase">Kemas Kini Slot</h3>
+                                        <button onClick={() => setIsModalOpen(false)} className="bg-red-600 text-white p-2 rounded-xl shadow-lg hover:rotate-90 transition-all"><Icons.X /></button>
+                                    </div>
+                                    <div className="p-10 space-y-6 overflow-y-auto flex-1 bg-white text-black">
+                                        {modalError && <div className="bg-red-100 p-4 rounded-2xl border-2 border-red-300 text-red-800 text-xs font-bold flex items-center gap-3">⚠️ {modalError}</div>}
+                                        
+                                        {/* BANNER NOTIS TERHAD KEPADA ADMIN */}
+                                        {isCoreRestricted && (
+                                            <div className="bg-amber-100 p-4 rounded-2xl border-2 border-amber-300 text-amber-900 text-xs font-bold flex items-center gap-3">
+                                                <span className="text-amber-600"><Icons.Lock /></span> 
+                                                <span>Maklumat asas slot ini telah ditetapkan oleh Superuser. Anda hanya dibenarkan menyunting dan mengisi <b>Nama Pengajar</b> atau <b>Bench Tutor</b> sahaja.</span>
+                                            </div>
+                                        )}
+
+                                        {editingEvent && editingEvent.updatedBy && (
+                                            <div className="bg-slate-100 p-3 rounded-xl border border-slate-200 text-slate-700 text-[10px] font-black uppercase">
+                                                👤 Dikemas kini terakhir oleh: <span className="text-blue-700">{editingEvent.updatedBy}</span>
+                                            </div>
+                                        )}
+
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <div className="space-y-1">
+                                                <label className="text-[11px] font-black text-slate-400 uppercase">Kod Kursus</label>
+                                                <select 
+                                                    className={`w-full p-4 bg-slate-50 border-2 rounded-2xl font-black text-sm text-black ${((formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') || isCoreRestricted) ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`} 
+                                                    value={(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? '' : formData.courseCode} 
+                                                    onChange={(e) => setFormData({...formData, courseCode: e.target.value})}
+                                                    disabled={(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') || isCoreRestricted}
+                                                >
+                                                    {(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') && <option value="">- Aktiviti Berasingan -</option>}
+                                                    {courseCodes.filter(c => c !== 'Lain-lain').map(c => <option key={c} value={c}>{c}</option>)}
+                                                </select>
+                                                {(!isCoreRestricted && formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') && (
+                                                    <div className="mt-2 text-[10px] font-black text-blue-600 uppercase">Jumlah Agihan: {getCourseSemesterCount(formData.courseCode)} / {courseLimits[formData.courseCode] || '∞'} Jam</div>
+                                                )}
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[11px] font-black text-slate-400 uppercase">Bilangan Slot</label>
+                                                <select 
+                                                    className={`w-full p-4 bg-slate-50 border-2 rounded-2xl font-black text-sm text-black ${isCoreRestricted ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`} 
+                                                    value={formData.duration} 
+                                                    onChange={(e) => setFormData({...formData, duration: parseInt(e.target.value)})}
+                                                    disabled={isCoreRestricted}
+                                                >
+                                                    {[1,2,3,4].map(n => <option key={n} value={n}>{n} Slot</option>)}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        {/* Borang Penalaan Status Tempahan Jenis Sesi */}
+                                        <div className="pt-1 space-y-2">
+                                            <button onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData(prev => ({ ...prev, type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${formData.type === 'Lain-lain' ? 'bg-slate-800 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Lain-lain' ? 'AKTIVITI LAIN-LAIN (LL) AKTIF' : 'KLIK UNTUK PENGISIAN LAIN-LAIN (LL)'}</button>
+                                            <button onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData(prev => ({ ...prev, type: prev.type === 'Taklimat' ? 'Kuliah' : 'Taklimat' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${formData.type === 'Taklimat' ? 'bg-indigo-800 border-indigo-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Taklimat' ? 'AKTIVITI TAKLIMAT AKTIF' : 'KLIK UNTUK PENGISIAN TAKLIMAT'}</button>
+                                            <button onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData(prev => ({ ...prev, type: prev.type === 'Penyediaan' ? 'Kuliah' : 'Penyediaan' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${formData.type === 'Penyediaan' ? 'bg-pink-800 border-pink-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Penyediaan' ? 'AKTIVITI PENYEDIAAN AKTIF' : 'KLIK UNTUK PENGISIAN PENYEDIAAN'}</button>
+                                            <button onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData(prev => ({ ...prev, type: prev.type === 'IL' ? 'Kuliah' : 'IL' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${formData.type === 'IL' ? 'bg-yellow-500 border-yellow-600 text-white shadow-lg font-black' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'IL' ? 'INDEPENDENT LEARNING (IL) AKTIF' : 'KLIK UNTUK PENGISIAN INDEPENDENT LEARNING (IL)'}</button>
+                                        </div>
+                                        
+                                        {(formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') && (
+                                            <div className="space-y-3 animate-in fade-in duration-300">
+                                                <label className="text-[11px] font-black text-slate-400 uppercase">Jenis Sesi</label>
+                                                <div className="flex flex-wrap gap-2 text-black">
+                                                    {sessionTypes.filter(t => t.value !== 'IL').map(t => (
+                                                        <button key={t.value} onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData({...formData, type: t.value}); }} className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all border-2 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${formData.type === t.value ? t.color + ' border-blue-600 shadow-md scale-105' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'}`}>{t.label}</button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {(formData.type === 'Kuliah' || formData.type === 'Amali') && (
+                                            <div className="space-y-1 animate-in slide-in-from-top-2">
+                                                <label className="text-[11px] font-black text-slate-400 uppercase">Bilangan {formData.type}</label>
+                                                <input type="number" min="1" className={`w-full p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl font-black text-sm text-black focus:border-blue-600 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`} placeholder="Cth: 1" value={formData.sessionNumber || ''} onChange={(e) => setFormData({...formData, sessionNumber: e.target.value})} disabled={isCoreRestricted} />
+                                            </div>
+                                        )}
+
+                                        {formData.type === 'IL' && (
+                                            <div className="bg-rose-50 p-4 rounded-2xl border-2 border-rose-100 space-y-3 mt-2 animate-in fade-in">
+                                                <label className="flex items-center gap-2 font-black text-xs text-rose-900 cursor-pointer">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        checked={!!formData.isBooked} 
+                                                        onChange={(e) => setFormData({...formData, isBooked: e.target.checked})} 
+                                                        className={`w-4 h-4 rounded border-rose-300 text-rose-600 focus:ring-rose-500 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        disabled={isCoreRestricted}
+                                                    />
+                                                    Tanda jika slot IL ini di-booking oleh Kursus
+                                                </label>
+                                                {formData.isBooked && (
+                                                    <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top-2">
+                                                        <div className="space-y-1">
+                                                            <label className="text-[10px] font-black text-rose-700 uppercase">Kod Kursus Pemboking</label>
+                                                            <select 
+                                                                value={formData.bookedCourse || ''} 
+                                                                onChange={(e) => setFormData({...formData, bookedCourse: e.target.value})} 
+                                                                className={`w-full p-2 bg-white border border-rose-300 rounded-xl font-bold text-xs ${isCoreRestricted ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`}
+                                                                disabled={isCoreRestricted}
+                                                            >
+                                                                <option value="">Pilih Kursus</option>
+                                                                {courseCodes.filter(c => c !== 'Lain-lain').map(c => <option key={c} value={c}>{c}</option>)}
+                                                            </select>
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <label className="text-[10px] font-black text-rose-700 uppercase">Tujuan Tempahan</label>
+                                                            <select 
+                                                                value={formData.bookedPurpose || 'Amali'} 
+                                                                onChange={(e) => setFormData({...formData, bookedPurpose: e.target.value})} 
+                                                                className={`w-full p-2 bg-white border border-rose-300 rounded-xl font-bold text-xs ${isCoreRestricted ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`}
+                                                                disabled={isCoreRestricted}
+                                                            >
+                                                                <option value="Amali">Amali</option>
+                                                                <option value="Ulangkaji">Ulangkaji</option>
+                                                                <option value="Perbincangan">Perbincangan</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="space-y-1 text-black">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase">{(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? 'Nama Aktiviti / Perkara' : 'Tajuk Pembelajaran'}</label>
                                             {(formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') && (
-                                                <div className="mt-2 text-[10px] font-black text-blue-600 uppercase">Jumlah Agihan: {getCourseSemesterCount(formData.courseCode)} / {courseLimits[formData.courseCode] || '∞'} Jam</div>
+                                                <select 
+                                                    className={`w-full p-3 mb-2 bg-emerald-50 border-2 border-emerald-400 rounded-xl font-black text-[11px] text-emerald-900 shadow-sm outline-none cursor-pointer ${isCoreRestricted ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`} 
+                                                    onChange={(e) => { if(e.target.value) setFormData({...formData, topic: e.target.value}); e.target.value = ""; }}
+                                                    disabled={isCoreRestricted}
+                                                >
+                                                    <option value="">⬇️ KLIK SINI UNTUK SENARAI TAJUK SILIBUS ⬇️</option>
+                                                    {formData.courseCode && courseTopics[formData.courseCode] && courseTopics[formData.courseCode].map((tajuk, idx) => (
+                                                        <option key={idx} value={tajuk}>{tajuk}</option>
+                                                    ))}
+                                                </select>
                                             )}
+                                            <textarea 
+                                                rows="3" 
+                                                className={`w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none font-bold text-sm text-black shadow-sm ${isCoreRestricted ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`} 
+                                                placeholder={(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? "Sila catat maklumat aktiviti..." : "Taip secara manual..."} 
+                                                value={formData.topic || ''} 
+                                                onChange={(e) => setFormData({...formData, topic: e.target.value})}
+                                                disabled={isCoreRestricted}
+                                            ></textarea>
                                         </div>
-                                        <div className="space-y-1">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase">Bilangan Slot</label>
-                                            <select className="w-full p-4 bg-slate-50 border-2 rounded-2xl font-black text-sm text-black" value={formData.duration} onChange={(e) => setFormData({...formData, duration: parseInt(e.target.value)})}>
-                                                {[1,2,3,4].map(n => <option key={n} value={n}>{n} Slot</option>)}
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    {/* Borang Penalaan Status Tempahan Jenis Sesi */}
-                                    <div className="pt-1 space-y-2">
-                                        <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Lain-lain' ? 'Kuliah' : 'Lain-lain' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Lain-lain' ? 'bg-slate-800 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Lain-lain' ? 'AKTIVITI LAIN-LAIN (LL) AKTIF' : 'KLIK UNTUK PENGISIAN LAIN-LAIN (LL)'}</button>
-                                        <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Taklimat' ? 'Kuliah' : 'Taklimat' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Taklimat' ? 'bg-indigo-800 border-indigo-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Taklimat' ? 'AKTIVITI TAKLIMAT AKTIF' : 'KLIK UNTUK PENGISIAN TAKLIMAT'}</button>
-                                        <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'Penyediaan' ? 'Kuliah' : 'Penyediaan' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'Penyediaan' ? 'bg-pink-800 border-pink-900 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'Penyediaan' ? 'AKTIVITI PENYEDIAAN AKTIF' : 'KLIK UNTUK PENGISIAN PENYEDIAAN'}</button>
-                                        <button onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, type: prev.type === 'IL' ? 'Kuliah' : 'IL' })); }} className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.type === 'IL' ? 'bg-yellow-500 border-yellow-600 text-white shadow-lg font-black' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>{formData.type === 'IL' ? 'INDEPENDENT LEARNING (IL) AKTIF' : 'KLIK UNTUK PENGISIAN INDEPENDENT LEARNING (IL)'}</button>
-                                    </div>
-                                    
-                                    {(formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') && (
-                                        <div className="space-y-3 animate-in fade-in duration-300">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase">Jenis Sesi</label>
-                                            <div className="flex flex-wrap gap-2 text-black">
-                                                {sessionTypes.filter(t => t.value !== 'IL').map(t => (
-                                                    <button key={t.value} onClick={(e) => { e.preventDefault(); setFormData({...formData, type: t.value}); }} className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all border-2 ${formData.type === t.value ? t.color + ' border-blue-600 shadow-md scale-105' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'}`}>{t.label}</button>
+                                        
+                                        <div className="space-y-1 text-black">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase">Susun Atur Perkataan (Alignment)</label>
+                                            <div className="flex gap-2">
+                                                {['left', 'center', 'right', 'justify'].map((alignMode) => (
+                                                    <button
+                                                        key={alignMode}
+                                                        type="button"
+                                                        onClick={(e) => { e.preventDefault(); if(!isCoreRestricted) setFormData({ ...formData, align: alignMode }); }}
+                                                        className={`flex-1 py-3 px-2 rounded-2xl text-[11px] font-black uppercase border-2 transition-all active:scale-95 ${isCoreRestricted ? 'opacity-50 cursor-not-allowed ' : ''}${(formData.align || 'left') === alignMode ? 'bg-blue-600 border-blue-600 text-white shadow-md' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+                                                    >
+                                                        {alignMode === 'left' && '⬅️ Kiri'}
+                                                        {alignMode === 'center' && '⬜ Tengah'}
+                                                        {alignMode === 'right' && '➡️ Kanan'}
+                                                        {alignMode === 'justify' && '↔️ Sisi'}
+                                                    </button>
                                                 ))}
                                             </div>
                                         </div>
-                                    )}
-                                    
-                                    {(formData.type === 'Kuliah' || formData.type === 'Amali') && (
-                                        <div className="space-y-1 animate-in slide-in-from-top-2">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase">Bilangan {formData.type}</label>
-                                            <input type="number" min="1" className="w-full p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl font-black text-sm text-black focus:border-blue-600" placeholder="Cth: 1" value={formData.sessionNumber || ''} onChange={(e) => setFormData({...formData, sessionNumber: e.target.value})} />
-                                        </div>
-                                    )}
 
-                                    {formData.type === 'IL' && (
-                                        <div className="bg-rose-50 p-4 rounded-2xl border-2 border-rose-100 space-y-3 mt-2 animate-in fade-in">
-                                            <label className="flex items-center gap-2 font-black text-xs text-rose-900 cursor-pointer">
-                                                <input 
-                                                    type="checkbox" 
-                                                    checked={!!formData.isBooked} 
-                                                    onChange={(e) => setFormData({...formData, isBooked: e.target.checked})} 
-                                                    className="w-4 h-4 rounded border-rose-300 text-rose-600 focus:ring-rose-500" 
-                                                />
-                                                Tanda jika slot IL ini di-booking oleh Kursus
-                                            </label>
-                                            {formData.isBooked && (
-                                                <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top-2">
-                                                    <div className="space-y-1">
-                                                        <label className="text-[10px] font-black text-rose-700 uppercase">Kod Kursus Pemboking</label>
-                                                        <select 
-                                                            value={formData.bookedCourse || ''} 
-                                                            onChange={(e) => setFormData({...formData, bookedCourse: e.target.value})} 
-                                                            className="w-full p-2 bg-white border border-rose-300 rounded-xl font-bold text-xs"
-                                                        >
-                                                            <option value="">Pilih Kursus</option>
-                                                            {courseCodes.filter(c => c !== 'Lain-lain').map(c => <option key={c} value={c}>{c}</option>)}
-                                                        </select>
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <label className="text-[10px] font-black text-rose-700 uppercase">Tujuan Tempahan</label>
-                                                        <select 
-                                                            value={formData.bookedPurpose || 'Amali'} 
-                                                            onChange={(e) => setFormData({...formData, bookedPurpose: e.target.value})} 
-                                                            className="w-full p-2 bg-white border border-rose-300 rounded-xl font-bold text-xs"
-                                                        >
-                                                            <option value="Amali">Amali</option>
-                                                            <option value="Ulangkaji">Ulangkaji</option>
-                                                            <option value="Perbincangan">Perbincangan</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    <div className="space-y-1 text-black">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase">{(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? 'Nama Aktiviti / Perkara' : 'Tajuk Pembelajaran'}</label>
-                                        {(formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') && (
+                                        {/* BAHAGIAN KEKAL BEBAS/TERBUKA KEPADA PENGAJAR UNTUK DIKEMAS KINI WALAUPUN SLOT DIKUNCI OLEH SUPERUSER */}
+                                        <div className="space-y-1 text-black">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase">Nama Pengajar / Pegawai Bertanggungjawab</label>
                                             <select 
-                                                className="w-full p-3 mb-2 bg-emerald-50 border-2 border-emerald-400 rounded-xl font-black text-[11px] text-emerald-900 shadow-sm outline-none cursor-pointer" 
-                                                onChange={(e) => { if(e.target.value) setFormData({...formData, topic: e.target.value}); e.target.value = ""; }}
+                                                className="w-full p-4 bg-white border-2 rounded-2xl font-black text-sm text-black shadow-md border-blue-400 ring-2 ring-blue-50" 
+                                                value={formData.instructor || ''} 
+                                                onChange={(e) => setFormData({...formData, instructor: e.target.value})}
                                             >
-                                                <option value="">⬇️ KLIK SINI UNTUK SENARAI TAJUK SILIBUS ⬇️</option>
-                                                {formData.courseCode && courseTopics[formData.courseCode] && courseTopics[formData.courseCode].map((tajuk, idx) => (
-                                                    <option key={idx} value={tajuk}>{tajuk}</option>
-                                                ))}
+                                                <option value="">Pilih Pengajar / Pegawai</option>
+                                                {instructorList.map(name => <option key={name} value={name}>{name}</option>)}
                                             </select>
+                                        </div>
+
+                                        {(formData.type === 'Amali' || formData.type === 'Penyediaan' || (formData.type === 'IL' && formData.isBooked)) && (
+                                            <div className="space-y-1 text-black mt-4 animate-in slide-in-from-top-2">
+                                                <label className="text-[11px] font-black text-slate-400 uppercase">Bench Tutor (Initial)</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full p-4 bg-white border-2 rounded-2xl font-black text-sm text-black shadow-md border-blue-400 outline-none focus:ring-2 focus:ring-blue-50" 
+                                                    placeholder="Taip initial pengajar lain (cth: HC, MB, AB)..." 
+                                                    value={formData.benchTutors || ''} 
+                                                    onChange={(e) => setFormData({...formData, benchTutors: e.target.value})} 
+                                                />
+                                            </div>
                                         )}
-                                        <textarea rows="3" className="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none font-bold text-sm text-black shadow-sm" placeholder={(formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? "Sila catat maklumat aktiviti..." : "Taip secara manual..."} value={formData.topic || ''} onChange={(e) => setFormData({...formData, topic: e.target.value})}></textarea>
                                     </div>
-                                    
-                                    <div className="space-y-1 text-black">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase">Susun Atur Perkataan (Alignment)</label>
-                                        <div className="flex gap-2">
-                                            {['left', 'center', 'right', 'justify'].map((alignMode) => (
-                                                <button
-                                                    key={alignMode}
-                                                    type="button"
-                                                    onClick={(e) => { e.preventDefault(); setFormData({ ...formData, align: alignMode }); }}
-                                                    className={`flex-1 py-3 px-2 rounded-2xl text-[11px] font-black uppercase border-2 transition-all active:scale-95 ${
-                                                        (formData.align || 'left') === alignMode
-                                                            ? 'bg-blue-600 border-blue-600 text-white shadow-md'
-                                                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                                                    }`}
-                                                >
-                                                    {alignMode === 'left' && '⬅️ Kiri'}
-                                                    {alignMode === 'center' && '⬜ Tengah'}
-                                                    {alignMode === 'right' && '➡️ Kanan'}
-                                                    {alignMode === 'justify' && '↔️ Sisi'}
-                                                </button>
-                                            ))}
-                                        </div>
+                                    <div className="p-10 bg-slate-50 border-t-2 flex gap-4">
+                                        <button onClick={(e) => { e.preventDefault(); setFormData(p => ({...p, topic: '', instructor: '', benchTutors: '', sessionNumber: ''}))}} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border-2 active:scale-90 transition-all uppercase tracking-widest"><Icons.Undo /> Undo</button>
+                                        {editingEvent && ( <button onClick={handleDelete} className="p-5 bg-white text-red-600 border-2 border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all"><Icons.Trash /></button> )}
+                                        <button onClick={handleSave} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 shadow-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2"> <Icons.Save /> Simpan Rekod </button>
                                     </div>
-
-                                    <div className="space-y-1 text-black">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase">Nama Pengajar / Pegawai Bertanggungjawab</label>
-                                        <select className="w-full p-4 bg-slate-50 border-2 rounded-2xl font-black text-sm text-black shadow-sm" value={formData.instructor || ''} onChange={(e) => setFormData({...formData, instructor: e.target.value})}>
-                                            <option value="">Pilih Pengajar / Pegawai</option>
-                                            {instructorList.map(name => <option key={name} value={name}>{name}</option>)}
-                                        </select>
-                                    </div>
-
-                                    {(formData.type === 'Amali' || formData.type === 'Penyediaan' || (formData.type === 'IL' && formData.isBooked)) && (
-                                        <div className="space-y-1 text-black mt-4 animate-in slide-in-from-top-2">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase">Bench Tutor (Initial)</label>
-                                            <input 
-                                                type="text" 
-                                                className="w-full p-4 bg-slate-50 border-2 rounded-2xl font-black text-sm text-black shadow-sm outline-none focus:border-blue-600" 
-                                                placeholder="Taip initial pengajar lain (cth: HC, MB, AB)..." 
-                                                value={formData.benchTutors || ''} 
-                                                onChange={(e) => setFormData({...formData, benchTutors: e.target.value})} 
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="p-10 bg-slate-50 border-t-2 flex gap-4">
-                                    <button onClick={(e) => { e.preventDefault(); setFormData(p => ({...p, topic: '', instructor: '', benchTutors: '', sessionNumber: ''}))}} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border-2 active:scale-90 transition-all uppercase tracking-widest"><Icons.Undo /> Undo</button>
-                                    {editingEvent && ( <button onClick={handleDelete} className="p-5 bg-white text-red-600 border-2 border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all"><Icons.Trash /></button> )}
-                                    <button onClick={handleSave} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 shadow-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2"> <Icons.Save /> Simpan Rekod </button>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
 
-                    {}
                     {/* DASHBOARD ANALITIK MODAL */}
                     {isDashboardOpen && (
                         <div className="fixed inset-0 z-[700] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in text-black">
