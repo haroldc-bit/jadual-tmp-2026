@@ -449,7 +449,7 @@
             const [events, setEvents] = useState({});
             const [courseLimits, setCourseLimits] = useState({}); 
             const [isTimetableLocked, setIsTimetableLocked] = useState(false);
-            const [weekLocks, setWeekLocks] = useState({});
+            const [weekLocks, setWeekLocks] = useState({}); // State tambahan Kunci Minggu
             const [selectedLoginInstructor, setSelectedLoginInstructor] = useState(""); 
             
             const [footerData, setFooterData] = useState({});
@@ -485,13 +485,16 @@
                 isBooked: false,
                 bookedCourse: '',
                 bookedPurpose: 'Amali',
-                lockedBySuperuser: false // Penanda Slot Terkunci Superuser
+                lockedBySuperuser: false // Penanda Slot Terkunci
             });
             const [modalError, setModalError] = useState("");
 
             const tableContainerRef = useRef(null);
             const tableElementRef = useRef(null);
             const printAreaRef = useRef(null);
+
+            // Pengisytiharan pembolehubah semakan Slot Superuser yang stabil di komponen induk
+            const isSlotSuperuserLocked = userRole === 'admin' && editingEvent && editingEvent.lockedBySuperuser;
 
             // --- 2. STRUCTURE CONSTANTS ---
             const timeSlots = ['8.00 - 9.00', '9.00 - 10.00', '10.00 - 10.30', '10.30 - 11.30', '11.30 - 12.30', '12.30 - 1.00', '1.00 - 2.00', '2.00 - 3.00', '3.00 - 4.00', '4.00 - 5.00'];
@@ -588,7 +591,8 @@
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true; 
                 if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true; 
-                if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx);
+                // Rehat Jumaat dialihkan ke jam 11.30 - 2.00 petang (Indeks 4, 5, 6)
+                if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx); 
                 return false;
             };
 
@@ -617,20 +621,17 @@
 
                 const finalCode = (formData.type === 'Lain-lain' || formData.type === 'Taklimat' || formData.type === 'Penyediaan' || formData.type === 'IL') ? 'Lain-Lain' : formData.courseCode;
                 
-                // Halang Admin ubah durasi jika dikunci SU
-                const isSlotSuperuserLocked = userRole === 'admin' && editingEvent && editingEvent.lockedBySuperuser;
-                
                 if (userRole === 'admin' && formData.type !== 'Lain-lain' && formData.type !== 'Taklimat' && formData.type !== 'Penyediaan' && formData.type !== 'IL') {
                     let currentCount = getCourseSemesterCount(finalCode);
                     if (editingEvent && editingEvent.courseCode === finalCode) {
                         currentCount -= (parseInt(editingEvent.duration) || 1); 
                     }
-                    // Jika SU lock, kekalkan duration sedia ada
-                    const newDuration = isSlotSuperuserLocked ? parseInt(editingEvent.duration) : (parseInt(formData.duration) || 1);
+                    // Jika SU lock, kekalkan duration sedia ada untuk penilaian had agihan
+                    const newDuration = isSlotSuperuserLocked && editingEvent ? parseInt(editingEvent.duration) : (parseInt(formData.duration) || 1);
                     const limit = courseLimits[finalCode] || 999;
                     
-                    // PEMBETULAN KHAS: Hanya sekat jika Admin menambah durasi slot baru melebihi limit. Jika mengemaskini nama/topik pada slot sedia ada, TIDAK DISEKAT walaupun melebihi limit.
                     const isExceedingLimit = (currentCount + newDuration) > limit;
+                    // Hanya paparkan ralat jika pengajar MENAMBAH durasi baru melebihi limit. Mengedit nama/topik pada durasi sama adalah dibenarkan (Bypass).
                     const isIncreasingDuration = !editingEvent || editingEvent.courseCode !== finalCode || newDuration > (parseInt(editingEvent.duration) || 1);
 
                     if (isExceedingLimit && isIncreasingDuration) {
@@ -648,9 +649,8 @@
                         const exStart = parseInt(ev.timeSlotIndex);
                         const exEnd = exStart + parseInt(ev.duration) - 1;
                         const newStart = parseInt(formData.timeSlotIndex);
-                        // Guna tempoh asal jika locked by SU
-                        const effectiveDuration = isSlotSuperuserLocked && editingEvent ? editingEvent.duration : formData.duration;
-                        const newEnd = newStart + parseInt(effectiveDuration) - 1;
+                        const effectiveDuration = isSlotSuperuserLocked && editingEvent ? parseInt(editingEvent.duration) : parseInt(formData.duration);
+                        const newEnd = newStart + effectiveDuration - 1;
 
                         return (newStart <= exEnd && newEnd >= exStart);
                     });
@@ -662,15 +662,18 @@
                 }
                 
                 const key = `${academicSession}-${selectedWeek}-${formData.day}-${formData.semester}-${formData.timeSlotIndex}`;
-                const currentUserSavedName = sessionStorage.getItem('tmp_user_name') || 'Admin / Pengajar';
+                const currentUserSavedName = safeStorage.getItem('tmp_user_name') || 'Admin / Pengajar';
                 
+                // MENGUNCI MEDAN TERAS UNTUK ADMIN JIKA SLOT DIMILIKI OLEH SUPERUSER
+                const finalCodeToSave = isSlotSuperuserLocked && editingEvent ? editingEvent.courseCode : (finalCode || '');
+                const finalDurationToSave = isSlotSuperuserLocked && editingEvent ? parseInt(editingEvent.duration) : (parseInt(formData.duration) || 1);
+
                 const dataToSave = {
                     id: formData.id || Math.random().toString(36).substr(2, 9),
                     day: formData.day,
                     timeSlotIndex: formData.timeSlotIndex,
-                    // Kekalkan core data kursus dan masa jika admin & SU Lock aktif
-                    courseCode: isSlotSuperuserLocked ? editingEvent.courseCode : (finalCode || ''),
-                    duration: isSlotSuperuserLocked ? editingEvent.duration : (parseInt(formData.duration) || 1),
+                    courseCode: finalCodeToSave,
+                    duration: finalDurationToSave,
                     topic: formData.topic || '',
                     type: formData.type || 'Kuliah',
                     instructor: formData.instructor || '',
@@ -711,7 +714,7 @@
                 if (e) e.preventDefault();
                 if (userRole === 'viewer') return;
                 
-                // Halang Admin daripada delete jika dikunci oleh SU
+                // Halang Admin daripada memadam slot yang dikunci oleh SU
                 if (userRole === 'admin' && editingEvent && editingEvent.lockedBySuperuser) {
                     setModalError("Anda tidak dibenarkan memadam slot ini kerana ia dikunci oleh Superuser.");
                     return;
@@ -825,8 +828,8 @@
                 container.style.overflow = 'visible';
                 container.style.maxHeight = 'none';
                 container.style.border = 'none';
-
-                // Tambah pemisah halaman khas (Page Break) untuk html2pdf
+                
+                // Menunjukkan elemen html2pdf__page-break khas hanya semasa penjanaan PDF
                 const footerElements = element.querySelectorAll('.html2pdf__page-break');
                 footerElements.forEach(el => { el.style.display = 'block'; });
 
@@ -856,6 +859,7 @@
                     noPrintElements.forEach((el, index) => {
                         el.style.display = originalDisplays[index];
                     });
+                    
                     footerElements.forEach(el => { el.style.display = 'none'; });
                 });
             };
@@ -1004,7 +1008,7 @@
                 // Halang Admin jika Minggu telah dikunci oleh Superuser
                 const isCurrentWeekLocked = weekLocks[`${academicCycle}-${selectedWeek}`];
                 if (userRole === 'admin' && isCurrentWeekLocked) {
-                    return; // Jangan buka modal jika minggu dikunci
+                    return; // Halang buka modal jika minggu tersebut dikunci
                 }
 
                 const canEdit = userRole === 'superuser' || (userRole === 'admin' && !isTimetableLocked);
@@ -1028,6 +1032,15 @@
                     setEditingEvent(null);
                 }
                 setIsModalOpen(true);
+            };
+
+            const handleLogout = () => {
+                safeStorage.clear();
+                safeStorage.localClear();
+                if (window.TMP_DB) window.TMP_DB.signOut(window.TMP_DB.auth).catch(() => {});
+                setIsAuthorized(false);
+                setUserRole(null);
+                window.location.reload(); 
             };
 
             if (!isAuthorized) {
@@ -1610,6 +1623,7 @@
                     {}
                     {/* MODAL EDITOR KEMAS KINI SLOT */}
                     {isModalOpen && (() => {
+                        // Memastikan penentuan Kunci Superuser dinilai di luar skop untuk kestabilan maksimum React
                         const isSlotSuperuserLocked = userRole === 'admin' && editingEvent && editingEvent.lockedBySuperuser;
 
                         return (
@@ -1809,7 +1823,7 @@
                                     </div>
                                     <div className="p-10 bg-slate-50 border-t-2 flex gap-4">
                                         <button onClick={(e) => { e.preventDefault(); setFormData(p => ({...p, topic: '', instructor: '', benchTutors: '', sessionNumber: ''}))}} className="flex-1 py-5 bg-white text-slate-600 text-xs font-black rounded-2xl border-2 active:scale-90 transition-all uppercase tracking-widest"><Icons.Undo /> Undo</button>
-                                        {/* Butang DELETE: Dihilangkan jika Admin dan Slot dikunci Superuser */}
+                                        {/* Butang DELETE: Dihilangkan jika Admin cuba memadam Slot Khas Superuser */}
                                         {editingEvent && !isSlotSuperuserLocked && ( <button onClick={handleDelete} className="p-5 bg-white text-red-600 border-2 border-red-100 rounded-2xl hover:bg-red-600 hover:text-white transition-all"><Icons.Trash /></button> )}
                                         <button onClick={handleSave} className="flex-[3] py-5 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 shadow-xl uppercase tracking-widest transition-all flex items-center justify-center gap-2"> <Icons.Save /> Simpan Rekod </button>
                                     </div>
