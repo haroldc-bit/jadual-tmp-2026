@@ -35,12 +35,14 @@
             body { background: white !important; padding: 0; margin: 0; font-family: 'Times New Roman', serif; color: black !important; }
             main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
             .freeze-container { overflow: visible !important; max-height: none !important; border: none !important; display: block !important; width: 100% !important; }
-            table { width: 100% !important; min-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: 2px solid black !important; }
+            table { width: 100% !important; min-width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; border: 2px solid black !important; }
             th, td { border: 1px solid black !important; background: white !important; color: black !important; padding: 4px 2px !important; }
             .rounded-3xl, .rounded-[3.5rem], .rounded-2xl { border-radius: 0 !important; }
             input, select, textarea { border: none !important; background: transparent !important; color: black !important; appearance: none; }
             thead, .table-to-scroll thead th { position: static !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            /* Memastikan Page Break HTML2PDF berfungsi dengan Native Print */
+            .html2pdf__page-break { page-break-before: always !important; break-before: page !important; }
         }
         
         .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); display: inline-block; }
@@ -73,7 +75,8 @@
         .week-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .week-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        table { border-collapse: collapse !important; border: 2px solid black !important; }
+        /* Penstabilan sempadan hitam penuh 1px seragam dengan table-layout auto */
+        table { border-collapse: collapse !important; border: 2px solid black !important; table-layout: auto !important; }
         th, td { border: 1px solid black !important; }
 
         .table-to-scroll thead th { 
@@ -84,8 +87,8 @@
             box-shadow: inset 0 -2px 0 #000; 
         }
         
+        /* Pengaktifan skrol native pelayar web sahaja */
         .freeze-container { 
-            border: 2px solid black; 
             background: white; 
             overflow: visible !important; 
             max-height: none !important;
@@ -483,7 +486,7 @@
                 isBooked: false,
                 bookedCourse: '',
                 bookedPurpose: 'Amali',
-                lockedBySuperuser: false // Penanda Slot Terkunci
+                lockedBySuperuser: false // Penanda Slot Terkunci Superuser
             });
             const [modalError, setModalError] = useState("");
 
@@ -582,12 +585,11 @@
                 }
             }, []);
 
-            // Penentuan kedudukan slot waktu rehat secara konsisten pada Isnin-Khamis dan Jumaat
             const isSlotBreak = (day, slotIdx) => {
                 const slot = timeSlots[slotIdx];
                 if (slot === '10.00 - 10.30') return true; 
                 if (day !== 'Jumaat' && slot === '1.00 - 2.00') return true; 
-                if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx); // Rehat Jumaat dialihkan ke jam 11.30 - 2.00 (SlotIdx 4, 5, 6)
+                if (day === 'Jumaat') return [4, 5, 6].includes(slotIdx);
                 return false;
             };
 
@@ -662,7 +664,7 @@
                     id: formData.id || Math.random().toString(36).substr(2, 9),
                     day: formData.day,
                     timeSlotIndex: formData.timeSlotIndex,
-                    // Kekalkan core data jika admin & SU Lock aktif
+                    // Kekalkan core data kursus dan masa jika admin & SU Lock aktif
                     courseCode: isSlotSuperuserLocked ? editingEvent.courseCode : (finalCode || ''),
                     duration: isSlotSuperuserLocked ? editingEvent.duration : (parseInt(formData.duration) || 1),
                     topic: formData.topic || '',
@@ -820,6 +822,10 @@
                 container.style.maxHeight = 'none';
                 container.style.border = 'none';
 
+                // Tambah pemisah halaman khas (Page Break) untuk html2pdf
+                const footerElements = element.querySelectorAll('.html2pdf__page-break');
+                footerElements.forEach(el => { el.style.display = 'block'; });
+
                 const opt = {
                     margin: [0.3, 0.3, 0.3, 0.3], 
                     filename: `JWM_TMP_Minggu_${selectedWeek}_Versi_${academicCycle}.pdf`,
@@ -846,6 +852,7 @@
                     noPrintElements.forEach((el, index) => {
                         el.style.display = originalDisplays[index];
                     });
+                    footerElements.forEach(el => { el.style.display = 'none'; });
                 });
             };
 
@@ -1219,7 +1226,6 @@
                         </div>
                     </nav>
 
-                    {}
                     {/* Main Timetable Content */}
                     <main ref={printAreaRef} className="max-w-[99%] mx-auto p-4 md:p-8 print:p-0">
                         <div className="relative mb-6 text-center border-b-2 border-black pb-4 text-black">
@@ -1458,9 +1464,11 @@
                                 </table>
                             </div>
                             
-                            {}
-                            {/* PEMBAIKAN KHUSUS MUKTAMAD: Memindahkan zon tandatangan ke bahagian bawah, terpisah sepenuhnya dari kontena jadual bagi menghalang sebarang ralat garis hitam */}
-                            <div className="mt-8 pt-8 border-t-2 border-black flex justify-between items-start font-bold text-[11px] bg-white w-full print:break-before-page print:border-t-0 print:pt-4">
+                            {/* PEMBAIKAN KHUSUS MUKTAMAD (PDF PAGE BREAK): 
+                                - html2pdf__page-break akan menolak elemen footer ini ke muka surat seterusnya apabila butang CETAK/PDF ditekan
+                            */}
+                            <div className="html2pdf__page-break" style={{ display: 'none' }}></div>
+                            <div className="mt-8 pt-8 border-t-2 border-black flex justify-between items-start font-bold text-[11px] bg-white w-full print:border-t-0 print:pt-4">
                                 
                                 {/* KIRI SEKALI: DISEDIAKAN OLEH */}
                                 <div className="space-y-4 w-[45%] text-left">
@@ -1601,7 +1609,6 @@
                         </div>
                     </main>
 
-                    {}
                     {/* MODAL EDITOR KEMAS KINI SLOT */}
                     {isModalOpen && (() => {
                         const isSlotSuperuserLocked = userRole === 'admin' && editingEvent && editingEvent.lockedBySuperuser;
@@ -1619,7 +1626,7 @@
                                         {/* Amaran khas kepada Pengajar jika Slot ini dilindungi Superuser */}
                                         {isSlotSuperuserLocked && (
                                             <div className="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-200 text-yellow-800 text-xs font-bold flex items-center gap-3">
-                                                <span>🔒</span> Slot ini dilindungi oleh Superuser. Anda hanya boleh mengedit Sesi, Tajuk, Nama Pengajar dan Tutor. Kod Kursus dan Padam Slot tidak dibenarkan.
+                                                <span>🔒</span> Slot ini dilindungi oleh Superuser. Anda bebas mengedit Tajuk, Sesi, dan Pengajar. Kod Kursus dan Padam Slot tidak dibenarkan.
                                             </div>
                                         )}
 
@@ -1728,7 +1735,7 @@
                                                             <label className="text-[10px] font-black text-rose-700 uppercase">Tujuan Tempahan</label>
                                                             <select 
                                                                 value={formData.bookedPurpose || 'Amali'} 
-                                                                onChange={(e) => setFormData({...formData, bookedPurpose: e.target.value})} 
+                                                            onChange={(e) => setFormData({...formData, bookedPurpose: e.target.value})} 
                                                                 className="w-full p-2 bg-white border border-rose-300 rounded-xl font-bold text-xs"
                                                             >
                                                                 <option value="Amali">Amali</option>
@@ -1812,7 +1819,6 @@
                         );
                     })()}
 
-                    {}
                     {/* DASHBOARD ANALITIK MODAL */}
                     {isDashboardOpen && (
                         <div className="fixed inset-0 z-[700] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print animate-in fade-in text-black">
